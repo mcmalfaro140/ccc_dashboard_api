@@ -25,6 +25,6 @@ public class HomeController {
         logger.trace("A message for more detailed debugging");
         MDC.remove("testKey");
         */
-        return "Hello World in Spring Boot";
+        return "Hello World in Spring Boot xxx";
     }
 }
