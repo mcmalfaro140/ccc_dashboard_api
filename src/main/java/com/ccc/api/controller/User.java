@@ -26,9 +26,9 @@ public class User implements Serializable {
 	@NotNull
 	@Column(name="Email")
 	private String email;
-	@Column(name="Dashboard", columnDefinition="json")
-	@Convert(attributeName="Dashboard", converter=JsonConverter.class)
-	private Map<String, Object> dashboard;
+	//@Column(name="Dashboard", columnDefinition="json")
+	//@Convert(attributeName="Dashboard", converter=JsonConverter.class)
+	//private Map<String, Object> dashboard;
 	
 	public User() {
 	}
