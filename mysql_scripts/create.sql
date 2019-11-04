@@ -3,11 +3,11 @@ CREATE DATABASE IF NOT EXISTS db;
 USE db;
 
 CREATE TABLE IF NOT EXISTS Users (
-	UserId INT NOT NULL AUTO_INCREMENT,
+	Id INT NOT NULL AUTO_INCREMENT,
 	Username VARCHAR(255) NOT NULL,
 	Email VARCHAR(255) NOT NULL,
 	Dashboard JSON,
-	PRIMARY KEY (UserId)
+	PRIMARY KEY (Id)
 );
 
 INSERT INTO Users (Username, Email, Dashboard) VALUES ("AlexHorejsi", "alex.horejsi59@gmail.com", NULL);
