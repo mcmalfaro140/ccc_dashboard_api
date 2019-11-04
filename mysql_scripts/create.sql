@@ -3,12 +3,20 @@ CREATE DATABASE IF NOT EXISTS db;
 USE db;
 
 CREATE TABLE IF NOT EXISTS Users (
+<<<<<<< HEAD
 	UserId INT NOT NULL AUTO_INCREMENT,
 	Username text NOT NULL,
     Password text NOT NULL,
 	Email text NOT NULL,
 	Dashboard longtext NOT NULL,
 	PRIMARY KEY (UserId)
+=======
+	Id INT NOT NULL AUTO_INCREMENT,
+	Username VARCHAR(255) NOT NULL,
+	Email VARCHAR(255) NOT NULL,
+	Dashboard JSON,
+	PRIMARY KEY (Id)
+>>>>>>> Figured out how to access all data fields in database except JSON data
 );
 
 
