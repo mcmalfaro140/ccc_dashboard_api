@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS db;
 CREATE DATABASE db;
 USE db;
 
+<<<<<<< HEAD
 CREATE TABLE Users (
 	UserId INT NOT NULL AUTO_INCREMENT,
 	Username VARCHAR(50) NOT NULL,
@@ -92,6 +93,14 @@ CREATE TABLE XRefLogAlarmSNSTopic (
 	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId),
 	FOREIGN KEY (SNSTopicId) REFERENCES SNSTopics(SNSTopicId),
 	UNIQUE (LogAlarmId, SNSTopicId)
+=======
+CREATE TABLE IF NOT EXISTS Users (
+	Id INT NOT NULL AUTO_INCREMENT,
+	Username VARCHAR(255) NOT NULL,
+	Email VARCHAR(255) NOT NULL,
+	Dashboard JSON,
+	PRIMARY KEY (Id)
+>>>>>>> Figured out how to access all data fields in database except JSON data
 );
 
 INSERT INTO Users (Username, Email, Dashboard) VALUES ("AlexHorejsi", "alex.horejsi59@gmail.com", NULL);
