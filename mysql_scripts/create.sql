@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS Users (
 	PRIMARY KEY (Id)
 );
 
-INSERT INTO Users (Username, Email, Dashboard) VALUES ("AlexHorejsi", "alex.horejsi59@gmail.com", NULL);
-INSERT INTO Users (Username, Email, Dashboard) VALUES ("MisaelCorvera", "mcmalfaro140@gmail.com", NULL);
-INSERT INTO Users (Username, Email, Dashboard) VALUES ("YiWang", "superhotdogzz@gmail.com", NULL);
-INSERT INTO Users (Username, Email, Dashboard) VALUES ("ZacYou", "zacyou151@yahoo.com", NULL);
-INSERT INTO Users (Username, Email, Dashboard) VALUES ("JatDida", "didajateni@gmail.com", NULL);
+INSERT INTO user (user_id, Username, Email, Dashboard) VALUES (1,"AlexHorejsi", "alex.horejsi59@gmail.com", NULL);
+INSERT INTO user (user_id,Username, Email, Dashboard) VALUES (2,"MisaelCorvera", "mcmalfaro140@gmail.com", NULL);
+INSERT INTO user (user_id,Username, Email, Dashboard) VALUES (3,"YiWang", "superhotdogzz@gmail.com", NULL);
+INSERT INTO user (user_id,Username, Email, Dashboard) VALUES (4,"ZacYou", "zacyou151@yahoo.com", NULL);
+INSERT INTO user (user_id,Username, Email, Dashboard) VALUES (5,"JatDida", "didajateni@gmail.com", NULL);
