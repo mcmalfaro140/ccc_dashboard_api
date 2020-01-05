@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ccc.api.model.Users;
 import com.ccc.api.model.dao.UsersDao;
@@ -38,25 +42,23 @@ public class HomeController {
         return "Hello World in Spring Boot misael";
     }
     
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @CrossOrigin(origins = "http://localhost:3000")
+    @RequestMapping(path = "/login", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public String getFoosBySimplePath(@RequestHeader Map<String, String> headers) {
-    	Boolean[] arr = {false}; 
-    	String[] user = {""};
-    	headers.forEach((key, value) -> {
-    		if(key.equals("user")) {
-    			user[0] = value;
-    		}
-        });
+    public HashMap<String, Object>  getFoosBySimplePath(@RequestBody Map<String, String> payload) {
+    	String userName = "misael";
+    	String pass = "test";
+    	HashMap<String, Object> response = new HashMap<>();
+    	String testUser = payload.get("username");
+    	String testPass = payload.get("password");
     	
-    	return "User found return true you are "+ user[0];
+    	if(testUser.equals(userName) && testPass.equals(pass)) {
+    		response.put("User", userName);
+		    response.put("Dashboard", "none");
+    	}else {
+    		response.put("error", "Username or password is incorrect");
+    	}
     	
-//    	if(arr[0]) {
-//    		return "User found return true you are "+ user[0];
-//    	}else {
-//    		return "User NOT found return true";
-//    	}
-    	
-        
+    	return response;
     }
 }
