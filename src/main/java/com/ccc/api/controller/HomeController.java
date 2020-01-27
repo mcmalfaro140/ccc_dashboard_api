@@ -70,42 +70,8 @@ public class HomeController {
     	}else {
     	response.put("error", "user not found");
     	}
-    	
-    	/*if(testUser.equals(userName) && testPass.equals(pass)) {
-    		response.put("id", "1");
-    		response.put("username", userName);
-    		response.put("firstName", "Misael");
-    		response.put("lastName", "Corvera");
-    		response.put("role", "Admin");
-    		response.put("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDb2RlcnRoZW1lIiwiaWF0IjoxNTU1NjgyNTc1LCJleHAiOjE1ODcyMTg1NzUsImF1ZCI6ImNvZGVydGhlbWVzLmNvbSIsInN1YiI6InRlc3QiLCJmaXJzdG5hbWUiOiJIeXBlciIsImxhc3RuYW1lIjoiVGVzdCIsIkVtYWlsIjoidGVzdEBoeXBlci5jb2RlcnRoZW1lcy5jb20iLCJSb2xlIjoiQWRtaW4ifQ.8qHJDbs5nw4FBTr3F8Xc1NJYOMSJmGnRma7pji0YwB4");
-		    response.put("Dashboard", "[{\"objectType\":\"graph\",\"graphSettings\":{\"type\":\"line\",\"realTime\":\"false\",\"metricName\":\"CPUUtilization\",\"nameSpace\":\"AWS/EC2\",\"chartName\":\"Test\",\"instanceId\":\"i-01e27ec0da2c4d296\",\"refreshRate\":\"\",\"period\":180},\"coordinates\":{\"x\":0,\"y\":1,\"w\":20,\"h\":19,\"minW\":6,\"minH\":9}}]");
-    	}else {
-    		response.put("error", "Username or password is incorrect");
-    	}*/
-    	
+
     	return response;
     }
     
-    @RequestMapping(value ="/check/{username}")
-	public @ResponseBody Users search (@PathVariable("username") String username) {
-		Users target = usersRepository.findByUsername(username);
-		return target;
-	}
-    
-    @RequestMapping(value ="/mocksearch/{username}")
-	public @ResponseBody HashMap<String, Object> search2 (@PathVariable("username") String username) {
-		Users target = usersRepository.findByUsername(username);
-    	HashMap<String, Object> response = new HashMap<>();
-    	if(target != null) {
-    	response.put("id",target.getUserId().toString());
-    	response.put("username", target.getUsername());
-    	response.put("password", target.getPassword());
-    	response.put("role", "admin");
-    	response.put("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDb2RlcnRoZW1lIiwiaWF0IjoxNTU1NjgyNTc1LCJleHAiOjE1ODcyMTg1NzUsImF1ZCI6ImNvZGVydGhlbWVzLmNvbSIsInN1YiI6InRlc3QiLCJmaXJzdG5hbWUiOiJIeXBlciIsImxhc3RuYW1lIjoiVGVzdCIsIkVtYWlsIjoidGVzdEBoeXBlci5jb2RlcnRoZW1lcy5jb20iLCJSb2xlIjoiQWRtaW4ifQ.8qHJDbs5nw4FBTr3F8Xc1NJYOMSJmGnRma7pji0YwB4");
-	    response.put("Dashboard", "[{\"objectType\":\"graph\",\"graphSettings\":{\"type\":\"line\",\"realTime\":\"false\",\"metricName\":\"CPUUtilization\",\"nameSpace\":\"AWS/EC2\",\"chartName\":\"Test\",\"instanceId\":\"i-01e27ec0da2c4d296\",\"refreshRate\":\"\",\"period\":180},\"coordinates\":{\"x\":0,\"y\":1,\"w\":20,\"h\":19,\"minW\":6,\"minH\":9}}]");
-    	}else {
-	    	response.put("error", "user not found");
-	    }
-		return response;
-    }
 }
