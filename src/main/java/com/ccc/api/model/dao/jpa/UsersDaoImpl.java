@@ -17,8 +17,8 @@ public class UsersDaoImpl implements UsersDao{
     private EntityManager entityManager;
 
     @Override
-    public Users getUsers(Integer userId) {
-        return entityManager.find(Users.class, userId);
+    public Users getUsers(Integer userid) {
+        return entityManager.find(Users.class, userid);
     }
 
     @Override
