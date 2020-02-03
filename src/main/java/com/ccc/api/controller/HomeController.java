@@ -19,6 +19,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ccc.api.model.Users;
@@ -60,9 +61,10 @@ public class HomeController {
     		{
     			response.put("id",target.getUserId().toString());
     	    	response.put("username", target.getUsername());
+    	    	response.put("Dashboard", target.getDashboard());
     	    	response.put("role", "admin");
     	    	response.put("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDb2RlcnRoZW1lIiwiaWF0IjoxNTU1NjgyNTc1LCJleHAiOjE1ODcyMTg1NzUsImF1ZCI6ImNvZGVydGhlbWVzLmNvbSIsInN1YiI6InRlc3QiLCJmaXJzdG5hbWUiOiJIeXBlciIsImxhc3RuYW1lIjoiVGVzdCIsIkVtYWlsIjoidGVzdEBoeXBlci5jb2RlcnRoZW1lcy5jb20iLCJSb2xlIjoiQWRtaW4ifQ.8qHJDbs5nw4FBTr3F8Xc1NJYOMSJmGnRma7pji0YwB4");
-    		    response.put("Dashboard", "[{\"objectType\":\"graph\",\"graphSettings\":{\"type\":\"line\",\"realTime\":\"false\",\"metricName\":\"CPUUtilization\",\"nameSpace\":\"AWS/EC2\",\"chartName\":\"Test\",\"instanceId\":\"i-01e27ec0da2c4d296\",\"refreshRate\":\"\",\"period\":180},\"coordinates\":{\"x\":0,\"y\":1,\"w\":20,\"h\":19,\"minW\":6,\"minH\":9}}]");
+    		    //response.put("Dashboard", "[{\"objectType\":\"graph\",\"graphSettings\":{\"type\":\"line\",\"realTime\":\"false\",\"metricName\":\"CPUUtilization\",\"nameSpace\":\"AWS/EC2\",\"chartName\":\"Test\",\"instanceId\":\"i-01e27ec0da2c4d296\",\"refreshRate\":\"\",\"period\":180},\"coordinates\":{\"x\":0,\"y\":1,\"w\":20,\"h\":19,\"minW\":6,\"minH\":9}}]");
     		}
     		else {
     			response.put("error","wrong password");
@@ -70,8 +72,32 @@ public class HomeController {
     	}else {
     	response.put("error", "user not found");
     	}
+    	
 
     	return response;
+    }
+    
+    
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PutMapping(path = "/update")
+    @ResponseBody
+    public HashMap <String, Object> updatemap(@RequestBody Map<String, String> payload)
+    {
+    	HashMap<String, Object> response = new HashMap<>();
+    	String inUser = payload.get("username");
+    	String dashBoard = payload.get("dashboard");
+    	Users target = usersRepository.findByUsername(inUser);
+    	
+    	if(target != null)
+    	{
+    		target.setDashboard(dashBoard);
+        	usersRepository.save(target);
+    	}
+    	else {
+    		response.put("error", "user not found");
+    	}
+		return response;
+    	
     }
     
 }
