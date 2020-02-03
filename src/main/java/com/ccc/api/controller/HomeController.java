@@ -79,7 +79,7 @@ public class HomeController {
     
     
     @CrossOrigin(origins = "http://localhost:3000")
-    @PutMapping(path = "/update")
+    @PutMapping(path = "/update", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap <String, Object> updatemap(@RequestBody Map<String, String> payload)
     {
