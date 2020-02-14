@@ -81,5 +81,27 @@ public class HomeController {
     	return new ResponseEntity<HashMap<String, Object>> (response,HttpStatus.OK);
     }
     
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PutMapping(path = "/update", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public HashMap <String, Object> updatemap(@RequestBody Map<String, String> payload)
+    {
+    	HashMap<String, Object> response = new HashMap<>();
+    	String inUser = payload.get("username");
+    	String dashBoard = payload.get("dashboard");
+    	Users target = usersRepository.findByUsername(inUser);
+    	
+    	if(target != null)
+    	{
+    		target.setDashboard(dashBoard);
+        	usersRepository.save(target);
+    	}
+    	else {
+    		response.put("error", "user not found");
+    	}
+		return response;
+    	
+    }
+    
     
 }
