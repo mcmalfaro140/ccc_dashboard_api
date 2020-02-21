@@ -62,6 +62,7 @@ public class HomeController {
     	{
     		if(inPass.contentEquals(target.getPassword()))
     		{
+    			//JWT
     			response.put("id",target.getUserId().toString());
     	    	response.put("username", target.getUsername());
     	    	response.put("dashboard", target.getDashboard());
