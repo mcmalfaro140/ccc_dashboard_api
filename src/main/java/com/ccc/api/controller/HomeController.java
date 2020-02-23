@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ccc.api.model.Users;
@@ -59,6 +62,7 @@ public class HomeController {
     	{
     		if(inPass.contentEquals(target.getPassword()))
     		{
+    			//JWT
     			response.put("id",target.getUserId().toString());
     	    	response.put("username", target.getUsername());
     	    	response.put("dashboard", target.getDashboard());
@@ -74,4 +78,28 @@ public class HomeController {
     	
     }
     
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PutMapping(path = "/update", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public HashMap <String, Object> updatemap(@RequestBody Map<String, String> payload)
+    {
+    	HashMap<String, Object> response = new HashMap<>();
+    	String inUser = payload.get("username");
+    	String dashBoard = payload.get("dashboard");
+    	Users target = usersRepository.findByUsername(inUser);
+    	
+    	if(target != null)
+    	{
+    		target.setDashboard(dashBoard);
+        	usersRepository.save(target);
+    	}
+    	else {
+    		response.put("error", "user not found");
+    	}
+		return response;
+    	
+    }
+    
+    
 }
+

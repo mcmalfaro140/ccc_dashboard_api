@@ -34,7 +34,9 @@ public class Users implements Serializable {
 	    @NotNull
 		@Column(name="Email")
 	    private String email;
-
+	    
+	    @NotNull
+	    @Column(name="Dashboard")
 	    private String dashboard;
 	    
 	    public Users() {
@@ -58,7 +60,15 @@ public class Users implements Serializable {
 			this.password=password;
 			this.email=email;
 		}
-
+		
+		public Users (int id, String username, String password, String email, String dashboard)
+		{
+			this.userid = id;
+			this.username=username;
+			this.password=password;
+			this.email=email;
+			this.dashboard=dashboard;
+		}
 	    
 	    public Integer getUserId() {
 	        return userid;

@@ -14,4 +14,6 @@ import com.ccc.api.model.Users;
 public interface UsersRepository extends JpaRepository<Users, Integer>,QueryByExampleExecutor<Users>  {
 	@Query("select u from Users u where u.username = :username")
 	  Users findByUsername(@Param("username") String username);
+	
 	}
+
