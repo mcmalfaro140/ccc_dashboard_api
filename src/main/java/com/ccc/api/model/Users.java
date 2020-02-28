@@ -122,7 +122,7 @@ public class Users implements Serializable {
 	        claims.put("userid", userid);
 	        claims.put("Username", username);
 	        claims.put("Email", email);
-	        claims.put("username", username);
+//	        claims.put("username", username);
 //	        claims.put("local", local);
 //	        claims.put("cin", cin);
 //	        claims.put("department", department);
