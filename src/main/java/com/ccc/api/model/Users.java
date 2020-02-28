@@ -12,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 @Entity
 @Table(name = "Users")
@@ -114,4 +116,35 @@ public class Users implements Serializable {
 		public String toString() {
 			return String.format("User{Id='%d', Username='%s', Email='%s'}", this.userid, this.username, this.email);
 		}
+	    
+	    public Claims toClaims() {
+	        Claims claims = Jwts.claims();
+	        claims.put("userid", userid);
+	        claims.put("Username", username);
+	        claims.put("Email", email);
+//	        claims.put("username", username);
+//	        claims.put("local", local);
+//	        claims.put("cin", cin);
+//	        claims.put("department", department);
+//	        claims.put("position", position.name());
+//	        claims.put("isAdministrator", isAdministrator);
+//	        claims.put("isEventOrganizer", isEventOrganizer);
+//	        claims.put("isRewardProvider", isRewardProvider);
+	        return claims;
+	      }
+
+	      public static Users fromClaims(Claims claims) {
+	        Users user = new Users();
+	        user.userid = claims.get("userid", Integer.class);
+	        user.username = claims.get("Username", String.class);
+	        user.email = claims.get("Email", String.class);
+//	        user.local = (boolean) claims.get("local");
+//	        user.cin = claims.get("cin", String.class);
+//	        user.department = claims.get("department", String.class);
+//	        user.position = Position.valueOf(claims.get("position", String.class));
+//	        user.isAdministrator = (boolean) claims.get("isAdministrator");
+//	        user.isEventOrganizer = (boolean) claims.get("isEventOrganizer");
+//	        user.isRewardProvider = (boolean) claims.get("isRewardProvider");
+	        return user;
+	      }
 }
