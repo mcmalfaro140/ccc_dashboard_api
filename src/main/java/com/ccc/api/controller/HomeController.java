@@ -140,12 +140,12 @@ public class HomeController {
 		return response;
     }
     
-    @RequestMapping(path = "/get_dashboard")
+    @RequestMapping(path = "/get_dashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
     public String getdashboard (@RequestHeader("Authorization") String token) {
     	Users toUsers = jwtutils.toUser(token);
     	String inUser = toUsers.getUsername();
-    	System.out.println(inUser);
+//    	System.out.println(inUser);
     	Users target = usersRepository.findByUsername(inUser);
     	return target.getDashboard();
     }
