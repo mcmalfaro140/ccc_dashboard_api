@@ -85,20 +85,17 @@ public class HomeController {
     
     @RequestMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public HashMap<String, Object>  getFoosBySimplePath(@RequestBody Map<String, String> payload) {
+    public HashMap<String , Object>  getFoosBySimplePath(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
     	String inUser = payload.get("username");
     	String inPass = payload.get("password");
-    	String dash = payload.get("dash");
-    	
     	Users target = usersRepository.findByUsername(inUser);
     	if (target != null)
     	{
     		if(inPass.contentEquals(target.getPassword()))
     		{
     			String jws = jwtutils.toToken(target);
-    			System.out.println(jws);
-    	    	response.put("dashboard", target.getDashboard());
+    	    	response.put("username", target.getUsername());
     	    	response.put("token", jws);
     		}
     		else {
@@ -140,14 +137,15 @@ public class HomeController {
 		return response;
     }
     
-    @RequestMapping(path = "/get_dashboard")
+    @RequestMapping(path = "/get_dashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public String getdashboard (@RequestHeader("Authorization") String token) {
+    public HashMap<String,Object> getdashboard (@RequestHeader("Authorization") String token) {
     	Users toUsers = jwtutils.toUser(token);
     	String inUser = toUsers.getUsername();
-    	System.out.println(inUser);
     	Users target = usersRepository.findByUsername(inUser);
-    	return target.getDashboard();
+    	HashMap<String,Object> response = new HashMap<>();
+    	response.put("dashboard", target.getDashboard());
+    	return response;
     }
 }
 
