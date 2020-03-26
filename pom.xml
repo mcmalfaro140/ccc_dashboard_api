@@ -38,7 +38,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-<<<<<<< HEAD
     		<groupId>io.jsonwebtoken</groupId>
     		<artifactId>jjwt-api</artifactId>
     		<version>0.11.0</version>
@@ -62,20 +61,7 @@
 		<dependency>
 		    <groupId>javax.persistence</groupId>
 		    <artifactId>javax.persistence-api</artifactId>
-=======
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-core</artifactId>
-		</dependency>
-		<dependency>
-<<<<<<< HEAD
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-core</artifactId>
-		    <version>2.9.9</version>
->>>>>>> Figured out how to access all data fields in database except JSON data
-=======
-		    <groupId>javax.persistence</groupId>
-		    <artifactId>javax.persistence-api</artifactId>
->>>>>>> Created skeleton for backend
+
 		</dependency>
 	</dependencies>
 
