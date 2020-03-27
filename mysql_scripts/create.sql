@@ -54,6 +54,13 @@ CREATE TABLE LogAlarms (
 	UNIQUE (AlarmName)
 );
 
+CREATE TABLE MetricAlarms (
+	MetricAlarmId INT NOT NULL AUTO_INCREMENT,
+	AlarmArn VARCHAR(100) NOT NULL,
+	PRIMARY KEY (MetricAlarmId),
+	UNIQUE (AlarmArn)
+);
+
 CREATE TABLE XRefUserLogAlarm (
 	UserLogAlarmId INT NOT NULL AUTO_INCREMENT,
 	UserId INT NOT NULL,
@@ -62,6 +69,16 @@ CREATE TABLE XRefUserLogAlarm (
 	FOREIGN KEY (UserId) REFERENCES Users(UserId),
 	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId),
 	UNIQUE (UserId, LogAlarmId)
+);
+
+CREATE TABLE XRefUserMetricAlarm (
+	UserMetricAlarmId INT NOT NULL AUTO_INCREMENT,
+	UserId INT NOT NULL,
+	MetricAlarmId INT NOT NULL,
+	PRIMARY KEY (UserMetricAlarmId)
+	FOREIGN KEY (UserId) REFERENCES Users(UserId),
+	FOREIGN KEY (MetricAlarmId) REFERENCES MetricAlarms(MetricAlarmId),
+	UNIQUE (UserId, MetricAlarmId)
 );
 
 CREATE TABLE XRefLogAlarmLogGroup (
