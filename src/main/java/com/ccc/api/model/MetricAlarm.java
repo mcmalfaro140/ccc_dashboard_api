@@ -17,7 +17,7 @@ public class MetricAlarm implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="MetricAlarmId")
-	private int metricAlarmId;
+	private Integer metricAlarmId;
 	
 	@Column(name="AlarmArn", nullable=false, unique=true)
 	private String alarmArn;
@@ -29,16 +29,20 @@ public class MetricAlarm implements Serializable {
 		this.alarmArn = alarmArn;
 	}
 	
-	public MetricAlarm(int metricAlarmId, String alarmArn) {
+	public MetricAlarm(Integer metricAlarmId, String alarmArn) {
 		this.metricAlarmId = metricAlarmId;
 		this.alarmArn = alarmArn;
 	}
 	
-	public int getMetricAlarmId() {
+	public Integer getMetricAlarmId() {
 		return this.metricAlarmId;
 	}
 	
 	public String getAlarmArn() {
 		return this.alarmArn;
+	}
+	
+	public void setAlarmArn(String alarmArn) {
+		this.alarmArn = alarmArn;
 	}
 }

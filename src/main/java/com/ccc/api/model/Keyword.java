@@ -19,7 +19,7 @@ public class Keyword implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="KeywordId")
-	private int keywordId;
+	private Integer keywordId;
 	
 	@Column(name="Word", unique=true)
 	private String word;
@@ -35,13 +35,13 @@ public class Keyword implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Keyword(int keywordId, String word, List<LogAlarm> logAlarmList) {
+	public Keyword(Integer keywordId, String word, List<LogAlarm> logAlarmList) {
 		this.keywordId = keywordId;
 		this.word = word;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public int getKeywordId() {
+	public Integer getKeywordId() {
 		return this.keywordId;
 	}
 	
@@ -49,7 +49,15 @@ public class Keyword implements Serializable {
 		return this.word;
 	}
 	
+	public void setWord(String word) {
+		this.word = word;
+	}
+	
 	public List<LogAlarm> getLogAlarmList() {
 		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 }

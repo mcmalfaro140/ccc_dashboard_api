@@ -11,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+
 @Entity
 @Table(name="Users")
 public class User implements Serializable {
@@ -19,7 +22,7 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="UserId")
-	private int userId;
+	private Integer userId;
 	
 	@Column(name="Username", nullable=false, unique=true)
 	private String username;
@@ -69,7 +72,7 @@ public class User implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public int getUserId() {
+	public Integer getUserId() {
 		return this.userId;
 	}
 	
@@ -77,19 +80,59 @@ public class User implements Serializable {
 		return this.username;
 	}
 	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
 	public String getPassword() {
 		return this.password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 	public String getEmail() {
 		return this.email;
 	}
 	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
 	public String getDashboard() {
 		return this.dashboard;
 	}
 	
+	public void setDashboard(String dashboard) {
+		this.dashboard = dashboard;
+	}
+	
 	public List<LogAlarm> getLogAlarmList() {
 		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
+	}
+	
+	public Claims toClaims() {
+		Claims claims = Jwts.claims();
+		
+		claims.put("UserId", userId);
+		claims.put("Username", username);
+		claims.put("Email", email);
+		    
+		return claims;
+	}
+
+	public static User fromClaims(Claims claims) {
+		User user = new User();
+		
+		user.userId = claims.get("UserId", Integer.class);
+		user.username = claims.get("Username", String.class);
+		user.email = claims.get("Email", String.class);
+		
+		return user;
 	}
 }

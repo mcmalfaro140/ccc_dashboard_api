@@ -18,7 +18,7 @@ public class LogGroup implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(name="LogGroupId")
-	private int logGroupId;
+	private Integer logGroupId;
 	
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
@@ -34,13 +34,13 @@ public class LogGroup implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public LogGroup(int logGroupId, String name, List<LogAlarm> logAlarmList) {
+	public LogGroup(Integer logGroupId, String name, List<LogAlarm> logAlarmList) {
 		this.logGroupId = logGroupId;
 		this.name = name;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public int getLogGroupId() {
+	public Integer getLogGroupId() {
 		return this.logGroupId;
 	}
 	
@@ -48,7 +48,15 @@ public class LogGroup implements Serializable {
 		return this.name;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public List<LogAlarm> getLogAlarmList() {
 		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 }

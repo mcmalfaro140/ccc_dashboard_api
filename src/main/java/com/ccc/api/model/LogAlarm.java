@@ -20,7 +20,7 @@ public class LogAlarm implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="LogAlarmId")
-	private int logAlarmId;
+	private Integer logAlarmId;
 	
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
@@ -65,7 +65,7 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public LogAlarm(
-			int logAlarmId,
+			Integer logAlarmId,
 			String alarmName,
 			String keywordRelationship,
 			LogLevelCriteria logLevelCriteria,
@@ -84,7 +84,7 @@ public class LogAlarm implements Serializable {
 		this.snsTopicList = snsTopicList;
 	}
 	
-	public int getLogAlarmId() {
+	public Integer getLogAlarmId() {
 		return this.logAlarmId;
 	}
 	
@@ -92,27 +92,55 @@ public class LogAlarm implements Serializable {
 		return this.alarmName;
 	}
 	
+	public void setAlarmName(String alarmName) {
+		this.alarmName = alarmName;
+	}
+	
 	public String getKeywordRelationship() {
 		return this.keywordRelationship;
+	}
+	
+	public void setKeywordRelationship(String keywordRelationship) {
+		this.keywordRelationship = keywordRelationship;
 	}
 	
 	public LogLevelCriteria getLogLevelCriteria() {
 		return this.logLevelCriteria;
 	}
 	
+	public void setLogLevelCriteria(LogLevelCriteria logLevelCriteria) {
+		this.logLevelCriteria = logLevelCriteria;
+	}
+	
 	public List<User> getUserList() {
 		return this.userList;
+	}
+	
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
 	}
 	
 	public List<LogGroup> getLogGroupList() {
 		return this.logGroupList;
 	}
 	
+	public void setLogGroupList(List<LogGroup> logGroupList) {
+		this.logGroupList = logGroupList;
+	}
+	
 	public List<Keyword> getKeywordList() {
 		return this.keywordList;
 	}
 	
+	public void setKeywordList(List<Keyword> keywordList) {
+		this.keywordList = keywordList;
+	}
+	
 	public List<SNSTopic> getSNSTopicList() {
 		return this.snsTopicList;
+	}
+	
+	public void setSNSTopicList(List<SNSTopic> snsTopicList) {
+		this.snsTopicList = snsTopicList;
 	}
 }

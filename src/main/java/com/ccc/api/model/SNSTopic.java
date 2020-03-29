@@ -19,7 +19,7 @@ public class SNSTopic implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="SNSTopicId")
-	private int snsTopicId;
+	private Integer snsTopicId;
 	
 	@Column(name="TopicName", nullable=false, unique=true)
 	private String topicName;
@@ -39,14 +39,14 @@ public class SNSTopic implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public SNSTopic(int snsTopicId, String topicName, String topicArn, List<LogAlarm> logAlarmList) {
+	public SNSTopic(Integer snsTopicId, String topicName, String topicArn, List<LogAlarm> logAlarmList) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public int getSNSTopicId() {
+	public Integer getSNSTopicId() {
 		return this.snsTopicId;
 	}
 	
@@ -54,11 +54,23 @@ public class SNSTopic implements Serializable {
 		return this.topicName;
 	}
 	
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
+	}
+	
 	public String getTopicArn() {
 		return this.topicArn;
 	}
 	
+	public void setTopicArn(String topicArn) {
+		this.topicArn = topicArn;
+	}
+	
 	public List<LogAlarm> getLogAlarmList() {
 		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 }

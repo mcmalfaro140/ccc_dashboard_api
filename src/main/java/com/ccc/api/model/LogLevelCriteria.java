@@ -17,7 +17,7 @@ public class LogLevelCriteria implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="LogLevelCriteriaId")
-	private int logLevelCriteriaId;
+	private Integer logLevelCriteriaId;
 	
 	@Column(name="LogLevel", nullable=false)
 	private String logLevel;
@@ -33,13 +33,13 @@ public class LogLevelCriteria implements Serializable {
 		this.comparison = comparison;
 	}
 	
-	public LogLevelCriteria(int logLevelCriteriaId, String logLevel, String comparison) {
+	public LogLevelCriteria(Integer logLevelCriteriaId, String logLevel, String comparison) {
 		this.logLevelCriteriaId = logLevelCriteriaId;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
 	}
 	
-	public int getLogLevelCriteriaId() {
+	public Integer getLogLevelCriteriaId() {
 		return this.logLevelCriteriaId;
 	}
 	
@@ -47,7 +47,15 @@ public class LogLevelCriteria implements Serializable {
 		return this.logLevel;
 	}
 	
+	public void setLogLevel(String logLevel) {
+		this.logLevel = logLevel;
+	}
+	
 	public String getComparison() {
 		return this.comparison;
+	}
+	
+	public void setComparison(String comparison) {
+		this.comparison = comparison;
 	}
 }
