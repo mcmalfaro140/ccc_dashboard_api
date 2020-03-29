@@ -3,10 +3,14 @@ package com.ccc.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -23,7 +27,22 @@ public class LogGroup implements Serializable {
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
 	
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefLogAlarmLogGroup",
+		joinColumns={
+			@JoinColumn(
+				name="LogGroupId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				nullable=false
+			)
+		}
+	)
 	private List<LogAlarm> logAlarmList;
 	
 	public LogGroup() {

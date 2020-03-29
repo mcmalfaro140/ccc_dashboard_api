@@ -1,12 +1,16 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -25,18 +29,28 @@ public class LogLevelCriteria implements Serializable {
 	@Column(name="Comparison", nullable=false)
 	private String comparison;
 	
+	@OneToMany(
+		mappedBy="logLevelCriteria",
+		fetch=FetchType.LAZY,
+		cascade=CascadeType.ALL,
+		orphanRemoval=true
+	)
+	private List<LogAlarm> logAlarmList;
+	
 	public LogLevelCriteria() {
 	}
 	
-	public LogLevelCriteria(String logLevel, String comparison) {
+	public LogLevelCriteria(String logLevel, String comparison, List<LogAlarm> logAlarmList) {
 		this.logLevel = logLevel;
 		this.comparison = comparison;
+		this.logAlarmList = logAlarmList;
 	}
 	
-	public LogLevelCriteria(Integer logLevelCriteriaId, String logLevel, String comparison) {
+	public LogLevelCriteria(Integer logLevelCriteriaId, String logLevel, String comparison, List<LogAlarm> logAlarmList) {
 		this.logLevelCriteriaId = logLevelCriteriaId;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
+		this.logAlarmList = logAlarmList;
 	}
 	
 	public Integer getLogLevelCriteriaId() {
@@ -57,5 +71,13 @@ public class LogLevelCriteria implements Serializable {
 	
 	public void setComparison(String comparison) {
 		this.comparison = comparison;
+	}
+	
+	public List<LogAlarm> getLogAlarmList() {
+		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 }

@@ -1,4 +1,4 @@
-package com.ccc.api.controller;
+package com.ccc.api.util;
 
 import javax.crypto.SecretKey;
 import io.jsonwebtoken.io.Encoders;

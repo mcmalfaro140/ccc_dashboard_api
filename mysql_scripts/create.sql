@@ -76,7 +76,7 @@ CREATE TABLE XRefUserMetricAlarm (
 	UserMetricAlarmId INT NOT NULL AUTO_INCREMENT,
 	UserId INT NOT NULL,
 	MetricAlarmId INT NOT NULL,
-	PRIMARY KEY (UserMetricAlarmId)
+	PRIMARY KEY (UserMetricAlarmId),
 	FOREIGN KEY (UserId) REFERENCES Users(UserId),
 	FOREIGN KEY (MetricAlarmId) REFERENCES MetricAlarms(MetricAlarmId),
 	UNIQUE (UserId, MetricAlarmId)

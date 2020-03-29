@@ -1,4 +1,4 @@
-package com.ccc.api.controller;
+package com.ccc.api.util;
 
 import java.util.Calendar;
 import javax.crypto.SecretKey;
@@ -19,7 +19,7 @@ import com.ccc.api.model.User;
 @Component
 public class JwtUtils {
 
-  private String issuer = "ccc";
+  /*private String issuer = "ccc";
 
   private SecretKey secretKey;
 
@@ -47,5 +47,5 @@ public class JwtUtils {
     	System.out.println(e);
       return null;
     }
-  }
+  }*/
 }

@@ -3,11 +3,15 @@ package com.ccc.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -24,7 +28,22 @@ public class Keyword implements Serializable {
 	@Column(name="Word", unique=true)
 	private String word;
 	
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefLogAlarmKeyword",
+		joinColumns={
+				@JoinColumn(
+					name="KeywordId",
+					nullable=false
+				)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+					name="LogAlarmId",
+					nullable=false
+			)
+		}
+	)
 	private List<LogAlarm> logAlarmList;
 	
 	public Keyword() {
