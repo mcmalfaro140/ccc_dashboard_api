@@ -1,4 +1,4 @@
-package com.ccc.api.util;
+package com.ccc.api.controller;
 
 
 import java.util.Map;
@@ -31,7 +31,7 @@ public class HomeController {
 	@Autowired
 	private JwtUtils jwtutils;
 	
-	/*@Bean
+	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
@@ -41,14 +41,14 @@ public class HomeController {
 				registry.addMapping("/get_dashboard").allowedOrigins("http://localhost:3000");
 			}
 		};
-	}*/
+	}
 	
 	@RequestMapping("/users")
     public List<User> users(ModelMap models) {
         return userRepo.findAll();
     }
     
-    /*@RequestMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
+    @RequestMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap<String , Object>  getUsersBySimplePath(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
@@ -71,9 +71,9 @@ public class HomeController {
     	}
     	
     	return response;
-    }*/
+    }
     
-    /*@PostMapping(path = "/update", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/update", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap<String, Object> updatemap(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
@@ -99,9 +99,9 @@ public class HomeController {
     	}
     	
 		return response;
-    }*/
+    }
     
-    /*@RequestMapping(path = "/get_dashboard" , produces = "application/json; charset=UTF-8")
+    @RequestMapping(path = "/get_dashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap<String,Object> getdashboard (@RequestHeader("Authorization") String token) {
     	User toUsers = jwtutils.toUser(token);
@@ -112,6 +112,6 @@ public class HomeController {
     	response.put("dashboard", target.getDashboard());
     	
     	return response;
-    }*/
+    }
 }
 
