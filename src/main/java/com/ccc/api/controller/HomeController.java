@@ -68,18 +68,14 @@ public class HomeController {
 				registry.addMapping("/update").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/authenticate").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/get_dashboard").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/getMetricAlarms").allowedOrigins("http://localhost:3000");
 			}
 		};
 	}
-	
-	 @RequestMapping("/Users")
-    public List<Users> users(ModelMap models) {
-        return usersDao.getUsers();
-    }
 
     @RequestMapping("/")
     public String hello() {
-        return "Hello World in Spring Boot misael";
+        return "Hello, BACKEND server for the CCC Dashboard Project";
     }
     
     
@@ -147,5 +143,81 @@ public class HomeController {
     	response.put("dashboard", target.getDashboard());
     	return response;
     }
+    
+    @RequestMapping(path = "/getLogAlarms" , produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public HashMap<String,Object> getLogAlarms (@RequestHeader("Authorization") String token) {
+    	HashMap<String,Object> response = new HashMap<>();
+    	Users user = jwtutils.toUser(token);
+    	if(user != null) {
+    		String user_name = user.getUsername();
+        	
+    		//Find user and get the alarms
+    		//response structure
+    		HashMap<String,Object> alarms = new HashMap<>();
+    		HashMap<String,Object> alarm = new HashMap<>();
+    		HashMap<String,String> alarmDesc = new HashMap<>();
+    		HashMap<String,String> sns = new HashMap<>();
+    		HashMap<String,String> logGroups = new HashMap<>();
+    		
+    		
+    		sns.put("sns", "SNS Topic ");
+			logGroups.put("logGroupName", "Log group name ");
+			
+			alarmDesc.put("name", "My alarm name ");
+			alarmDesc.put("filter", "Logs > WARN");
+			alarmDesc.put("keyword", "");
+			alarmDesc.put("isSubscribed", "false");
+			alarmDesc.put("filter", "Logs > WARN");
+			
+			alarm.put("desc",alarmDesc);
+			alarm.put("sns_topic", sns);
+			alarm.put("log_groups", logGroups);
+			
+			alarms.put("alarm_1",alarm);
+			alarms.put("alarm_2",alarm);
+			alarms.put("alarm_3",alarm);
+			alarms.put("alarm_4",alarm);
+			alarms.put("alarm_5",alarm);
+			alarms.put("alarm_6",alarm);
+    		
+        	response.put("Alarms", alarms);
+    	}else {
+    		HashMap<String,String> error = new HashMap<>();
+    		error.put("message", "Authentication failed. Invalid token.");
+        	response.put("Error", error);
+    	}
+    	return response;
+    }
+    
+    @RequestMapping(path = "/getMetricAlarms" , produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public HashMap<String,Object> getMetricAlarms (@RequestHeader("Authorization") String token) {
+    	
+    	HashMap<String,Object> response = new HashMap<>();
+    	String[] alarmARN = new String[2];
+    	HashMap<String,String[]> arns = new HashMap<>();
+    	
+    	alarmARN[0] = "arn:aws:cloudwatch:us-west-1:155103565385:alarm:Alarm Test 2";
+    	alarmARN[1] = "arn:aws:cloudwatch:us-west-1:155103565385:alarm:CPUUtilization";
+    	
+    	arns.put("alarms_arn",alarmARN);
+    	
+    	Users user = jwtutils.toUser(token);
+    	if(user != null) {
+    		String user_name = user.getUsername();
+    		System.out.print(user_name);
+    		
+    		response.put("data",arns);
+    
+    	}else {
+    		HashMap<String,String> error = new HashMap<>();
+    		error.put("message", "Authentication failed. Invalid token.");
+        	response.put("Error", error);
+    	}
+    	return response;
+    }
+    
+    
 }
 
