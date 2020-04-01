@@ -164,33 +164,33 @@ public class HomeController {
     	return response;
     }
     
-    @RequestMapping(path = "/getMetricAlarms" , produces = "application/json; charset=UTF-8")
-    @ResponseBody
-    public HashMap<String,Object> getMetricAlarms (@RequestHeader("Authorization") String token) {
-    	
-    	HashMap<String,Object> response = new HashMap<>();
-    	String[] alarmARN = new String[2];
-    	HashMap<String,String[]> arns = new HashMap<>();
-    	
-    	alarmARN[0] = "arn:aws:cloudwatch:us-west-1:155103565385:alarm:Alarm Test 2";
-    	alarmARN[1] = "arn:aws:cloudwatch:us-west-1:155103565385:alarm:CPUUtilization";
-    	
-    	arns.put("alarms_arn",alarmARN);
-    	
-    	Users user = jwtutils.toUser(token);
-    	if(user != null) {
-    		String user_name = user.getUsername();
-    		System.out.print(user_name);
-    		
-    		response.put("data",arns);
-    
-    	}else {
-    		HashMap<String,String> error = new HashMap<>();
-    		error.put("message", "Authentication failed. Invalid token.");
-        	response.put("Error", error);
-    	}
-    	return response;
-    }
+//    @RequestMapping(path = "/getMetricAlarms" , produces = "application/json; charset=UTF-8")
+//    @ResponseBody
+//    public HashMap<String,Object> getMetricAlarms (@RequestHeader("Authorization") String token) {
+//    	
+//    	HashMap<String,Object> response = new HashMap<>();
+//    	String[] alarmARN = new String[2];
+//    	HashMap<String,String[]> arns = new HashMap<>();
+//    	
+//    	alarmARN[0] = "arn:aws:cloudwatch:us-west-1:155103565385:alarm:Alarm Test 2";
+//    	alarmARN[1] = "arn:aws:cloudwatch:us-west-1:155103565385:alarm:CPUUtilization";
+//    	
+//    	arns.put("alarms_arn",alarmARN);
+//    	
+//    	Users user = jwtutils.toUser(token);
+//    	if(user != null) {
+//    		String user_name = user.getUsername();
+//    		System.out.print(user_name);
+//    		
+//    		response.put("data",arns);
+//    
+//    	}else {
+//    		HashMap<String,String> error = new HashMap<>();
+//    		error.put("message", "Authentication failed. Invalid token.");
+//        	response.put("Error", error);
+//    	}
+//    	return response;
+//    }
     
     @PostMapping(path = "/addMetricAlarms" , produces = "application/json; charset=UTF-8")
     @ResponseBody
