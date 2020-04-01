@@ -18,7 +18,6 @@ import com.ccc.api.model.User;
 //@Slf4j
 @Component
 public class JwtUtils {
-
   private String issuer = "ccc";
 
   private SecretKey secretKey;

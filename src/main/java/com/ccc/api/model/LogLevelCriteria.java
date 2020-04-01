@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="LogLevelCriteria")
 @Table(name="LogLevelCriteria")
 public class LogLevelCriteria implements Serializable {
 	private static final long serialVersionUID = 3401552680372591857L;
@@ -21,7 +21,7 @@ public class LogLevelCriteria implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="LogLevelCriteriaId")
-	private Integer logLevelCriteriaId;
+	private Long logLevelCriteriaId;
 	
 	@Column(name="LogLevel", nullable=false)
 	private String logLevel;
@@ -46,14 +46,14 @@ public class LogLevelCriteria implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public LogLevelCriteria(Integer logLevelCriteriaId, String logLevel, String comparison, List<LogAlarm> logAlarmList) {
+	public LogLevelCriteria(Long logLevelCriteriaId, String logLevel, String comparison, List<LogAlarm> logAlarmList) {
 		this.logLevelCriteriaId = logLevelCriteriaId;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Integer getLogLevelCriteriaId() {
+	public Long getLogLevelCriteriaId() {
 		return this.logLevelCriteriaId;
 	}
 	

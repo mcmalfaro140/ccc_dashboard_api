@@ -9,12 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="LogGroups")
 @Table(name="LogGroups")
 public class LogGroup implements Serializable {
 	private static final long serialVersionUID = 6840950844769274284L;
@@ -22,27 +20,12 @@ public class LogGroup implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(name="LogGroupId")
-	private Integer logGroupId;
+	private Long logGroupId;
 	
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefLogAlarmLogGroup",
-		joinColumns={
-			@JoinColumn(
-				name="LogGroupId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				nullable=false
-			)
-		}
-	)
+	@ManyToMany(mappedBy="logGroupList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
 	public LogGroup() {
@@ -53,13 +36,13 @@ public class LogGroup implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public LogGroup(Integer logGroupId, String name, List<LogAlarm> logAlarmList) {
+	public LogGroup(Long logGroupId, String name, List<LogAlarm> logAlarmList) {
 		this.logGroupId = logGroupId;
 		this.name = name;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Integer getLogGroupId() {
+	public Long getLogGroupId() {
 		return this.logGroupId;
 	}
 	

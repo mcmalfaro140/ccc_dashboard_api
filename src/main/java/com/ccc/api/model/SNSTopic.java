@@ -10,12 +10,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="SNSTopics")
 @Table(name="SNSTopics")
 public class SNSTopic implements Serializable {
 	private static final long serialVersionUID = 3077399178896844362L;
@@ -23,7 +21,7 @@ public class SNSTopic implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="SNSTopicId")
-	private Integer snsTopicId;
+	private Long snsTopicId;
 	
 	@Column(name="TopicName", nullable=false, unique=true)
 	private String topicName;
@@ -31,22 +29,7 @@ public class SNSTopic implements Serializable {
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefLogAlarmSNSTopic",
-		joinColumns={
-			@JoinColumn(
-				name="SNSTopicId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				nullable=false
-			)
-		}
-	)
+	@ManyToMany(mappedBy="snsTopicList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
 	public SNSTopic() {
@@ -58,14 +41,14 @@ public class SNSTopic implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public SNSTopic(Integer snsTopicId, String topicName, String topicArn, List<LogAlarm> logAlarmList) {
+	public SNSTopic(Long snsTopicId, String topicName, String topicArn, List<LogAlarm> logAlarmList) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Integer getSNSTopicId() {
+	public Long getSNSTopicId() {
 		return this.snsTopicId;
 	}
 	

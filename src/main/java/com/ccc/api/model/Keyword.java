@@ -10,12 +10,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="Keywords")
 @Table(name="Keywords")
 public class Keyword implements Serializable {
 	private static final long serialVersionUID = 2313514433783049935L;
@@ -23,27 +21,12 @@ public class Keyword implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="KeywordId")
-	private Integer keywordId;
+	private Long keywordId;
 	
 	@Column(name="Word", unique=true)
 	private String word;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefLogAlarmKeyword",
-		joinColumns={
-				@JoinColumn(
-					name="KeywordId",
-					nullable=false
-				)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-					name="LogAlarmId",
-					nullable=false
-			)
-		}
-	)
+	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
 	public Keyword() {
@@ -54,13 +37,13 @@ public class Keyword implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Keyword(Integer keywordId, String word, List<LogAlarm> logAlarmList) {
+	public Keyword(Long keywordId, String word, List<LogAlarm> logAlarmList) {
 		this.keywordId = keywordId;
 		this.word = word;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Integer getKeywordId() {
+	public Long getKeywordId() {
 		return this.keywordId;
 	}
 	

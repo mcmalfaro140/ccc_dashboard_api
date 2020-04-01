@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.ccc.api.model.LogGroup;
 
 @Repository
-public interface LogGroupRepository extends JpaRepository<LogGroup, Integer> {
+public interface LogGroupRepository extends JpaRepository<LogGroup, Long> {
 }

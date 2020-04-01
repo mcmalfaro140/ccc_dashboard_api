@@ -1,6 +1,5 @@
 package com.ccc.api.controller;
 
-
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,7 +25,7 @@ import com.ccc.api.util.JwtUtils;
 @RestController
 public class HomeController {
 	@Autowired
-	private UserRepository userRepo;
+	private UserRepository userRepository;
 	
 	@Autowired
 	private JwtUtils jwtutils;
@@ -45,16 +44,16 @@ public class HomeController {
 	
 	@RequestMapping("/users")
     public List<User> users(ModelMap models) {
-        return userRepo.findAll();
+        return userRepository.findAll();
     }
     
     @RequestMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public HashMap<String , Object>  getUsersBySimplePath(@RequestBody Map<String, String> payload) {
+    public HashMap<String , Object> getUsersBySimplePath(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
     	String inUser = payload.get("username");
     	String inPass = payload.get("password");
-    	User target = userRepo.findByUsername(inUser);
+    	User target = userRepository.findByUsername(inUser);
     	
     	if (target != null) {
     		if (inPass.contentEquals(target.getPassword())) {
@@ -88,11 +87,11 @@ public class HomeController {
     	}
     	
     	String inUser = toUser.getUsername();
-    	User target = this.userRepo.findByUsername(inUser);
+    	User target = userRepository.findByUsername(inUser);
     	
     	if (target != null) {
     		target.setDashboard(dashBoard);
-    		userRepo.save(target);
+    		userRepository.save(target);
     	}
     	else {
     		response.put("error", "user not found");
@@ -103,10 +102,10 @@ public class HomeController {
     
     @RequestMapping(path = "/get_dashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public HashMap<String,Object> getdashboard (@RequestHeader("Authorization") String token) {
+    public HashMap<String, Object> getdashboard(@RequestHeader("Authorization") String token) {
     	User toUsers = jwtutils.toUser(token);
     	String inUser = toUsers.getUsername();
-    	User target = userRepo.findByUsername(inUser);
+    	User target = userRepository.findByUsername(inUser);
     	
     	HashMap<String, Object> response = new HashMap<>();
     	response.put("dashboard", target.getDashboard());

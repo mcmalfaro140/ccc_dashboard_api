@@ -18,7 +18,7 @@ import javax.persistence.Table;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
-@Entity
+@Entity(name="Users")
 @Table(name="Users")
 public class User implements Serializable {
 	private static final long serialVersionUID = 4066752461555608563L;
@@ -26,7 +26,7 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="UserId")
-	private Integer userId;
+	private Long userId;
 	
 	@Column(name="Username", nullable=false, unique=true)
 	private String username;
@@ -100,7 +100,7 @@ public class User implements Serializable {
 	}
 	
 	public User(
-			int userId,
+			Long userId,
 			String username,
 			String password,
 			String email,
@@ -117,7 +117,7 @@ public class User implements Serializable {
 		this.metricAlarmList = metricAlarmList;
 	}
 	
-	public Integer getUserId() {
+	public Long getUserId() {
 		return this.userId;
 	}
 	
@@ -172,9 +172,9 @@ public class User implements Serializable {
 	public Claims toClaims() {
 		Claims claims = Jwts.claims();
 		
-		claims.put("UserId", userId);
-		claims.put("Username", username);
-		claims.put("Email", email);
+		claims.put("UserId", this.userId);
+		claims.put("Username", this.username);
+		claims.put("Email", this.email);
 		    
 		return claims;
 	}
@@ -182,7 +182,7 @@ public class User implements Serializable {
 	public static User fromClaims(Claims claims) {
 		User user = new User();
 		
-		user.userId = claims.get("UserId", Integer.class);
+		user.userId = claims.get("UserId", Long.class);
 		user.username = claims.get("Username", String.class);
 		user.email = claims.get("Email", String.class);
 		

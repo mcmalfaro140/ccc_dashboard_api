@@ -10,12 +10,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="MetricAlarms")
 @Table(name="MetricAlarms")
 public class MetricAlarm implements Serializable {
 	private static final long serialVersionUID = 5302804181895613828L;
@@ -23,27 +21,12 @@ public class MetricAlarm implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="MetricAlarmId")
-	private Integer metricAlarmId;
+	private Long metricAlarmId;
 	
 	@Column(name="AlarmArn", nullable=false, unique=true)
 	private String alarmArn;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefUserMetricAlarm",
-		joinColumns={
-			@JoinColumn(
-				name="MetricAlarmId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="UserId",
-				nullable=false
-			)
-		}
-	)
+	@ManyToMany(mappedBy="metricAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<User> userList;
 	
 	public MetricAlarm() {
@@ -54,13 +37,13 @@ public class MetricAlarm implements Serializable {
 		this.userList = userList;
 	}
 	
-	public MetricAlarm(Integer metricAlarmId, String alarmArn, List<User> userList) {
+	public MetricAlarm(Long metricAlarmId, String alarmArn, List<User> userList) {
 		this.metricAlarmId = metricAlarmId;
 		this.alarmArn = alarmArn;
 		this.userList = userList;
 	}
 	
-	public Integer getMetricAlarmId() {
+	public Long getMetricAlarmId() {
 		return this.metricAlarmId;
 	}
 	

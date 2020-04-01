@@ -67,8 +67,8 @@ CREATE TABLE XRefUserLogAlarm (
 	UserId INT NOT NULL,
 	LogAlarmId INT NOT NULL,
 	PRIMARY KEY (UserLogAlarmId),
-	FOREIGN KEY (UserId) REFERENCES Users(UserId),
-	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId),
+	FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE,
+	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId) ON DELETE CASCADE,
 	UNIQUE (UserId, LogAlarmId)
 );
 
@@ -77,8 +77,8 @@ CREATE TABLE XRefUserMetricAlarm (
 	UserId INT NOT NULL,
 	MetricAlarmId INT NOT NULL,
 	PRIMARY KEY (UserMetricAlarmId),
-	FOREIGN KEY (UserId) REFERENCES Users(UserId),
-	FOREIGN KEY (MetricAlarmId) REFERENCES MetricAlarms(MetricAlarmId),
+	FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE,
+	FOREIGN KEY (MetricAlarmId) REFERENCES MetricAlarms(MetricAlarmId) ON DELETE CASCADE,
 	UNIQUE (UserId, MetricAlarmId)
 );
 
@@ -87,8 +87,8 @@ CREATE TABLE XRefLogAlarmLogGroup (
 	LogAlarmId INT NOT NULL,
 	LogGroupId INT NOT NULL,
 	PRIMARY KEY (LogAlarmLogGroupId),
-	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId),
-	FOREIGN KEY (LogGroupId) REFERENCES LogGroups(LogGroupId),
+	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId) ON DELETE CASCADE,
+	FOREIGN KEY (LogGroupId) REFERENCES LogGroups(LogGroupId) ON DELETE CASCADE,
 	UNIQUE (LogAlarmId, LogGroupId)
 );
 
@@ -97,8 +97,8 @@ CREATE TABLE XRefLogAlarmKeyword (
 	LogAlarmId INT NOT NULL,
 	KeywordId INT NOT NULL, 
 	PRIMARY KEY (LogAlarmKeywordId),
-	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId),
-	FOREIGN KEY (KeywordId) REFERENCES Keywords(KeywordId),
+	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId) ON DELETE CASCADE,
+	FOREIGN KEY (KeywordId) REFERENCES Keywords(KeywordId) ON DELETE CASCADE,
 	UNIQUE (LogAlarmId, KeywordId)
 );
 
@@ -107,7 +107,7 @@ CREATE TABLE XRefLogAlarmSNSTopic (
 	LogAlarmId INT NOT NULL,
 	SNSTopicId INT NOT NULL,
 	PRIMARY KEY (LogAlarmSNSTopicId),
-	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId),
-	FOREIGN KEY (SNSTopicId) REFERENCES SNSTopics(SNSTopicId),
+	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId) ON DELETE CASCADE,
+	FOREIGN KEY (SNSTopicId) REFERENCES SNSTopics(SNSTopicId) ON DELETE CASCADE,
 	UNIQUE (LogAlarmId, SNSTopicId)
 );

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.ccc.api.model.LogLevelCriteria;
 
 @Repository
-public interface LogLevelCriteriaRepository extends JpaRepository<LogLevelCriteria, Integer> {
+public interface LogLevelCriteriaRepository extends JpaRepository<LogLevelCriteria, Long> {
 }
