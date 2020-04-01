@@ -3,16 +3,20 @@ package com.ccc.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="LogAlarms")
 @Table(name="LogAlarms")
 public class LogAlarm implements Serializable {
 	private static final long serialVersionUID = 4198681733980071621L;
@@ -20,7 +24,7 @@ public class LogAlarm implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="LogAlarmId")
-	private int logAlarmId;
+	private Long logAlarmId;
 	
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
@@ -28,19 +32,87 @@ public class LogAlarm implements Serializable {
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="LogLevelCriteria",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogLevelCriteriaId",
+				referencedColumnName="LogLevelCriteriaId",
+				nullable=false
+			)
+		}
+	)
 	private LogLevelCriteria logLevelCriteria;
 	
-	@ManyToMany
+	@ManyToMany(mappedBy="logAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<User> userList;
 	
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefLogAlarmLogGroup",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogGroupId",
+				referencedColumnName="LogGroupId",
+				nullable=false
+			)
+		}
+	)
 	private List<LogGroup> logGroupList;
 	
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefLogAlarmKeyword",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="KeywordId",
+				referencedColumnName="KeywordId",
+				nullable=false
+			)
+		}
+	)
 	private List<Keyword> keywordList;
 	
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="SNSTopicId",
+				referencedColumnName="SNSTopicId",
+				nullable=false
+			)
+		}
+	)
 	private List<SNSTopic> snsTopicList;
 	
 	public LogAlarm() {
@@ -65,7 +137,7 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public LogAlarm(
-			int logAlarmId,
+			Long logAlarmId,
 			String alarmName,
 			String keywordRelationship,
 			LogLevelCriteria logLevelCriteria,
@@ -84,7 +156,7 @@ public class LogAlarm implements Serializable {
 		this.snsTopicList = snsTopicList;
 	}
 	
-	public int getLogAlarmId() {
+	public Long getLogAlarmId() {
 		return this.logAlarmId;
 	}
 	
@@ -92,27 +164,55 @@ public class LogAlarm implements Serializable {
 		return this.alarmName;
 	}
 	
+	public void setAlarmName(String alarmName) {
+		this.alarmName = alarmName;
+	}
+	
 	public String getKeywordRelationship() {
 		return this.keywordRelationship;
+	}
+	
+	public void setKeywordRelationship(String keywordRelationship) {
+		this.keywordRelationship = keywordRelationship;
 	}
 	
 	public LogLevelCriteria getLogLevelCriteria() {
 		return this.logLevelCriteria;
 	}
 	
+	public void setLogLevelCriteria(LogLevelCriteria logLevelCriteria) {
+		this.logLevelCriteria = logLevelCriteria;
+	}
+	
 	public List<User> getUserList() {
 		return this.userList;
+	}
+	
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
 	}
 	
 	public List<LogGroup> getLogGroupList() {
 		return this.logGroupList;
 	}
 	
+	public void setLogGroupList(List<LogGroup> logGroupList) {
+		this.logGroupList = logGroupList;
+	}
+	
 	public List<Keyword> getKeywordList() {
 		return this.keywordList;
 	}
 	
+	public void setKeywordList(List<Keyword> keywordList) {
+		this.keywordList = keywordList;
+	}
+	
 	public List<SNSTopic> getSNSTopicList() {
 		return this.snsTopicList;
+	}
+	
+	public void setSNSTopicList(List<SNSTopic> snsTopicList) {
+		this.snsTopicList = snsTopicList;
 	}
 }

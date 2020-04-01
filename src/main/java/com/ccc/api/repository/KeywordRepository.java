@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.ccc.api.model.Keyword;
 
 @Repository
-public interface KeywordRepository extends JpaRepository<Keyword, Integer> {
+public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 }

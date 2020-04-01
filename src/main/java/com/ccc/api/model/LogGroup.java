@@ -3,14 +3,16 @@ package com.ccc.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="LogGroups")
 @Table(name="LogGroups")
 public class LogGroup implements Serializable {
 	private static final long serialVersionUID = 6840950844769274284L;
@@ -18,12 +20,12 @@ public class LogGroup implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(name="LogGroupId")
-	private int logGroupId;
+	private Long logGroupId;
 	
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
 	
-	@ManyToMany
+	@ManyToMany(mappedBy="logGroupList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
 	public LogGroup() {
@@ -34,13 +36,13 @@ public class LogGroup implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public LogGroup(int logGroupId, String name, List<LogAlarm> logAlarmList) {
+	public LogGroup(Long logGroupId, String name, List<LogAlarm> logAlarmList) {
 		this.logGroupId = logGroupId;
 		this.name = name;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public int getLogGroupId() {
+	public Long getLogGroupId() {
 		return this.logGroupId;
 	}
 	
@@ -48,7 +50,15 @@ public class LogGroup implements Serializable {
 		return this.name;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public List<LogAlarm> getLogAlarmList() {
 		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 }

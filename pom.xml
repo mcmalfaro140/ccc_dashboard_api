@@ -12,10 +12,13 @@
 	<artifactId>api</artifactId>
 	<version>1.0.0</version>
 	<name>API</name>
-	<description>Back end for senior design project for Commonwealth Casualty Company</description>
+	<description>Backend for senior design project for Commonwealth Casualty Company</description>
 
 	<properties>
 		<java.version>1.8</java.version>
+		<jjwt-api.version>0.11.0</jjwt-api.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<dependencies>
@@ -40,19 +43,19 @@
 		<dependency> 
     		<groupId>io.jsonwebtoken</groupId>
     		<artifactId>jjwt-api</artifactId>
-    		<version>0.11.0</version>
+    		<version>${jjwt-api.version}</version>
 		</dependency>
 		<dependency>
     		<groupId>io.jsonwebtoken</groupId>
     		<artifactId>jjwt-impl</artifactId>
-    		<version>0.11.0</version>
     		<scope>runtime</scope>
+    		<version>${jjwt-api.version}</version>
 		</dependency>
 		<dependency>
     		<groupId>io.jsonwebtoken</groupId>
-    		<artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
-    		<version>0.11.0</version>
+    		<artifactId>jjwt-jackson</artifactId>
     		<scope>runtime</scope>
+    		<version>${jjwt-api.version}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.hibernate</groupId>

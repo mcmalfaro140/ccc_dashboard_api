@@ -3,15 +3,17 @@ package com.ccc.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="Keywords")
 @Table(name="Keywords")
 public class Keyword implements Serializable {
 	private static final long serialVersionUID = 2313514433783049935L;
@@ -19,12 +21,12 @@ public class Keyword implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="KeywordId")
-	private int keywordId;
+	private Long keywordId;
 	
 	@Column(name="Word", unique=true)
 	private String word;
 	
-	@ManyToMany
+	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
 	public Keyword() {
@@ -35,13 +37,13 @@ public class Keyword implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Keyword(int keywordId, String word, List<LogAlarm> logAlarmList) {
+	public Keyword(Long keywordId, String word, List<LogAlarm> logAlarmList) {
 		this.keywordId = keywordId;
 		this.word = word;
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public int getKeywordId() {
+	public Long getKeywordId() {
 		return this.keywordId;
 	}
 	
@@ -49,7 +51,15 @@ public class Keyword implements Serializable {
 		return this.word;
 	}
 	
+	public void setWord(String word) {
+		this.word = word;
+	}
+	
 	public List<LogAlarm> getLogAlarmList() {
 		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 }

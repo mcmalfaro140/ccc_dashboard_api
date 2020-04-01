@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.ccc.api.model.LogAlarm;
 
 @Repository
-public interface LogAlarmRepository extends JpaRepository<LogAlarm, Integer> {
+public interface LogAlarmRepository extends JpaRepository<LogAlarm, Long> {
 }

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.ccc.api.model.SNSTopic;
 
 @Repository
-public interface SNSTopicRepository extends JpaRepository<SNSTopic, Integer> {
+public interface SNSTopicRepository extends JpaRepository<SNSTopic, Long> {
 }

@@ -1,4 +1,4 @@
-package com.ccc.api.controller;
+package com.ccc.api.util;
 
 import java.util.Calendar;
 import javax.crypto.SecretKey;
@@ -12,13 +12,12 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 //import lombok.extern.slf4j.Slf4j;
 
-import com.ccc.api.model.Users;
+import com.ccc.api.model.User;
 
 
 //@Slf4j
 @Component
 public class JwtUtils {
-
   private String issuer = "ccc";
 
   private SecretKey secretKey;
@@ -29,7 +28,7 @@ public class JwtUtils {
     secretKey = Keys.hmacShaKeyFor(keyBytes);
   }
 
-  public String toToken(Users user) {
+  public String toToken(User user) {
     Calendar expiration = Calendar.getInstance();
     expiration.add(Calendar.DATE, 7);
     
@@ -38,10 +37,10 @@ public class JwtUtils {
         .setExpiration(expiration.getTime()).setClaims(user.toClaims()).signWith(secretKey).compact();
   }
 
-  public Users toUser(String token) {
+  public User toUser(String token) {
     try {
     	Jws<Claims> jws =	Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-      return Users.fromClaims(jws.getBody());
+      return User.fromClaims(jws.getBody());
     } catch (JwtException e) {
 //      log.warn("JWT Token Error", e);
     	System.out.println(e);
