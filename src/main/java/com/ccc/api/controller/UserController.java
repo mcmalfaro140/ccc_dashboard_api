@@ -23,7 +23,7 @@ import com.ccc.api.repository.UserRepository;
 import com.ccc.api.util.JwtUtils;
 
 @RestController
-public class HomeController {
+public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 	

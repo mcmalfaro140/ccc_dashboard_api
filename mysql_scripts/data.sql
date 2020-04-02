@@ -23,9 +23,9 @@ INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('WARN', '>=');
 INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('INFO', '>=');
 INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('ERROR', '==');
 
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (1, 'alarm', 'OR');
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (2, 'alarm2', 'OR');
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (3, 'alarm3', 'AND');
+INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (1, 'alarm', 'ANY');
+INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (2, 'alarm2', 'ANY');
+INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (3, 'alarm3', 'ALL');
 INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (4, 'alarm4', NULL);
 
 INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (1, 1);
