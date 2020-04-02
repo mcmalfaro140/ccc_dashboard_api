@@ -49,7 +49,7 @@ CREATE TABLE LogAlarms (
 	LogAlarmId INT NOT NULL AUTO_INCREMENT,
 	LogLevelCriteriaId INT NOT NULL,
 	AlarmName VARCHAR(255) NOT NULL,
-	KeywordRelationship VARCHAR(3) CHECK (KeywordRelationship IN ('AND', 'OR', NULL)),
+	KeywordRelationship CHAR(3) CHECK (KeywordRelationship IN ('ANY', 'ALL', NULL)),
 	PRIMARY KEY (LogAlarmId),
 	FOREIGN KEY (LogLevelCriteriaId) REFERENCES LogLevelCriteria(LogLevelCriteriaId),
 	UNIQUE (AlarmName)
