@@ -18,15 +18,10 @@ INSERT INTO Keywords (Word) VALUES ('message1');
 INSERT INTO Keywords (Word) VALUES ('message2');
 INSERT INTO Keywords (Word) VALUES ('message3');
 
-INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('WARN', '==');
-INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('WARN', '>=');
-INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('INFO', '>=');
-INSERT INTO LogLevelCriteria (LogLevel, Comparison) VALUES ('ERROR', '==');
-
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (1, 'alarm', 'OR');
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (2, 'alarm2', 'OR');
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (3, 'alarm3', 'AND');
-INSERT INTO LogAlarms (LogLevelCriteriaId, AlarmName, KeywordRelationship) VALUES (4, 'alarm4', NULL);
+INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('WARN', '==', 'alarm', 'ANY');
+INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('WARN', '>=', 'alarm2', 'ANY');
+INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('INFO', '>=', 'alarm3', 'ALL');
+INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('ERROR', '==', 'alarm4', NULL);
 
 INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (1, 1);
 INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (2, 2);

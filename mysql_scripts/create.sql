@@ -37,21 +37,13 @@ CREATE TABLE Keywords (
 	UNIQUE (Word)
 );
 
-CREATE TABLE LogLevelCriteria (
-	LogLevelCriteriaId INT NOT NULL AUTO_INCREMENT,
-	LogLevel VARCHAR(5) NOT NULL CHECK (LogLevel IN ('TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR')),
-	Comparison VARCHAR(2) CHECK (Comparison IN ('==', '>', '>=')),
-	PRIMARY KEY (LogLevelCriteriaId),
-	UNIQUE (LogLevel, Comparison)
-);
-
 CREATE TABLE LogAlarms (
 	LogAlarmId INT NOT NULL AUTO_INCREMENT,
-	LogLevelCriteriaId INT NOT NULL,
+	LogLevel VARCHAR(5) NOT NULL CHECK (LogLevel IN ('TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR')),
+	Comparison VARCHAR(2) CHECK (Comparison IN ('==', '<', '<=', '>', '>=')),
 	AlarmName VARCHAR(255) NOT NULL,
-	KeywordRelationship VARCHAR(3) CHECK (KeywordRelationship IN ('AND', 'OR', NULL)),
+	KeywordRelationship CHAR(3) CHECK (KeywordRelationship IN ('ANY', 'ALL', NULL)),
 	PRIMARY KEY (LogAlarmId),
-	FOREIGN KEY (LogLevelCriteriaId) REFERENCES LogLevelCriteria(LogLevelCriteriaId),
 	UNIQUE (AlarmName)
 );
 
