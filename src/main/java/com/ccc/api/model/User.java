@@ -181,7 +181,6 @@ public class User implements Serializable {
 
 	public static User fromClaims(Claims claims) {
 		User user = new User();
-		
 		user.userId = claims.get("UserId", Long.class);
 		user.username = claims.get("Username", String.class);
 		user.email = claims.get("Email", String.class);

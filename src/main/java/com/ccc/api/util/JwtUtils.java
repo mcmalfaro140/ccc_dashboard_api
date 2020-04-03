@@ -23,7 +23,6 @@ public class JwtUtils {
   private SecretKey secretKey;
 
   public JwtUtils(@Value("${jwt.secret}") String secret) {
-	  System.out.println(secret);
     byte[] keyBytes = Decoders.BASE64URL.decode(secret);
     secretKey = Keys.hmacShaKeyFor(keyBytes);
   }
