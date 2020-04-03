@@ -177,10 +177,7 @@ public class LogAlarmController {
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
 			
 			user.getLogAlarmList().add(logAlarm);
-			logAlarm.getUserList().add(user);
-			
 			this.userRepo.save(user);
-			this.logAlarmRepo.save(logAlarm);
 			
 			response.put("Result", "Success");
 		}
@@ -201,10 +198,7 @@ public class LogAlarmController {
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
 			
 			user.getLogAlarmList().remove(logAlarm);
-			logAlarm.getUserList().remove(user);
-			
 			this.userRepo.save(user);
-			this.logAlarmRepo.save(logAlarm);
 			
 			response.put("Result", "Success");
 		}
@@ -224,7 +218,6 @@ public class LogAlarmController {
 			Long logAlarmId = Long.parseLong(body.get("LogAlarmId"));
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
 			
-			user.getLogAlarmList().remove(logAlarm);
 			logAlarm.getUserList().remove(user);
 			
 			if (logAlarm.getUserList().isEmpty()) {
