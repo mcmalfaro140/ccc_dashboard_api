@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity(name="LogAlarms")
@@ -32,25 +31,11 @@ public class LogAlarm implements Serializable {
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="LogLevelCriteria",
-		joinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				referencedColumnName="LogAlarmId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="LogLevelCriteriaId",
-				referencedColumnName="LogLevelCriteriaId",
-				nullable=false
-			)
-		}
-	)
-	private LogLevelCriteria logLevelCriteria;
+	@Column(name="LogLevel")
+	private String logLevel;
+	
+	@Column(name="Comparison")
+	private String comparison;
 	
 	@ManyToMany(mappedBy="logAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<User> userList;
@@ -121,7 +106,8 @@ public class LogAlarm implements Serializable {
 	public LogAlarm(
 			String alarmName,
 			String keywordRelationship,
-			LogLevelCriteria logLevelCriteria,
+			String logLevel,
+			String comparison,
 			List<User> userList,
 			List<LogGroup> logGroupList,
 			List<Keyword> keywordList,
@@ -129,7 +115,8 @@ public class LogAlarm implements Serializable {
 	) {
 		this.alarmName = alarmName;
 		this.keywordRelationship = keywordRelationship;
-		this.logLevelCriteria = logLevelCriteria;
+		this.logLevel = logLevel;
+		this.comparison = comparison;
 		this.userList = userList;
 		this.logGroupList = logGroupList;
 		this.keywordList = keywordList;
@@ -140,7 +127,8 @@ public class LogAlarm implements Serializable {
 			Long logAlarmId,
 			String alarmName,
 			String keywordRelationship,
-			LogLevelCriteria logLevelCriteria,
+			String logLevel,
+			String comparison,
 			List<User> userList,
 			List<LogGroup> logGroupList,
 			List<Keyword> keywordList,
@@ -149,7 +137,8 @@ public class LogAlarm implements Serializable {
 		this.logAlarmId = logAlarmId;
 		this.alarmName = alarmName;
 		this.keywordRelationship = keywordRelationship;
-		this.logLevelCriteria = logLevelCriteria;
+		this.logLevel = logLevel;
+		this.comparison = comparison;
 		this.userList = userList;
 		this.logGroupList = logGroupList;
 		this.keywordList = keywordList;
@@ -176,12 +165,20 @@ public class LogAlarm implements Serializable {
 		this.keywordRelationship = keywordRelationship;
 	}
 	
-	public LogLevelCriteria getLogLevelCriteria() {
-		return this.logLevelCriteria;
+	public String getLogLevel() {
+		return this.logLevel;
 	}
 	
-	public void setLogLevelCriteria(LogLevelCriteria logLevelCriteria) {
-		this.logLevelCriteria = logLevelCriteria;
+	public void setLogLevel(String logLevel) {
+		this.logLevel = logLevel;
+	}
+	
+	public String getComparison() {
+		return this.comparison;
+	}
+	
+	public void setComparison(String comparison) {
+		this.comparison = comparison;
 	}
 	
 	public List<User> getUserList() {
