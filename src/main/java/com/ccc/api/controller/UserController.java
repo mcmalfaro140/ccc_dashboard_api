@@ -36,6 +36,11 @@ public class UserController {
 				registry.addMapping("/update").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/authenticate").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/get_dashboard").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/getLogAlarms").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/createLogAlarm").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/subscribeToLogAlarm").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/unsubscribeToLogAlarm").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/deleteLogAlarm").allowedOrigins("http://localhost:3000");
 			}
 		};
 	}
