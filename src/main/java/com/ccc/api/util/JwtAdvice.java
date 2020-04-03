@@ -9,11 +9,11 @@ import com.ccc.api.model.User;
 
 @ControllerAdvice
 public class JwtAdvice {
-  @Autowired
-  private JwtUtils jwtUtils;
+//  @Autowired
+//  private JwtUtils jwtUtils;
 
-  @ModelAttribute
-  public User jwtToUser(@RequestHeader("Authorization") String token) {
-    return token != null ? jwtUtils.toUser(token) : null;
-  }
+//  @ModelAttribute
+//  public User jwtToUser(@RequestHeader("Authorization") String token) {
+//    return token != null ? jwtUtils.toUser(token) : null;
+//  }
 }

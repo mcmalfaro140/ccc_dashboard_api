@@ -47,6 +47,7 @@ CREATE TABLE LogAlarms (
 	UNIQUE (AlarmName)
 );
 
+<<<<<<< HEAD
 CREATE TABLE MetricAlarms (
 	MetricAlarmId INT NOT NULL AUTO_INCREMENT,
 	AlarmArn VARCHAR(100) NOT NULL,
@@ -54,6 +55,9 @@ CREATE TABLE MetricAlarms (
 	UNIQUE (AlarmArn)
 );
 
+=======
+-- not created
+>>>>>>> MetricAlarmController
 CREATE TABLE XRefUserLogAlarm (
 	UserLogAlarmId INT NOT NULL AUTO_INCREMENT,
 	UserId INT NOT NULL,
@@ -64,6 +68,7 @@ CREATE TABLE XRefUserLogAlarm (
 	UNIQUE (UserId, LogAlarmId)
 );
 
+<<<<<<< HEAD
 CREATE TABLE XRefUserMetricAlarm (
 	UserMetricAlarmId INT NOT NULL AUTO_INCREMENT,
 	UserId INT NOT NULL,
@@ -74,6 +79,9 @@ CREATE TABLE XRefUserMetricAlarm (
 	UNIQUE (UserId, MetricAlarmId)
 );
 
+=======
+--not created
+>>>>>>> MetricAlarmController
 CREATE TABLE XRefLogAlarmLogGroup (
 	LogAlarmLogGroupId INT NOT NULL AUTO_INCREMENT,
 	LogAlarmId INT NOT NULL,
@@ -87,7 +95,7 @@ CREATE TABLE XRefLogAlarmLogGroup (
 CREATE TABLE XRefLogAlarmKeyword (
 	LogAlarmKeywordId INT NOT NULL AUTO_INCREMENT,
 	LogAlarmId INT NOT NULL,
-	KeywordId INT NOT NULL, 
+	KeywordId INT NOT NULL,
 	PRIMARY KEY (LogAlarmKeywordId),
 	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId) ON DELETE CASCADE,
 	FOREIGN KEY (KeywordId) REFERENCES Keywords(KeywordId) ON DELETE CASCADE,
@@ -102,4 +110,8 @@ CREATE TABLE XRefLogAlarmSNSTopic (
 	FOREIGN KEY (LogAlarmId) REFERENCES LogAlarms(LogAlarmId) ON DELETE CASCADE,
 	FOREIGN KEY (SNSTopicId) REFERENCES SNSTopics(SNSTopicId) ON DELETE CASCADE,
 	UNIQUE (LogAlarmId, SNSTopicId)
+<<<<<<< HEAD
 );
+=======
+	);
+>>>>>>> MetricAlarmController
