@@ -22,7 +22,7 @@ import com.ccc.api.util.JwtUtils;
 
 @RestController
 public class UserController {
-	@Autowired
+	/*@Autowired
 	private UserRepository userRepository;
 	
 	@Autowired
@@ -110,5 +110,5 @@ public class UserController {
     	response.put("dashboard", target.getDashboard());
     	
     	return response;
-    }
+    }*/
 }
