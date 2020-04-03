@@ -34,7 +34,6 @@ public class UserController {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/update").allowedOrigins("http://localhost:3000");
-				registry.addMapping("/authenticate").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/get_dashboard").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/getLogAlarms").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/createLogAlarm").allowedOrigins("http://localhost:3000");
