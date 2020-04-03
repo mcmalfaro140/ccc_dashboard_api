@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +21,11 @@ import com.amazonaws.services.sns.model.CreateTopicResult;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
-import com.ccc.api.model.LogLevelCriteria;
 import com.ccc.api.model.SNSTopic;
 import com.ccc.api.model.User;
 import com.ccc.api.repository.KeywordRepository;
 import com.ccc.api.repository.LogAlarmRepository;
 import com.ccc.api.repository.LogGroupRepository;
-import com.ccc.api.repository.LogLevelCriteriaRepository;
 import com.ccc.api.repository.SNSTopicRepository;
 import com.ccc.api.repository.UserRepository;
 import com.ccc.api.util.GlobalVariables;
@@ -39,9 +36,6 @@ import com.ccc.api.util.JwtUtils;
 public class LogAlarmController {
 	@Autowired
 	private LogAlarmRepository logAlarmRepo;
-	
-	@Autowired
-	private LogLevelCriteriaRepository logLevelCriteriaRepo;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -89,7 +83,7 @@ public class LogAlarmController {
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
-			response.put("Result", "User not found");
+			response.put("Result", "ERROR: User not found");
 		}
 		else {
 			String alarmName = logAlarmInfo.get("AlarmName");
@@ -99,14 +93,12 @@ public class LogAlarmController {
 			String[] logGroupNames = logAlarmInfo.get("LogGroups").split(",");
 			String[] keywordNames = logAlarmInfo.get("Keywords").split(",");
 			String[] snsTopicNames = logAlarmInfo.get("SNSTopicNames").split(",");
-			
-			LogLevelCriteria logLevelCriteria = this.getLogLevelCriteria(logLevel, comparison);
 			List<User> userList = this.getUser(user);
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
 			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicNames);
 			
-			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevelCriteria, userList, logGroupList, keywordList, snsTopicList);
+			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, userList, logGroupList, keywordList, snsTopicList);
 			
 			this.logAlarmRepo.save(logAlarm);
 			
@@ -114,13 +106,6 @@ public class LogAlarmController {
 		}
 		
 		return response;
-	}
-	
-	private LogLevelCriteria getLogLevelCriteria(String logLevel, String comparison) {
-		this.logLevelCriteriaRepo.insertIgnore(logLevel, comparison);
-		LogLevelCriteria logLevelCriteria = this.logLevelCriteriaRepo.findByLogLevelAndComparison(logLevel, comparison).get();
-		
-		return logLevelCriteria;
 	}
 	
 	private List<User> getUser(User user) {
