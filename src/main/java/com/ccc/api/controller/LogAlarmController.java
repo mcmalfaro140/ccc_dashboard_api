@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.amazonaws.services.sns.AmazonSNS;
@@ -53,6 +54,7 @@ public class LogAlarmController {
 	private JwtUtils jwtUtils;
 	
 	@GetMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@ResponseBody
 	public List<List<LogAlarm>> getLogAlarms(@RequestHeader(name="Authroization") String token) {		
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
 		List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, token);
@@ -78,6 +80,7 @@ public class LogAlarmController {
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@ResponseBody
 	public Map<String, String> createLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> logAlarmInfo) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
@@ -165,6 +168,7 @@ public class LogAlarmController {
 	}
 	
 	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@ResponseBody
 	public Map<String, String> subscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
@@ -186,6 +190,7 @@ public class LogAlarmController {
 	}
 	
 	@PostMapping(path="/unsubcribeToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@ResponseBody
 	public Map<String, String> unsubscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
@@ -207,6 +212,7 @@ public class LogAlarmController {
 	}
 	
 	@PostMapping(path="/deleteLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@ResponseBody
 	public Map<String, String> deleteLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
