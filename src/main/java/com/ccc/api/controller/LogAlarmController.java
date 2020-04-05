@@ -21,7 +21,7 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
-import com.ccc.api.model.GetLogAlarmResponse;
+import com.ccc.api.http.GetLogAlarmResponse;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
@@ -60,22 +60,11 @@ public class LogAlarmController {
 	@ResponseBody
 	public ResponseEntity<GetLogAlarmResponse> getLogAlarms(@RequestHeader(name="Authroization") String token) {
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-		List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, token);
 		
-		return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
-	}
-	
-	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, String token) {
 		User user = this.jwtUtils.toUser(token);
-		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
+		List<LogAlarm> userLogAlarm = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
 		
-		for (LogAlarm alarm : allLogAlarms) {
-			if (alarm.getUserList().contains(user)) {
-				userLogAlarms.add(alarm);
-			}
-		}
-		
-		return userLogAlarms;
+		return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarm));
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")

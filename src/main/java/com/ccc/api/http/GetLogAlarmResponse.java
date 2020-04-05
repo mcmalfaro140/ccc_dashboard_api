@@ -1,9 +1,15 @@
-package com.ccc.api.model;
+package com.ccc.api.http;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.ccc.api.model.Keyword;
+import com.ccc.api.model.LogAlarm;
+import com.ccc.api.model.LogGroup;
+import com.ccc.api.model.SNSTopic;
+import com.ccc.api.model.User;
 
 public class GetLogAlarmResponse {
 	private Map<String, List<Map<String, Object>>> allLogAlarms;
