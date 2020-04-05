@@ -34,17 +34,13 @@ public class UserController {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/update").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/authenticate").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/get_dashboard").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/getLogAlarms").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/createLogAlarm").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/subscribeToLogAlarm").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/unsubscribeToLogAlarm").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/deleteLogAlarm").allowedOrigins("http://localhost:3000");
-				
-				registry.addMapping("/getMetricAlarms").allowedOrigins("http://localhost:3000");
-				registry.addMapping("/deleteMetricAlarms").allowedOrigins("http://localhost:3000");
-				registry.addMapping("/subscribeToMetricAlarm").allowedOrigins("http://localhost:3000");
-				registry.addMapping("/unsubscribeToMetricAlarm").allowedOrigins("http://localhost:3000");
 			}
 		};
 	}

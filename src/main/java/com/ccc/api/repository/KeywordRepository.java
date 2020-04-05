@@ -12,12 +12,6 @@ import com.ccc.api.model.Keyword;
 @Repository
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 	@Query(
-		value="INSERT IGNORE INTO Keywords (Word) VALUES (:word)",
-		nativeQuery=true
-	)
-	public void insertIgnore(@Param(value="word") String word);
-	
-	@Query(
 		value="SELECT * FROM Keywords WHERE Word = :word",
 		nativeQuery=true
 	)

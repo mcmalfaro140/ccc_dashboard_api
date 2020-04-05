@@ -17,7 +17,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<jjwt-api.version>0.11.0</jjwt-api.version>
-		<aws-java-sdk-bom.version>1.11.747</aws-java-sdk-bom.version>
+		<aws-java-sdk.version>1.11.747</aws-java-sdk.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -27,7 +27,7 @@
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>${aws-java-sdk-bom.version}</version>
+				<version>${aws-java-sdk.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -81,7 +81,7 @@
 		<dependency>
 		    <groupId>com.amazonaws</groupId>
 		    <artifactId>aws-java-sdk</artifactId>
-		    <version>1.0.12</version>
+		    <version>${aws-java-sdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>

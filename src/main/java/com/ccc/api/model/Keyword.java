@@ -19,7 +19,7 @@ public class Keyword implements Serializable {
 	private static final long serialVersionUID = 2313514433783049935L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="KeywordId")
 	private Long keywordId;
 	

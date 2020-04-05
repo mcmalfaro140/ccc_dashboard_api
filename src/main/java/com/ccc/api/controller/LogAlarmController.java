@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
+import com.ccc.api.model.GetLogAlarmResponse;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
@@ -55,15 +58,11 @@ public class LogAlarmController {
 	
 	@GetMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
-	public List<List<LogAlarm>> getLogAlarms(@RequestHeader(name="Authroization") String token) {		
+	public ResponseEntity<GetLogAlarmResponse> getLogAlarms(@RequestHeader(name="Authroization") String token) {
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
 		List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, token);
 		
-		List<List<LogAlarm>> logAlarms = new ArrayList<List<LogAlarm>>();
-		logAlarms.add(allLogAlarms);
-		logAlarms.add(userLogAlarms);
-		
-		return logAlarms;
+		return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 	}
 	
 	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, String token) {
@@ -81,7 +80,7 @@ public class LogAlarmController {
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
-	public Map<String, String> createLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> logAlarmInfo) {
+	public Map<String, String> createLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
@@ -89,20 +88,22 @@ public class LogAlarmController {
 			response.put("Result", "ERROR: User not found");
 		}
 		else {
-			String alarmName = logAlarmInfo.get("AlarmName");
-			String keywordRelationship = logAlarmInfo.get("KeywordRelationship");
-			String logLevel = logAlarmInfo.get("LogLevel");
-			String comparison = logAlarmInfo.get("Comparison");
-			String[] logGroupNames = logAlarmInfo.get("LogGroups").split(",");
-			String[] keywordNames = logAlarmInfo.get("Keywords").split(",");
-			String[] snsTopicNames = logAlarmInfo.get("SNSTopicNames").split(",");
+			String alarmName = body.get("AlarmName");
+			String keywordRelationship = body.get("KeywordRelationship");
+			String logLevel = body.get("LogLevel");
+			String comparison = body.get("Comparison");
+			String[] logGroupNames = body.get("LogGroups").split(",");
+			
+			String keywordNamesAsString = body.get("Keywords");
+			String[] keywordNames = (null == keywordNamesAsString) ? null : keywordNamesAsString.split(",");
+					
+			String[] snsTopicNames = body.get("SNSTopicNames").split(",");
 			List<User> userList = this.getUser(user);
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
 			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicNames);
 			
-			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, userList, logGroupList, keywordList, snsTopicList);
-			
+			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, userList, logGroupList, keywordList, snsTopicList);		
 			this.logAlarmRepo.save(logAlarm);
 			
 			response.put("Result", "Success");
@@ -124,10 +125,17 @@ public class LogAlarmController {
 		List<LogGroup> logGroupList = new ArrayList<LogGroup>(logGroupNameList.length);
 		
 		for (String logGroupName : logGroupNameList) {
-			this.logGroupRepo.insertIgnore(logGroupName);
-			LogGroup logGroup = this.logGroupRepo.findByName(logGroupName).get();
+			Optional<LogGroup> logGroup = this.logGroupRepo.findByName(logGroupName);
 			
-			logGroupList.add(logGroup);
+			if (logGroup.isPresent()) {
+				logGroupList.add(logGroup.get());
+			}
+			else {
+				LogGroup newLogGroup = new LogGroup(logGroupName, new ArrayList<LogAlarm>());
+				
+				this.logGroupRepo.save(newLogGroup);
+				logGroupList.add(newLogGroup);
+			}
 		}
 		
 		return logGroupList;
@@ -136,11 +144,20 @@ public class LogAlarmController {
 	private List<Keyword> getKeywordList(String[] keywordNameList) {
 		List<Keyword> keywordList = new ArrayList<Keyword>(keywordNameList.length);
 		
-		for (String keywordName : keywordNameList) {
-			this.keywordRepo.insertIgnore(keywordName);
-			Keyword keyword = this.keywordRepo.findByWord(keywordName).get();
-			
-			keywordList.add(keyword);
+		if (keywordNameList != null) {
+			for (String keywordName : keywordNameList) {			
+				Optional<Keyword> keyword = this.keywordRepo.findByWord(keywordName);
+				
+				if (keyword.isPresent()) {
+					keywordList.add(keyword.get());
+				}
+				else {
+					Keyword newKeyword = new Keyword(keywordName, new ArrayList<LogAlarm>());
+					
+					this.keywordRepo.save(newKeyword);
+					keywordList.add(newKeyword);
+				}
+			}
 		}
 		
 		return keywordList;
@@ -155,13 +172,19 @@ public class LogAlarmController {
 				.build();
 		
 		for (String snsTopicName : snsTopicNameList) {
-			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
-			CreateTopicResult result = snsClient.createTopic(request);
+			Optional<SNSTopic> snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName);
 			
-			this.snsTopicRepo.insertIgnore(snsTopicName, result.getTopicArn());
-			SNSTopic snsTopic = this.snsTopicRepo.findByTopicNameAndTopicArn(snsTopicName, result.getTopicArn()).get();
-			
-			snsTopicList.add(snsTopic);
+			if (snsTopic.isPresent()) {
+				snsTopicList.add(snsTopic.get());
+			}
+			else {
+				CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
+				CreateTopicResult result = snsClient.createTopic(request);
+				SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<LogAlarm>());
+				
+				this.snsTopicRepo.save(newTopic);
+				snsTopicList.add(newTopic);
+			}
 		}
 		
 		return snsTopicList;
@@ -229,10 +252,29 @@ public class LogAlarmController {
 			if (logAlarm.getUserList().isEmpty()) {
 				this.logAlarmRepo.delete(logAlarm);
 			}
+			else {
+				this.logAlarmRepo.save(logAlarm);
+			}
 			
 			response.put("Result", "Success");
 		}
 		
 		return response;
+	}
+	
+	@GetMapping(path="/test", produces="application/json; charset=UTF-8")
+	public ResponseEntity<GetLogAlarmResponse> test() {
+		List<LogAlarm> logAlarmList = this.logAlarmRepo.findAll();
+		User user = this.userRepo.findById(1L).get();
+		
+		List<LogAlarm> userLogAlarmList = new ArrayList<LogAlarm>(logAlarmList.size());
+		
+		for (LogAlarm alarm : logAlarmList) {
+			if (alarm.getUserList().contains(user)) {
+				userLogAlarmList.add(alarm);
+			}
+		}
+		
+		return ResponseEntity.ok(new GetLogAlarmResponse(logAlarmList, userLogAlarmList));
 	}
 }

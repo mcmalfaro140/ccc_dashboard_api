@@ -12,12 +12,6 @@ import com.ccc.api.model.LogGroup;
 @Repository
 public interface LogGroupRepository extends JpaRepository<LogGroup, Long> {
 	@Query(
-		value="INSERT IGNORE INTO LogGroups (Name) VALUES (:name)",
-		nativeQuery=true
-	)
-	public void insertIgnore(@Param(value="name") String name);
-	
-	@Query(
 		value="SELECT * FROM LogGroups WHERE Name = :name",
 		nativeQuery=true
 	)

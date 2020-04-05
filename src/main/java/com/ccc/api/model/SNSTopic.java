@@ -19,7 +19,7 @@ public class SNSTopic implements Serializable {
 	private static final long serialVersionUID = 3077399178896844362L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="SNSTopicId")
 	private Long snsTopicId;
 	

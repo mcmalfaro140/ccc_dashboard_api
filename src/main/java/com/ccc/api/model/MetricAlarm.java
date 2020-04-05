@@ -14,7 +14,7 @@ public class MetricAlarm implements Serializable {
 	private static final long serialVersionUID = 4198681733980071621L;
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="MetricAlarmId")
 	private Long metricAlarmId;
 	
