@@ -51,7 +51,7 @@ public class UserController {
         return "Hello, BACKEND server for the CCC Dashboard Project";
     }
     
-    @RequestMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap<String , Object> getUsersBySimplePath(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
@@ -66,11 +66,11 @@ public class UserController {
     	    	response.put("token", jwt);
     		}
     		else {
-    			response.put("error","Incorrect Password.");
+    			response.put("Error","Incorrect Password.");
     		}
     	} 
     	else {
-    		response.put("error", "User Not Found.");
+    		response.put("Error", "User Not Found.");
     	}
     	
     	return response;
@@ -78,42 +78,49 @@ public class UserController {
     
     @PostMapping(path = "/update", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public HashMap<String, Object> updatemap(@RequestBody Map<String, String> payload) {
+    public Object updateDahboard(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
-    	String token = payload.get("token");
     	String dashBoard = payload.get("dashboard");
 
     	User toUser = jwtutils.toUser(token);
     	
-    	if (toUser == null) {
-    		response.put("error", "token is having issue");
-    		return response;
+    	if (toUser != null) {
+    		String username = toUser.getUsername();
+        	User target = userRepository.findByUsername(username);
+        	if(target != null){
+        		if(dashBoard != null) {
+        			target.setDashboard(dashBoard);
+            		userRepository.save(target);
+            		response.put("Success", "Update completed.");
+        		}else {
+        			response.put("Error", "Missing Parameters.");
+        		}
+        	}else {
+        		response.put("Error", "User not found.");
+        	}
+    	}else {
+    		response.put("Error", "Invalid Token.");
     	}
-    	
-    	String inUser = toUser.getUsername();
-    	User target = userRepository.findByUsername(inUser);
-    	
-    	if (target != null) {
-    		target.setDashboard(dashBoard);
-    		userRepository.save(target);
-    	}
-    	else {
-    		response.put("error", "user not found");
-    	}
-    	
-		return response;
+    	return response;
     }
     
-    @RequestMapping(path = "/get_dashboard" , produces = "application/json; charset=UTF-8")
+    @RequestMapping(path = "/getDashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public HashMap<String, Object> getdashboard(@RequestHeader("Authorization") String token) {
-    	User toUsers = jwtutils.toUser(token);
-    	String inUser = toUsers.getUsername();
-    	User target = userRepository.findByUsername(inUser);
-    	
+    public Object getdashboard(@RequestHeader("Authorization") String token) {
     	HashMap<String, Object> response = new HashMap<>();
-    	response.put("dashboard", target.getDashboard());
+    	User toUsers = jwtutils.toUser(token);
     	
+    	if(toUsers != null) {
+    		String inUser = toUsers.getUsername();
+    		User target = userRepository.findByUsername(inUser);
+    		if(target != null) {
+            	response.put("dashboard", target.getDashboard());
+    		}else {
+    			response.put("Error", "User not found.");
+    		}
+    	}else {
+    		response.put("Error", "Invalid Token.");
+    	}
     	return response;
     }
 }
