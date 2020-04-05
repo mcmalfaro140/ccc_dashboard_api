@@ -12,7 +12,6 @@ import com.ccc.api.model.Keyword;
 
 @Repository
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
-	@Modifying
 	@Query(
 		value="SELECT * FROM Keywords WHERE Word = :word",
 		nativeQuery=true

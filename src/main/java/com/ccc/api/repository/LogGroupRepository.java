@@ -12,7 +12,6 @@ import com.ccc.api.model.LogGroup;
 
 @Repository
 public interface LogGroupRepository extends JpaRepository<LogGroup, Long> {
-	@Modifying
 	@Query(
 		value="SELECT * FROM LogGroups WHERE Name = :name",
 		nativeQuery=true

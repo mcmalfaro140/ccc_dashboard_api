@@ -12,7 +12,6 @@ import com.ccc.api.model.SNSTopic;
 
 @Repository
 public interface SNSTopicRepository extends JpaRepository<SNSTopic, Long> {
-	@Modifying
 	@Query(
 		value="SELECT * FROM SNSTopics WHERE TopicName = :topicName",
 		nativeQuery=true

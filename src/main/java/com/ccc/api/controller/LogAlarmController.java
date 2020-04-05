@@ -59,20 +59,24 @@ public class LogAlarmController {
 	
 	@RequestMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
-	public ResponseEntity<GetLogAlarmResponse> getLogAlarms(@RequestHeader(name="Authroization") String token) {
+	public Object getLogAlarms(@RequestHeader(name="Authorization") String token) {
 
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-		
 		User user = this.jwtUtils.toUser(token);
-		List<LogAlarm> userLogAlarm = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
-		
-		return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarm));
+		if(user != null) {
+			List<LogAlarm> userLogAlarm = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
+			return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarm));
+		}else {
+			Map<String, String> response = new HashMap<String, String>();
+			response.put("Error", "User Not Found.");
+			return response;
+		}
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
 
-	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> logAlarmInfo) {
+	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
@@ -192,37 +196,33 @@ public class LogAlarmController {
 			response.put("Result", "ERROR: User not found");
 		}
 		else {
+			User target = userRepo.findByUsername(user.getUsername());
 			Long logAlarmId = Long.parseLong(body.get("LogAlarmId"));
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
-			
-			user.getLogAlarmList().add(logAlarm);
-			this.userRepo.save(user);
-			
+			target.getLogAlarmList().add(logAlarm);
+			this.userRepo.save(target);
 			response.put("Result", "Success");
 		}
-		
 		return response;
 	}
 	
-	@PostMapping(path="/unsubcribeToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@PostMapping(path="/unsubscribeToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> unsubscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody Map<String, String> body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
-			response.put("Result", "ERROR: User not found");
+			response.put("E", "ERROR: User not found");
 		}
 		else {
+			User target = userRepo.findByUsername(user.getUsername());
 			Long logAlarmId = Long.parseLong(body.get("LogAlarmId"));
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
-			
-			user.getLogAlarmList().remove(logAlarm);
-			this.userRepo.save(user);
-			
+			target.getLogAlarmList().remove(logAlarm);
+			this.userRepo.save(target);
 			response.put("Result", "Success");
 		}
-		
 		return response;
 	}
 	
