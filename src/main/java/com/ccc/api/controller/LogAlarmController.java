@@ -62,9 +62,9 @@ public class LogAlarmController {
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
 		
 		User user = this.jwtUtils.toUser(token);
-		List<LogAlarm> userLogAlarm = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
+		List<LogAlarm> userLogAlarms = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
 		
-		return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarm));
+		return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
@@ -112,6 +112,7 @@ public class LogAlarmController {
 	
 	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
 		List<LogGroup> logGroupList = new ArrayList<LogGroup>(logGroupNameList.length);
+		List<LogGroup> newLogGroupsToSave = new ArrayList<LogGroup>(logGroupNameList.length);
 		
 		for (String logGroupName : logGroupNameList) {
 			Optional<LogGroup> logGroup = this.logGroupRepo.findByName(logGroupName);
@@ -122,16 +123,19 @@ public class LogAlarmController {
 			else {
 				LogGroup newLogGroup = new LogGroup(logGroupName, new ArrayList<LogAlarm>());
 				
-				this.logGroupRepo.save(newLogGroup);
+				newLogGroupsToSave.add(newLogGroup);
 				logGroupList.add(newLogGroup);
 			}
 		}
+		
+		this.logGroupRepo.saveAll(newLogGroupsToSave);
 		
 		return logGroupList;
 	}
 	
 	private List<Keyword> getKeywordList(String[] keywordNameList) {
 		List<Keyword> keywordList = new ArrayList<Keyword>(keywordNameList.length);
+		List<Keyword> newKeywordsToSave = new ArrayList<Keyword>(keywordNameList.length);
 		
 		if (keywordNameList != null) {
 			for (String keywordName : keywordNameList) {			
@@ -143,17 +147,20 @@ public class LogAlarmController {
 				else {
 					Keyword newKeyword = new Keyword(keywordName, new ArrayList<LogAlarm>());
 					
-					this.keywordRepo.save(newKeyword);
+					newKeywordsToSave.add(newKeyword);
 					keywordList.add(newKeyword);
 				}
 			}
 		}
+		
+		this.keywordRepo.saveAll(newKeywordsToSave);
 		
 		return keywordList;
 	}
 	
 	private List<SNSTopic> getSNSTopicList(String[] snsTopicNameList) {
 		List<SNSTopic> snsTopicList = new ArrayList<SNSTopic>(snsTopicNameList.length);
+		List<SNSTopic> newSNSTopicsToSave = new ArrayList<SNSTopic>(snsTopicNameList.length);
 		AmazonSNS snsClient = AmazonSNSClientBuilder
 				.standard()
 				.withCredentials(GlobalVariables.AWS_CREDENTIALS)
@@ -171,10 +178,12 @@ public class LogAlarmController {
 				CreateTopicResult result = snsClient.createTopic(request);
 				SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<LogAlarm>());
 				
-				this.snsTopicRepo.save(newTopic);
+				newSNSTopicsToSave.add(newTopic);
 				snsTopicList.add(newTopic);
 			}
 		}
+		
+		this.snsTopicRepo.saveAll(newSNSTopicsToSave);
 		
 		return snsTopicList;
 	}
@@ -249,21 +258,5 @@ public class LogAlarmController {
 		}
 		
 		return response;
-	}
-	
-	@GetMapping(path="/test", produces="application/json; charset=UTF-8")
-	public ResponseEntity<GetLogAlarmResponse> test() {
-		List<LogAlarm> logAlarmList = this.logAlarmRepo.findAll();
-		User user = this.userRepo.findById(1L).get();
-		
-		List<LogAlarm> userLogAlarmList = new ArrayList<LogAlarm>(logAlarmList.size());
-		
-		for (LogAlarm alarm : logAlarmList) {
-			if (alarm.getUserList().contains(user)) {
-				userLogAlarmList.add(alarm);
-			}
-		}
-		
-		return ResponseEntity.ok(new GetLogAlarmResponse(logAlarmList, userLogAlarmList));
 	}
 }
