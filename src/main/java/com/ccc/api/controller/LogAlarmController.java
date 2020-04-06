@@ -60,17 +60,20 @@ public class LogAlarmController {
 	@RequestMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
 	public Object getLogAlarms(@RequestHeader(name="Authorization") String token) {
-
+		Map<String, Object> response = new HashMap<String, Object>();
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
 		User user = this.jwtUtils.toUser(token);
 		if(user != null) {
-			List<LogAlarm> userLogAlarm = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
-			return ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarm));
+			try {
+				List<LogAlarm> userLogAlarm = this.userRepo.findById(user.getUserId()).get().getLogAlarmList();
+				response.put("Data",ResponseEntity.ok(new GetLogAlarmResponse(allLogAlarms, userLogAlarm))); 
+			}catch (Exception e) {
+				response.put("Data","[]");
+			}
 		}else {
-			Map<String, String> response = new HashMap<String, String>();
 			response.put("Error", "User Not Found.");
-			return response;
 		}
+		return response;
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
