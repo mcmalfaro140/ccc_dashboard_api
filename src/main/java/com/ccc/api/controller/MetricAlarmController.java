@@ -37,18 +37,23 @@ public class MetricAlarmController {
     @ResponseBody
     public Object getMetricAlarms (@RequestHeader("Authorization") String token) {
 		HashMap<String,Object> response = new HashMap<>();
+		HashMap<String,String> Error = new HashMap<>();
     	User user = jwtutils.toUser(token);
     	if(user != null) {
     		User target = userRepository.findByUsername(user.getUsername());
     		
     		HashMap<String,Object> alarms = new HashMap<>();
-    		List<MetricAlarm> allMetricAlarms = this.metricAlarmRepo.findAll();
-    		List<MetricAlarm> userMetricAlarms = metricAlarmRepo.findAlarmsById(target.getUserId().toString());
-    		alarms.put("all", allMetricAlarms);
-    		alarms.put("user", userMetricAlarms);
-    		response.put("Data", alarms);
+    		try {
+    			List<MetricAlarm> allMetricAlarms = this.metricAlarmRepo.findAll();
+        		List<MetricAlarm> userMetricAlarms = metricAlarmRepo.findAlarmsById(target.getUserId().toString());
+        		alarms.put("all", allMetricAlarms);
+        		alarms.put("user", userMetricAlarms);
+        		response.put("Data", alarms);
+    		}catch (Exception e) {
+    			Error.put("message","No metric alarms found.");
+        		response.put("Error", Error);
+    		}    		
     	}else {
-    		HashMap<String,String> Error = new HashMap<>();
     		Error.put("message","Invalid Token.");
     		response.put("Error", Error);
     	}
@@ -87,7 +92,7 @@ public class MetricAlarmController {
 		HashMap<String,String> Message = new HashMap<>();
 	    User user = jwtutils.toUser(token);
 	   	if(user != null) {
-	   		User target = userRepository.findByUsername(user.getUsername());
+	   		Long target = userRepository.findById(user.getUserId()).get().getUserId();
 	   		if(payload.get("alarmArn") != null) {
 	   			String alarmArn = payload.get("alarmArn");
 	   			MetricAlarm newAlarm = metricAlarmRepo.getMetricAlarm(alarmArn);
@@ -95,7 +100,7 @@ public class MetricAlarmController {
 	   				metricAlarmRepo.insertNewMetricAlarm(alarmArn);
 	   				newAlarm = metricAlarmRepo.getMetricAlarm(alarmArn);
 	   			}
-	   			metricAlarmRepo.insertNewXRefUserMetricAlarm(target.getUserId().toString(), newAlarm.getMetricAlarmId().toString());
+	   			metricAlarmRepo.insertNewXRefUserMetricAlarm(target.toString(), newAlarm.getMetricAlarmId().toString());
 	   			Message.put("message","Successfully subscribed to " + alarmArn);
 		   		response.put("Success", Message);
 	   		}else {
@@ -117,11 +122,11 @@ public class MetricAlarmController {
 		HashMap<String,String> Message = new HashMap<>();
 	    User user = jwtutils.toUser(token);
 	   	if(user != null) {
-	   		User target = userRepository.findByUsername(user.getUsername());
+	   		Long target = userRepository.findById(user.getUserId()).get().getUserId();
 	   		if(payload.get("alarmArn") != null) {
 	   			String alarmArn = payload.get("alarmArn");
 	   			MetricAlarm newAlarm = metricAlarmRepo.getMetricAlarm(alarmArn);
-	   			metricAlarmRepo.deleteXRefUserMetricAlarm(target.getUserId().toString(), newAlarm.getMetricAlarmId().toString());
+	   			metricAlarmRepo.deleteXRefUserMetricAlarm(target.toString(), newAlarm.getMetricAlarmId().toString());
 	   			Message.put("message","Successfully unsubscribed to "+alarmArn);
 		   		response.put("Success", Message);
 	   		}else {
