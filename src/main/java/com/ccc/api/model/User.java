@@ -63,7 +63,7 @@ public class User implements Serializable {
 	)
 	private List<LogAlarm> logAlarmList;
 	
-	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
 		joinColumns={
