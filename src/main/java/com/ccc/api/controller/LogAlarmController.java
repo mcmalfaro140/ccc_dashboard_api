@@ -151,7 +151,6 @@ public class LogAlarmController {
 		if (keywordNameList.isPresent()) {
 			String[] nonullKeywordNameList = keywordNameList.get();
 			List<Keyword> newKeywordsToSave = new ArrayList<Keyword>(nonullKeywordNameList.length);
-			keywordList.ensureCapacity(nonullKeywordNameList.length);
 			
 			for (String keywordName : nonullKeywordNameList) {			
 				Optional<Keyword> keyword = this.keywordRepo.findByWord(keywordName);
