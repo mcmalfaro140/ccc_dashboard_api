@@ -231,7 +231,7 @@ public class LogAlarmController {
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
-			response.put("E", "ERROR: User not found");
+			response.put("Result", "ERROR: User not found");
 		}
 		else {
 			user = this.userRepo.findById(user.getUserId()).get();
