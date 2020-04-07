@@ -13,33 +13,31 @@ import io.jsonwebtoken.security.Keys;
 
 import com.ccc.api.model.User;
 
-
 @Component
 public class JwtUtils {
-	  private String issuer = "ccc";
+	private String issuer = "ccc";
+	private SecretKey secretKey;
 	
-	  private SecretKey secretKey;
-	
-	  public JwtUtils(@Value("${jwt.secret}") String secret) {
-		    byte[] keyBytes = Decoders.BASE64URL.decode(secret);
-		    secretKey = Keys.hmacShaKeyFor(keyBytes);
-	  }
-	
-	  public String toToken(User user) {
-		  Calendar expiration = Calendar.getInstance();
-		  expiration.add(Calendar.DATE, 7);
-			    
-			    
-	      return Jwts.builder().setIssuer(issuer).setSubject(user.getUserId().toString())
-	          .setExpiration(expiration.getTime()).setClaims(user.toClaims()).signWith(secretKey).compact();
-	  }
-	
-	  public User toUser(String token) {
-		    try {
-		    	Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-		    	return User.fromClaims(jws.getBody());
-		    } catch (JwtException e) {
-			      return null;
-		    }
-	  }
+	public JwtUtils(@Value("${jwt.secret}") String secret) {
+		byte[] keyBytes = Decoders.BASE64URL.decode(secret);
+		secretKey = Keys.hmacShaKeyFor(keyBytes);
+	}
+
+	public String toToken(User user) {
+		Calendar expiration = Calendar.getInstance();
+		expiration.add(Calendar.DATE, 7);
+		    
+		    
+		return Jwts.builder().setIssuer(issuer).setSubject(user.getUserId().toString())
+				.setExpiration(expiration.getTime()).setClaims(user.toClaims()).signWith(secretKey).compact();
+	}
+
+	public User toUser(String token) {
+		try {
+			Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+			return User.fromClaims(jws.getBody());
+		} catch (JwtException e) {
+		      return null;
+		}
+	}
 }

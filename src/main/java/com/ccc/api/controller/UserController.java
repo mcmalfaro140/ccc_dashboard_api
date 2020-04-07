@@ -3,7 +3,6 @@ package com.ccc.api.controller;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -13,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -44,14 +44,13 @@ public class UserController {
 			}
 		};
 	}
-
-
-    @RequestMapping("/")
+	
+	@GetMapping("/")
     public String hello() {
         return "Hello, BACKEND server for the CCC Dashboard Project";
     }
     
-    @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap<String , Object> getUsersBySimplePath(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
@@ -76,7 +75,7 @@ public class UserController {
     	return response;
     }
     
-    @PostMapping(path = "/update", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/update", produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
     @ResponseBody
     public Object updateDahboard(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
@@ -104,7 +103,7 @@ public class UserController {
     	return response;
     }
     
-    @RequestMapping(path = "/getDashboard" , produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/getDashboard" , produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
     @ResponseBody
     public Object getdashboard(@RequestHeader("Authorization") String token) {
     	HashMap<String, Object> response = new HashMap<>();

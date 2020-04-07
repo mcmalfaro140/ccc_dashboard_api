@@ -12,21 +12,19 @@ import com.ccc.api.model.SNSTopic;
 import com.ccc.api.model.User;
 
 public class GetLogAlarmResponse {
-	private Map<String, List<Map<String, Object>>> allLogAlarms;
-	private Map<String, List<Map<String, Object>>> userLogAlarms;
+	private List<Map<String, Object>> allLogAlarms;
+	private List<Map<String, Object>> userLogAlarms;
 	
 	
 	public GetLogAlarmResponse(List<LogAlarm> logAlarmsForAll, List<LogAlarm> logAlarmsForUser) {
-		this.allLogAlarms = new HashMap<String, List<Map<String, Object>>>();
-		this.addToMap("all", this.allLogAlarms, logAlarmsForAll);
+		this.allLogAlarms = new ArrayList<Map<String, Object>>();
+		this.addToList(this.allLogAlarms, logAlarmsForAll);
 		
-		this.userLogAlarms = new HashMap<String, List<Map<String, Object>>>();
-		this.addToMap("user", this.userLogAlarms, logAlarmsForUser);
+		this.userLogAlarms = new ArrayList<Map<String, Object>>();
+		this.addToList(this.userLogAlarms, logAlarmsForUser);
 	}
 	
-	private void addToMap(String name, Map<String, List<Map<String, Object>>> logAlarmsMap, List<LogAlarm> logAlarmsList) {
-		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>(logAlarmsList.size());
-		
+	private void addToList(List<Map<String, Object>> logAlarmsMapList, List<LogAlarm> logAlarmsList) {		
 		for (LogAlarm alarm : logAlarmsList) {
 			List<String> usernames = this.getUsernames(alarm.getUserList());
 			List<String> logGroupNames = this.getLogGroupNames(alarm.getLogGroupList());
@@ -43,10 +41,8 @@ public class GetLogAlarmResponse {
 			entry.put("Keywords", keywordNames);
 			entry.put("SNSTopics", snsTopicNames);
 			
-			data.add(entry);
+			logAlarmsMapList.add(entry);
 		}
-		
-		logAlarmsMap.put(name, data);
 	}
 	
 	private List<String> getUsernames(List<User> userList) {
@@ -89,11 +85,11 @@ public class GetLogAlarmResponse {
 		return snsTopicNameList;
 	}
 	
-	public Map<String, List<Map<String, Object>>> getAllLogAlarms() {
+	public List<Map<String, Object>> getAllLogAlarms() {
 		return this.allLogAlarms;
 	}
 	
-	public Map<String, List<Map<String, Object>>> getUserLogAlarms() {
+	public List<Map<String, Object>> getUserLogAlarms() {
 		return this.userLogAlarms;
 	}
 }

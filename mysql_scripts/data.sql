@@ -46,7 +46,7 @@ INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (1, 1);
 INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (2, 2);
 INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (3, 3);
 INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (4, 4);
-
+INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (1, 4);
 
 
 --misael
