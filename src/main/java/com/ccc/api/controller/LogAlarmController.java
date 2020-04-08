@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +56,8 @@ public class LogAlarmController {
 	@Autowired
 	private JwtUtils jwtUtils;
 	
+	@RequestMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8")
+	@ResponseBody
 	public Map<String, Object> getLogAlarms(@RequestHeader(name="Authorization") String token) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();

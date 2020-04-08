@@ -36,6 +36,7 @@ public class GetLogAlarmResponse {
 			entry.put("AlarmName", alarm.getAlarmName());
 			entry.put("LogLevel", alarm.getLogLevel());
 			entry.put("KeywordRelationship", alarm.getKeywordRelationship());
+			entry.put("Comparison", alarm.getComparison());
 			entry.put("Users", usernames);
 			entry.put("LogGroups", logGroupNames);
 			entry.put("Keywords", keywordNames);
