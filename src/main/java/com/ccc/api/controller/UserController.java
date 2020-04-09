@@ -35,7 +35,7 @@ public class UserController {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/authenticate").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/update").allowedOrigins("http://localhost:3000");
-				registry.addMapping("/get_dashboard").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/getDashboard").allowedOrigins("http://localhost:3000");
 				
 				registry.addMapping("/getLogAlarms").allowedOrigins("http://localhost:3000");
 				registry.addMapping("/createLogAlarm").allowedOrigins("http://localhost:3000");
@@ -109,7 +109,7 @@ public class UserController {
     	return response;
     }
     
-    @GetMapping(path = "/getDashboard" , produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
+    @GetMapping(path = "/getDashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
     public Object getdashboard(@RequestHeader("Authorization") String token) {
     	HashMap<String, Object> response = new HashMap<>();
