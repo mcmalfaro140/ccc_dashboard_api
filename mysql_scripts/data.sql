@@ -40,7 +40,6 @@ INSERT INTO XRefUserLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (2,
 INSERT INTO XRefUserLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (3, 1, 3);
 INSERT INTO XRefUserLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (4, 2, 4);
 INSERT INTO XRefUserLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 2, 1);
-INSERT INTO XRefUserLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (4, 1, 1);
 
 --misael
 Use db;
