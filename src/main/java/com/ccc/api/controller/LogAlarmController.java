@@ -65,7 +65,7 @@ public class LogAlarmController {
 	@Autowired
 	private JwtUtils jwtUtils;
 	
-	@GetMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@GetMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> getLogAlarms(@RequestHeader(name="Authorization") String token) {
 		Map<String, Object> response = new HashMap<String, Object>();
@@ -85,7 +85,7 @@ public class LogAlarmController {
 		return response;
 	}
 	
-	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody CreateLogAlarmRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
@@ -225,7 +225,7 @@ public class LogAlarmController {
 		return xrefUserLogAlarmSNSTopicList;
 	}
 	
-	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> subscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmSubscriptionRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
@@ -252,7 +252,7 @@ public class LogAlarmController {
 		return response;
 	}
 	
-	@PostMapping(path="/unsubscribeToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@PostMapping(path="/unsubscribeToLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> unsubscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmSubscriptionRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
@@ -277,7 +277,7 @@ public class LogAlarmController {
 		return response;
 	}
 	
-	@PostMapping(path="/deleteLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@PostMapping(path="/deleteLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> deleteLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmIdRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
@@ -299,7 +299,7 @@ public class LogAlarmController {
 		return response;
 	}
 	
-	@PostMapping(path="/assignTopicToLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+	@PostMapping(path="/assignTopicToLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> assignTopicToAlarm(@RequestHeader(name="Authorization") String token, @RequestBody AssignTopicToLogAlarmRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
