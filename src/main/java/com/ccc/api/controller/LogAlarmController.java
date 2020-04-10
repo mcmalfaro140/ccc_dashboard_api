@@ -21,6 +21,7 @@ import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
 import com.ccc.api.http.AssignTopicToLogAlarmRequest;
+import com.ccc.api.http.CreateLogAlarmRequest;
 import com.ccc.api.http.GetLogAlarmResponse;
 import com.ccc.api.http.LogAlarmIdRequest;
 import com.ccc.api.http.LogAlarmSubscriptionRequest;
@@ -85,7 +86,7 @@ public class LogAlarmController {
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
 	@ResponseBody
-	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> body) {
+	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody CreateLogAlarmRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
@@ -95,16 +96,17 @@ public class LogAlarmController {
 		else {
 			User obtainedUser = this.userRepo.findById(user.getUserId()).get();
 			
-			String alarmName = body.get("AlarmName");
-			String keywordRelationship = body.get("KeywordRelationship");
-			String logLevel = body.get("LogLevel");
-			String comparison = body.get("Comparison");
-			String[] logGroupNames = body.get("LogGroups").split(",");
+			String alarmName = body.getAlarmName();
+			String keywordRelationship = body.getKeywordRelationship();
+			String logLevel = body.getLogLevel();
+			String comparison = body.getComparison();
+			String[] logGroupNames = body.getLogGroups().split(",");
 			
-			String keywordNamesAsString = body.get("Keywords");
+			String keywordNamesAsString = body.getKeywords();
 			Optional<String[]> keywordNames = (null == keywordNamesAsString) ? Optional.empty() : Optional.of(keywordNamesAsString.split(","));
 					
-			String[] snsTopicNames = body.get("SNSTopicNames").split(",");
+			String[] snsTopicNames = body.getSNSTopicNames().split(",");
+			
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
 			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicNames);
