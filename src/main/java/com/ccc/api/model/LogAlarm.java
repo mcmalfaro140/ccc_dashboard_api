@@ -2,7 +2,6 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -183,17 +182,12 @@ public class LogAlarm implements Serializable {
 		this.alarmName = alarmName;
 	}
 	
-	public Optional<String> getKeywordRelationship() {
-		return Optional.ofNullable(this.keywordRelationship);
+	public String getKeywordRelationship() {
+		return this.keywordRelationship;
 	}
 	
-	public void setKeywordRelationship(Optional<String> keywordRelationship) {
-		if (keywordRelationship.isPresent()) {
-			this.keywordRelationship = keywordRelationship.get();
-		}
-		else {
-			this.keywordRelationship = null;
-		}
+	public void setKeywordRelationship(String keywordRelationship) {
+		this.keywordRelationship = keywordRelationship;
 	}
 	
 	public String getLogLevel() {
