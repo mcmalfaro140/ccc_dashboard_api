@@ -78,6 +78,46 @@ public class LogAlarm implements Serializable {
 	)
 	private List<Keyword> keywordList;
 	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefUserLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="UserId",
+				referencedColumnName="UserId",
+				nullable=false
+			)
+		}
+	)
+	private List<User> userList;
+	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefUserLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="SNSTopicId",
+				referencedColumnName="SNSTopicId",
+				nullable=false
+			)
+		}
+	)
+	private List<SNSTopic> snsTopicList;
+	
 	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
 	
@@ -91,6 +131,8 @@ public class LogAlarm implements Serializable {
 			String comparison,
 			List<LogGroup> logGroupList,
 			List<Keyword> keywordList,
+			List<User> userList,
+			List<SNSTopic> snsTopicList,
 			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
 		this.alarmName = alarmName;
@@ -99,6 +141,8 @@ public class LogAlarm implements Serializable {
 		this.comparison = comparison;
 		this.logGroupList = logGroupList;
 		this.keywordList = keywordList;
+		this.userList = userList;
+		this.snsTopicList = snsTopicList;
 		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
@@ -110,6 +154,8 @@ public class LogAlarm implements Serializable {
 			String comparison,
 			List<LogGroup> logGroupList,
 			List<Keyword> keywordList,
+			List<User> userList,
+			List<SNSTopic> snsTopicList,
 			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
 		this.logAlarmId = logAlarmId;
@@ -119,6 +165,8 @@ public class LogAlarm implements Serializable {
 		this.comparison = comparison;
 		this.logGroupList = logGroupList;
 		this.keywordList = keywordList;
+		this.userList = userList;
+		this.snsTopicList = snsTopicList;
 		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
@@ -172,6 +220,22 @@ public class LogAlarm implements Serializable {
 	
 	public void setKeywordList(List<Keyword> keywordList) {
 		this.keywordList = keywordList;
+	}
+	
+	public List<User> getUserList() {
+		return this.userList;
+	}
+	
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
+	}
+	
+	public List<SNSTopic> getSNSTopicList() {
+		return this.snsTopicList;
+	}
+	
+	public void setSNSTopicList(List<SNSTopic> snsTopicList) {
+		this.snsTopicList = snsTopicList;
 	}
 	
 	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {

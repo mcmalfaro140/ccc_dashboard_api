@@ -68,14 +68,15 @@ public class LogAlarmController {
 	@ResponseBody
 	public Map<String, Object> getLogAlarms(@RequestHeader(name="Authorization") String token) {
 		Map<String, Object> response = new HashMap<String, Object>();
+		List<XRefUserLogAlarmSNSTopic> allLogAlarms = this.xrefUserLogAlarmSNSTopicRepo.findAll();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
 			response.put("Result", "ERROR: User Not Found");
 		}
 		else {
-			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
+			user = this.userRepo.findById(user.getUserId()).get();
+			List<XRefUserLogAlarmSNSTopic> userLogAlarms = user.getXRefUserLogAlarmSNSTopicList();
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
@@ -83,6 +84,7 @@ public class LogAlarmController {
 		return response;
 	}
 	
+<<<<<<< HEAD
 	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
 		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
 		
@@ -120,12 +122,23 @@ public class LogAlarmController {
 					
 			String snsTopicName = body.getSNSTopicName();
 			
+			List<User> userList = this.getUserList(obtainedUser);
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
 			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicName);
 			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = this.getXRefUserLogAlarmSNSTopicList(obtainedUser, snsTopicList);
 			
-			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, logGroupList, keywordList, xrefUserLogAlarmSNSTopicList);
+			LogAlarm logAlarm = new LogAlarm(
+					alarmName,
+					keywordRelationship,
+					logLevel,
+					comparison,
+					logGroupList,
+					keywordList,
+					userList,
+					snsTopicList,
+					xrefUserLogAlarmSNSTopicList
+			);
 			
 			logGroupList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
 			keywordList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
@@ -141,6 +154,13 @@ public class LogAlarmController {
 		}
 		
 		return response;
+	}
+	
+	private List<User> getUserList(User user) {
+		ArrayList<User> userList = new ArrayList<User>(1);
+		userList.add(user);
+		
+		return userList;
 	}
 	
 	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
@@ -331,5 +351,12 @@ public class LogAlarmController {
 		}
 		
 		return response;
+	}
+	
+	@GetMapping(path="/", produces="text/plain")
+	public String test() {
+		return this.userRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString() +
+				this.logAlarmRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString() +
+				this.snsTopicRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString();
 	}
 }
