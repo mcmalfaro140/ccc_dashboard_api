@@ -42,46 +42,6 @@ public class User implements Serializable {
 	private String dashboard;
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
-		name="XRefUserLogAlarmSNSTopic",
-		joinColumns={
-			@JoinColumn(
-				name="UserId",
-				referencedColumnName="UserId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				referencedColumnName="LogAlarmId",
-				nullable=false
-			)
-		}
-	)
-	private List<LogAlarm> logAlarmList;
-	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefUserLogAlarmSNSTopic",
-		joinColumns={
-			@JoinColumn(
-				name="UserId",
-				referencedColumnName="UserId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="SNSTopicId",
-				referencedColumnName="SNSTopicId",
-				nullable=false
-			)
-		}
-	)
-	private List<SNSTopic> snsTopicList;
-	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
 		name="XRefUserMetricAlarm",
 		joinColumns={
 			@JoinColumn(
@@ -111,8 +71,6 @@ public class User implements Serializable {
 			String password,
 			String email,
 			String dashboard,
-			List<LogAlarm> logAlarmList,
-			List<SNSTopic> snsTopicList,
 			List<MetricAlarm> metricAlarmList,
 			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
@@ -120,8 +78,6 @@ public class User implements Serializable {
 		this.password = password;
 		this.email = email;
 		this.dashboard = dashboard;
-		this.logAlarmList = logAlarmList;
-		this.snsTopicList = snsTopicList;
 		this.metricAlarmList = metricAlarmList;
 		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
@@ -132,8 +88,6 @@ public class User implements Serializable {
 			String password,
 			String email,
 			String dashboard,
-			List<LogAlarm> logAlarmList,
-			List<SNSTopic> snsTopicList,
 			List<MetricAlarm> metricAlarmList,
 			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
@@ -142,8 +96,6 @@ public class User implements Serializable {
 		this.password = password;
 		this.email = email;
 		this.dashboard = dashboard;
-		this.logAlarmList = logAlarmList;
-		this.snsTopicList = snsTopicList;
 		this.metricAlarmList = metricAlarmList;
 		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
@@ -182,22 +134,6 @@ public class User implements Serializable {
 	
 	public void setDashboard(String dashboard) {
 		this.dashboard = dashboard;
-	}
-	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
-	}
-	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
-	}
-	
-	public List<SNSTopic> getSNSTopicList() {
-		return this.snsTopicList;
-	}
-	
-	public void setSNSTopicList(List<SNSTopic> snsTopicList) {
-		this.snsTopicList = snsTopicList;
 	}
 	
 	public List<MetricAlarm> getMetricAlarmList() {

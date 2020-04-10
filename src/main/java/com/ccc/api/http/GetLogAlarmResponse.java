@@ -45,7 +45,7 @@ public class GetLogAlarmResponse {
 			entry.put("Comparison", alarm.getComparison());
 			entry.put("LogGroups", logGroupNames);
 			entry.put("Keywords", keywordNames);
-			entry.put("XRefUserSNSTopic", new AllData(xrefUserLogAlarmSNSTopic.getUser().getUsername(), xrefUserLogAlarmSNSTopic.getSNSTopic().getTopicName()));
+			entry.put("XRefUserSNSTopic", new Data(xrefUserLogAlarmSNSTopic.getUser().getUsername(), xrefUserLogAlarmSNSTopic.getSNSTopic().getTopicName()));
 			
 			logAlarmsMapList.add(entry);
 		}
@@ -73,14 +73,14 @@ public class GetLogAlarmResponse {
 		return keywordNameList;
 	}
 	
-	public static class AllData {
+	public static class Data {
 		@JsonProperty(value="Username")
 		private String username;
 		
 		@JsonProperty(value="SNSTopicName")
 		private String snsTopicName;
 		
-		public AllData(String username, String snsTopicName) {
+		public Data(String username, String snsTopicName) {
 			this.username = username;
 			this.snsTopicName = snsTopicName;
 		}

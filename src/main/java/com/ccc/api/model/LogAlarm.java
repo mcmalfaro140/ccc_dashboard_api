@@ -81,7 +81,7 @@ public class LogAlarm implements Serializable {
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
-		name="XRefUserLogAlamrSNSTopic",
+		name="XRefUserLogAlarmSNSTopic",
 		joinColumns={
 			@JoinColumn(
 				name="LogAlarmId",
@@ -101,7 +101,7 @@ public class LogAlarm implements Serializable {
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
-		name="XRefUserLogAlamrSNSTopic",
+		name="XRefUserLogAlarmSNSTopic",
 		joinColumns={
 			@JoinColumn(
 				name="LogAlarmId",
