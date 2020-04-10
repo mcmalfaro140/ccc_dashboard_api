@@ -10,6 +10,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -29,22 +32,79 @@ public class SNSTopic implements Serializable {
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefUserLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="SNSTopicId",
+				referencedColumnName="SNSTopicId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="UserId",
+				referencedColumnName="UserId",
+				nullable=false
+			)
+		}
+	)
+	private List<User> userList;
+	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefUserLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="SNSTopicId",
+				referencedColumnName="SNSTopicId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		}
+	)
+	private List<LogAlarm> logAlarmList;
+	
 	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
 	
 	public SNSTopic() {
 	}
 	
-	public SNSTopic(String topicName, String topicArn, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
+	public SNSTopic(
+			String topicName,
+			String topicArn,
+			List<User> userList,
+			List<LogAlarm> logAlarmList,
+			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+	) {
 		this.topicName = topicName;
 		this.topicArn = topicArn;
+		this.userList = userList;
+		this.logAlarmList = logAlarmList;
 		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
-	public SNSTopic(Long snsTopicId, String topicName, String topicArn, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
+	public SNSTopic(
+			Long snsTopicId,
+			String topicName,
+			String topicArn,
+			List<User> userList,
+			List<LogAlarm> logAlarmList,
+			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+	) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
+		this.userList = userList;
+		this.logAlarmList = logAlarmList;
 		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
@@ -66,6 +126,22 @@ public class SNSTopic implements Serializable {
 	
 	public void setTopicArn(String topicArn) {
 		this.topicArn = topicArn;
+	}
+	
+	public List<User> getUserList() {
+		return this.userList;
+	}
+	
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
+	}
+	
+	public List<LogAlarm> getLogAlarmList() {
+		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
 	}
 	
 	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
