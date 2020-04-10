@@ -68,6 +68,7 @@ public class LogAlarmController {
 	@ResponseBody
 	public Map<String, Object> getLogAlarms(@RequestHeader(name="Authorization") String token) {
 		Map<String, Object> response = new HashMap<String, Object>();
+		List<XRefUserLogAlarmSNSTopic> allLogAlarms = this.xrefUserLogAlarmSNSTopicRepo.findAll();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
@@ -75,9 +76,9 @@ public class LogAlarmController {
 		}
 		else {
 			user = this.userRepo.findById(user.getUserId()).get();
-			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
+			List<XRefUserLogAlarmSNSTopic> userLogAlarms = user.getXRefUserLogAlarmSNSTopicList();
 			
-			response.put("Result", new GetLogAlarmResponse(allLogAlarms, user));
+			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
 		
 		return response;
@@ -335,5 +336,12 @@ public class LogAlarmController {
 		}
 		
 		return response;
+	}
+	
+	@GetMapping(path="/", produces="text/plain")
+	public String test() {
+		return this.userRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString() +
+				this.logAlarmRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString() +
+				this.snsTopicRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString();
 	}
 }
