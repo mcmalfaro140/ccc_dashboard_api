@@ -40,7 +40,6 @@ public class User implements Serializable {
 	
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
-	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
