@@ -71,8 +71,10 @@ public class GetLogAlarmResponse {
 	private List<String> getKeywords(List<Keyword> keywordList) {
 		List<String> keywordNameList = new ArrayList<String>(keywordList.size());
 		
-		for (Keyword keyword : keywordList) {
-			keywordNameList.add(keyword.getWord());
+		if (keywordList.size() > 1 || (keywordList.size() == 1 && keywordList.get(0).getWord().isPresent())) {
+			for (Keyword keyword : keywordList) {
+				keywordNameList.add(keyword.getWord().get());
+			}
 		}
 		
 		return keywordNameList;
