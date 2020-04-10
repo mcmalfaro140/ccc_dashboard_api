@@ -21,9 +21,9 @@ public class CreateLogAlarmRequest {
 	@JsonProperty(value="Keywords")
 	private String keywords;
 	
-	@JsonProperty(value="SNSTopicNames")
-	private String snsTopicNames;
-	
+	@JsonProperty(value="SNSTopicName")
+	private String snsTopicName;
+
 	public CreateLogAlarmRequest() {
 	}
 	
@@ -34,7 +34,7 @@ public class CreateLogAlarmRequest {
 			String comparison,
 			String logGroups,
 			String keywords,
-			String snsTopicNames
+			String snsTopicName
 	) {
 		this.alarmName = alarmName;
 		this.keywordRelationship = keywordRelationship;
@@ -42,7 +42,7 @@ public class CreateLogAlarmRequest {
 		this.comparison = comparison;
 		this.logGroups = logGroups;
 		this.keywords = keywords;
-		this.snsTopicNames = snsTopicNames;
+		this.snsTopicName = snsTopicName;
 	}
 	
 	public String getAlarmName() {
@@ -69,7 +69,7 @@ public class CreateLogAlarmRequest {
 		return this.keywords;
 	}
 	
-	public String getSNSTopicNames() {
-		return this.snsTopicNames;
+	public String getSNSTopicName() {
+		return this.snsTopicName;
 	}
 }

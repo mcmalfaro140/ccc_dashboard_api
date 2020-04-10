@@ -75,27 +75,13 @@ public class LogAlarmController {
 			response.put("Result", "ERROR: User Not Found");
 		}
 		else {
+			user = this.userRepo.findById(user.getUserId()).get();
 			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
 			
-			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
+			response.put("Result", new GetLogAlarmResponse(allLogAlarms, user));
 		}
 		
 		return response;
-	}
-	
-	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
-		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
-		
-		for (LogAlarm alarm : allLogAlarms) {
-			for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : alarm.getXRefUserLogAlarmSNSTopicList()) {
-				if (xrefUserLogAlarmSNSTopic.getUser().equals(user)) {
-					userLogAlarms.add(alarm);
-				}
-			}
-		}
-		
-		return userLogAlarms;
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
@@ -119,14 +105,25 @@ public class LogAlarmController {
 			String keywordNamesAsString = body.getKeywords();
 			Optional<String[]> keywordNames = (null == keywordNamesAsString) ? Optional.empty() : Optional.of(keywordNamesAsString.split(","));
 					
-			String[] snsTopicNames = body.getSNSTopicNames().split(",");
+			String snsTopicName = body.getSNSTopicName();
 			
+			List<User> userList = this.getUserList(obtainedUser);
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
-			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicNames);
+			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicName);
 			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = this.getXRefUserLogAlarmSNSTopicList(obtainedUser, snsTopicList);
 			
-			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, logGroupList, keywordList, xrefUserLogAlarmSNSTopicList);
+			LogAlarm logAlarm = new LogAlarm(
+					alarmName,
+					keywordRelationship,
+					logLevel,
+					comparison,
+					logGroupList,
+					keywordList,
+					userList,
+					snsTopicList,
+					xrefUserLogAlarmSNSTopicList
+			);
 			
 			logGroupList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
 			keywordList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
@@ -142,6 +139,13 @@ public class LogAlarmController {
 		}
 		
 		return response;
+	}
+	
+	private List<User> getUserList(User user) {
+		ArrayList<User> userList = new ArrayList<User>(1);
+		userList.add(user);
+		
+		return userList;
 	}
 	
 	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
@@ -194,32 +198,33 @@ public class LogAlarmController {
 		return keywordList;
 	}
 	
-	private List<SNSTopic> getSNSTopicList(String[] snsTopicNameList) {
-		ArrayList<SNSTopic> snsTopicList = new ArrayList<SNSTopic>(snsTopicNameList.length);
-		ArrayList<SNSTopic> newSNSTopicsToSave = new ArrayList<SNSTopic>(snsTopicNameList.length);
+	private List<SNSTopic> getSNSTopicList(String snsTopicName) {
+		ArrayList<SNSTopic> snsTopicList = new ArrayList<SNSTopic>(1);
 		AmazonSNS snsClient = AmazonSNSClientBuilder
 				.standard()
 				.withCredentials(GlobalVariables.AWS_CREDENTIALS)
 				.withRegion(GlobalVariables.AWS_REGION)
 				.build();
 		
-		for (String snsTopicName : snsTopicNameList) {
-			Optional<SNSTopic> snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName);
-			
-			if (snsTopic.isPresent()) {
-				snsTopicList.add(snsTopic.get());
-			}
-			else {
-				CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
-				CreateTopicResult result = snsClient.createTopic(request);
-				SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<XRefUserLogAlarmSNSTopic>());
-				
-				newSNSTopicsToSave.add(newTopic);
-				snsTopicList.add(newTopic);
-			}
-		}
+		Optional<SNSTopic> snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName);
 		
-		this.snsTopicRepo.saveAll(newSNSTopicsToSave);
+		if (snsTopic.isPresent()) {
+			snsTopicList.add(snsTopic.get());
+		}
+		else {
+			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
+			CreateTopicResult result = snsClient.createTopic(request);
+			SNSTopic newTopic = new SNSTopic(
+					snsTopicName,
+					result.getTopicArn(),
+					new ArrayList<User>(),
+					new ArrayList<LogAlarm>(),
+					new ArrayList<XRefUserLogAlarmSNSTopic>()
+			);
+			
+			this.snsTopicRepo.save(newTopic);
+			snsTopicList.add(newTopic);
+		}
 		
 		return snsTopicList;
 	}

@@ -8,6 +8,7 @@ import java.util.Map;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
+import com.ccc.api.model.User;
 import com.ccc.api.model.XRefUserLogAlarmSNSTopic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,12 +23,12 @@ public class GetLogAlarmResponse {
 	public GetLogAlarmResponse() {
 	}
 	
-	public GetLogAlarmResponse(List<LogAlarm> logAlarmsForAll, List<LogAlarm> logAlarmsForUser) {
+	public GetLogAlarmResponse(List<LogAlarm> logAlarmsForAll, User user) {
 		this.all = new ArrayList<Map<String, Object>>();
 		this.add(this.all, logAlarmsForAll);
 		
 		this.user = new ArrayList<Map<String, Object>>();
-		this.add(this.user, logAlarmsForUser);
+		this.add(this.user, user.getLogAlarmList());
 	}
 	
 	private void add(List<Map<String, Object>> logAlarmsMapList, List<LogAlarm> logAlarmList) {				
@@ -52,7 +53,6 @@ public class GetLogAlarmResponse {
 			entry.put("Users", userList);
 			entry.put("SNSTopics", snsTopicList);
 			entry.put("XRefUserSNSTopic", xrefUserSNSTopicList);
-			
 			
 			logAlarmsMapList.add(entry);
 		}
