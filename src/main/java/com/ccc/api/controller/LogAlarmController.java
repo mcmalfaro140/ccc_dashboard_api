@@ -84,7 +84,6 @@ public class LogAlarmController {
 		return response;
 	}
 	
-<<<<<<< HEAD
 	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
 		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
 		
