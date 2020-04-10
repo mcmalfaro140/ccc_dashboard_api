@@ -69,15 +69,14 @@ public class LogAlarmController {
 	@ResponseBody
 	public Map<String, Object> getLogAlarms(@RequestHeader(name="Authorization") String token) {
 		Map<String, Object> response = new HashMap<String, Object>();
-		List<XRefUserLogAlarmSNSTopic> allLogAlarms = this.xrefUserLogAlarmSNSTopicRepo.findAll();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
 			response.put("Result", "ERROR: User Not Found");
 		}
 		else {
-			user = this.userRepo.findById(user.getUserId()).get();
-			List<XRefUserLogAlarmSNSTopic> userLogAlarms = user.getXRefUserLogAlarmSNSTopicList();
+			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
+			List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
@@ -85,7 +84,25 @@ public class LogAlarmController {
 		return response;
 	}
 	
+<<<<<<< HEAD
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
+=======
+	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
+		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
+		
+		for (LogAlarm alarm : allLogAlarms) {
+			for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : alarm.getXRefUserLogAlarmSNSTopicList()) {
+				if (xrefUserLogAlarmSNSTopic.getUser().equals(user)) {
+					userLogAlarms.add(alarm);
+				}
+			}
+		}
+		
+		return userLogAlarms;
+	}
+	
+	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8", consumes="application/json; charset=UTF-8")
+>>>>>>> 1ddb20343e274426b3eb6e05640bd9dd721bf845
 	@ResponseBody
 	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody CreateLogAlarmRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
@@ -324,12 +341,5 @@ public class LogAlarmController {
 		}
 		
 		return response;
-	}
-	
-	@GetMapping(path="/", produces="text/plain")
-	public String test() {
-		return this.userRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString() +
-				this.logAlarmRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString() +
-				this.snsTopicRepo.findAll().get(0).getXRefUserLogAlarmSNSTopicList().toString();
 	}
 }
