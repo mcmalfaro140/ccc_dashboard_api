@@ -23,7 +23,7 @@ public class CreateLogAlarmRequest {
 	
 	@JsonProperty(value="SNSTopicName")
 	private String snsTopicName;
-
+	
 	public CreateLogAlarmRequest() {
 	}
 	
