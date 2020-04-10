@@ -13,16 +13,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 @Entity(name="Users")
 @Table(name="Users")
-@Transactional
 public class User implements Serializable {
 	private static final long serialVersionUID = 4066752461555608563L;
 
@@ -43,27 +41,7 @@ public class User implements Serializable {
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
 	
-	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefUserLogAlarm",
-		joinColumns={
-			@JoinColumn(
-				name="UserId",
-				referencedColumnName="UserId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				referencedColumnName="LogAlarmId",
-				nullable=false
-			)
-		}
-	)
-	private List<LogAlarm> logAlarmList;
-	
-	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
 		joinColumns={
@@ -83,6 +61,9 @@ public class User implements Serializable {
 	)
 	private List<MetricAlarm> metricAlarmList;
 	
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
+	
 	public User() {
 	}
 	
@@ -91,15 +72,15 @@ public class User implements Serializable {
 			String password,
 			String email,
 			String dashboard,
-			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList
+			List<MetricAlarm> metricAlarmList,
+			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.dashboard = dashboard;
-		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public User(
@@ -109,15 +90,16 @@ public class User implements Serializable {
 			String email,
 			String dashboard,
 			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList
+			List<MetricAlarm> metricAlarmList,
+			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.dashboard = dashboard;
-		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public Long getUserId() {
@@ -156,20 +138,20 @@ public class User implements Serializable {
 		this.dashboard = dashboard;
 	}
 	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
-	}
-	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
-	}
-	
 	public List<MetricAlarm> getMetricAlarmList() {
 		return this.metricAlarmList;
 	}
 	
 	public void setMetricAlarmList(List<MetricAlarm> metricAlarmList) {
 		this.metricAlarmList = metricAlarmList;
+	}
+	
+	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
+		return this.xrefUserLogAlarmSNSTopicList;
+	}
+	
+	public void setXRefUserLogAlarmSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public Claims toClaims() {
@@ -189,5 +171,23 @@ public class User implements Serializable {
 		user.email = claims.get("Email", String.class);
 		
 		return user;
+	}
+	
+	@Override
+	public int hashCode() {
+		int modifier = 31;
+		
+		return Math.abs(
+				modifier * this.userId.hashCode() +
+				modifier * this.username.hashCode() +
+				modifier * this.password.hashCode() +
+				modifier * this.email.hashCode() +
+				modifier * this.dashboard.hashCode()
+		);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof User) ? this.userId == ((User)obj).userId : false;
 	}
 }

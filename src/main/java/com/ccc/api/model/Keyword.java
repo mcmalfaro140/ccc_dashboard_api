@@ -62,4 +62,19 @@ public class Keyword implements Serializable {
 	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
 		this.logAlarmList = logAlarmList;
 	}
+	
+	@Override
+	public int hashCode() {
+		int modifier = 31;
+		
+		return Math.abs(
+				modifier * this.keywordId.hashCode() +
+				modifier * this.word.hashCode()
+		);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Keyword) ? this.keywordId == ((Keyword)obj).keywordId : false;
+	}
 }

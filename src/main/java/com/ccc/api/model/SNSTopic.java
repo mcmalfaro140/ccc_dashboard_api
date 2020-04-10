@@ -10,7 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity(name="SNSTopics")
@@ -29,23 +29,23 @@ public class SNSTopic implements Serializable {
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
-	@ManyToMany(mappedBy="snsTopicList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<LogAlarm> logAlarmList;
+	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
 	
 	public SNSTopic() {
 	}
 	
-	public SNSTopic(String topicName, String topicArn, List<LogAlarm> logAlarmList) {
+	public SNSTopic(String topicName, String topicArn, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
 		this.topicName = topicName;
 		this.topicArn = topicArn;
-		this.logAlarmList = logAlarmList;
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
-	public SNSTopic(Long snsTopicId, String topicName, String topicArn, List<LogAlarm> logAlarmList) {
+	public SNSTopic(Long snsTopicId, String topicName, String topicArn, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
-		this.logAlarmList = logAlarmList;
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public Long getSNSTopicId() {
@@ -68,11 +68,27 @@ public class SNSTopic implements Serializable {
 		this.topicArn = topicArn;
 	}
 	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
+	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
+		return this.xrefUserLogAlarmSNSTopicList;
 	}
 	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
+	public void setXRefUserLogAlarmSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
+	}
+	
+	@Override
+	public int hashCode() {
+		int modifier = 31;
+		
+		return Math.abs(
+				modifier * this.snsTopicId.hashCode() +
+				modifier * this.topicName.hashCode() +
+				modifier * this.topicArn.hashCode()
+		);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof SNSTopic) ? this.snsTopicId == ((SNSTopic)obj).snsTopicId : false;
 	}
 }

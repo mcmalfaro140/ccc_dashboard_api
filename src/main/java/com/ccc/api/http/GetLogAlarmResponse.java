@@ -8,28 +8,34 @@ import java.util.Map;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
-import com.ccc.api.model.SNSTopic;
-import com.ccc.api.model.User;
+import com.ccc.api.model.XRefUserLogAlarmSNSTopic;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GetLogAlarmResponse {
-	private List<Map<String, Object>> allLogAlarms;
-	private List<Map<String, Object>> userLogAlarms;
+	@JsonProperty(value="All")
+	private List<Map<String, Object>> all;
 	
+	@JsonProperty(value="User")
+	private List<Map<String, Object>> user;
 	
-	public GetLogAlarmResponse(List<LogAlarm> logAlarmsForAll, List<LogAlarm> logAlarmsForUser) {
-		this.allLogAlarms = new ArrayList<Map<String, Object>>();
-		this.addToList(this.allLogAlarms, logAlarmsForAll);
-		
-		this.userLogAlarms = new ArrayList<Map<String, Object>>();
-		this.addToList(this.userLogAlarms, logAlarmsForUser);
+	public GetLogAlarmResponse() {
 	}
 	
-	private void addToList(List<Map<String, Object>> logAlarmsMapList, List<LogAlarm> logAlarmsList) {		
-		for (LogAlarm alarm : logAlarmsList) {
-			List<String> usernames = this.getUsernames(alarm.getUserList());
+	public GetLogAlarmResponse(List<XRefUserLogAlarmSNSTopic> logAlarmsForAll, List<XRefUserLogAlarmSNSTopic> logAlarmsForUser) {
+		this.all = new ArrayList<Map<String, Object>>();
+		this.addToAll(this.all, logAlarmsForAll);
+		
+		this.user = new ArrayList<Map<String, Object>>();
+		this.addToUser(this.user, logAlarmsForUser);
+	}
+	
+	private void addToAll(List<Map<String, Object>> logAlarmsMapList, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {				
+		for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : xrefUserLogAlarmSNSTopicList) {
+			LogAlarm alarm = xrefUserLogAlarmSNSTopic.getLogAlarm();
+			
 			List<String> logGroupNames = this.getLogGroupNames(alarm.getLogGroupList());
 			List<String> keywordNames = this.getKeywords(alarm.getKeywordList());
-			List<String> snsTopicNames = this.getSNSTopicNames(alarm.getSNSTopicList());
 			
 			Map<String, Object> entry = new HashMap<String, Object>();
 			entry.put("LogAlarmId", alarm.getLogAlarmId());
@@ -37,23 +43,33 @@ public class GetLogAlarmResponse {
 			entry.put("LogLevel", alarm.getLogLevel());
 			entry.put("KeywordRelationship", alarm.getKeywordRelationship());
 			entry.put("Comparison", alarm.getComparison());
-			entry.put("Users", usernames);
 			entry.put("LogGroups", logGroupNames);
 			entry.put("Keywords", keywordNames);
-			entry.put("SNSTopics", snsTopicNames);
+			entry.put("XRefUserSNSTopic", new AllData(xrefUserLogAlarmSNSTopic.getUser().getUsername(), xrefUserLogAlarmSNSTopic.getSNSTopic().getTopicName()));
 			
 			logAlarmsMapList.add(entry);
 		}
 	}
 	
-	private List<String> getUsernames(List<User> userList) {
-		List<String> usernameList = new ArrayList<String>(userList.size());
-		
-		for (User user : userList) {
-			usernameList.add(user.getUsername());
+	private void addToUser(List<Map<String, Object>> logAlarmsMapList, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {				
+		for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : xrefUserLogAlarmSNSTopicList) {
+			LogAlarm alarm = xrefUserLogAlarmSNSTopic.getLogAlarm();
+			
+			List<String> logGroupNames = this.getLogGroupNames(alarm.getLogGroupList());
+			List<String> keywordNames = this.getKeywords(alarm.getKeywordList());
+			
+			Map<String, Object> entry = new HashMap<String, Object>();
+			entry.put("LogAlarmId", alarm.getLogAlarmId());
+			entry.put("AlarmName", alarm.getAlarmName());
+			entry.put("LogLevel", alarm.getLogLevel());
+			entry.put("KeywordRelationship", alarm.getKeywordRelationship());
+			entry.put("Comparison", alarm.getComparison());
+			entry.put("LogGroups", logGroupNames);
+			entry.put("Keywords", keywordNames);
+			entry.put("SNSTopics", xrefUserLogAlarmSNSTopic.getSNSTopic().getTopicName());
+			
+			logAlarmsMapList.add(entry);
 		}
-		
-		return usernameList;
 	}
 	
 	private List<String> getLogGroupNames(List<LogGroup> logGroupList) {
@@ -76,21 +92,25 @@ public class GetLogAlarmResponse {
 		return keywordNameList;
 	}
 	
-	private List<String> getSNSTopicNames(List<SNSTopic> snsTopicList) {
-		List<String> snsTopicNameList = new ArrayList<String>(snsTopicList.size());
+	public static class AllData {
+		@JsonProperty(value="Username")
+		private String username;
 		
-		for (SNSTopic topic : snsTopicList) {
-			snsTopicNameList.add(topic.getTopicName());
+		@JsonProperty(value="SNSTopicName")
+		private String snsTopicName;
+		
+		public AllData(String username, String snsTopicName) {
+			this.username = username;
+			this.snsTopicName = snsTopicName;
 		}
 		
-		return snsTopicNameList;
-	}
-	
-	public List<Map<String, Object>> getAllLogAlarms() {
-		return this.allLogAlarms;
-	}
-	
-	public List<Map<String, Object>> getUserLogAlarms() {
-		return this.userLogAlarms;
+		public String getUsername() {
+			return this.username;
+		}
+		
+		@JsonIgnore
+		public String getSNSTopicName() {
+			return this.snsTopicName;
+		}
 	}
 }

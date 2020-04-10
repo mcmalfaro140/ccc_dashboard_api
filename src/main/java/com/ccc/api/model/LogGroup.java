@@ -62,4 +62,19 @@ public class LogGroup implements Serializable {
 	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
 		this.logAlarmList = logAlarmList;
 	}
+	
+	@Override
+	public int hashCode() {
+		int modifier = 31;
+		
+		return Math.abs(
+				modifier * this.logGroupId.hashCode() +
+				modifier * this.name.hashCode()
+		);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof LogGroup) ? this.logGroupId == ((LogGroup)obj).logGroupId : false;
+	}
 }

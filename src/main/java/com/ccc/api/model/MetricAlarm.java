@@ -45,5 +45,19 @@ public class MetricAlarm implements Serializable {
 	public void setAlarmArn(String alarmArn) {
 		this.metricAlarmArn = alarmArn;
 	}
+	
+	@Override
+	public int hashCode() {
+		int modifier = 31;
+		
+		return Math.abs(
+				modifier * this.metricAlarmId.hashCode() +
+				modifier * this.metricAlarmArn.hashCode()
+		);
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof MetricAlarm) ? this.metricAlarmId == ((MetricAlarm)obj).metricAlarmId : false;
+	}
 }

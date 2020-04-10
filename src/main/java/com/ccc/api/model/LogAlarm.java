@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity(name="LogAlarms")
@@ -36,9 +37,6 @@ public class LogAlarm implements Serializable {
 	
 	@Column(name="Comparison")
 	private String comparison;
-	
-	@ManyToMany(mappedBy="logAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<User> userList;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
@@ -80,25 +78,8 @@ public class LogAlarm implements Serializable {
 	)
 	private List<Keyword> keywordList;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
-		name="XRefLogAlarmSNSTopic",
-		joinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				referencedColumnName="LogAlarmId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="SNSTopicId",
-				referencedColumnName="SNSTopicId",
-				nullable=false
-			)
-		}
-	)
-	private List<SNSTopic> snsTopicList;
+	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
 	
 	public LogAlarm() {
 	}
@@ -108,19 +89,17 @@ public class LogAlarm implements Serializable {
 			String keywordRelationship,
 			String logLevel,
 			String comparison,
-			List<User> userList,
 			List<LogGroup> logGroupList,
 			List<Keyword> keywordList,
-			List<SNSTopic> snsTopicList
+			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
 		this.alarmName = alarmName;
 		this.keywordRelationship = keywordRelationship;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
-		this.userList = userList;
 		this.logGroupList = logGroupList;
 		this.keywordList = keywordList;
-		this.snsTopicList = snsTopicList;
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public LogAlarm(
@@ -129,20 +108,18 @@ public class LogAlarm implements Serializable {
 			String keywordRelationship,
 			String logLevel,
 			String comparison,
-			List<User> userList,
 			List<LogGroup> logGroupList,
 			List<Keyword> keywordList,
-			List<SNSTopic> snsTopicList
+			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
 	) {
 		this.logAlarmId = logAlarmId;
 		this.alarmName = alarmName;
 		this.keywordRelationship = keywordRelationship;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
-		this.userList = userList;
 		this.logGroupList = logGroupList;
 		this.keywordList = keywordList;
-		this.snsTopicList = snsTopicList;
+		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public Long getLogAlarmId() {
@@ -181,14 +158,6 @@ public class LogAlarm implements Serializable {
 		this.comparison = comparison;
 	}
 	
-	public List<User> getUserList() {
-		return this.userList;
-	}
-	
-	public void setUserList(List<User> userList) {
-		this.userList = userList;
-	}
-	
 	public List<LogGroup> getLogGroupList() {
 		return this.logGroupList;
 	}
@@ -205,11 +174,29 @@ public class LogAlarm implements Serializable {
 		this.keywordList = keywordList;
 	}
 	
-	public List<SNSTopic> getSNSTopicList() {
-		return this.snsTopicList;
+	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
+		return this.xrefUserLogAlarmSNSTopicList;
 	}
 	
-	public void setSNSTopicList(List<SNSTopic> snsTopicList) {
-		this.snsTopicList = snsTopicList;
+	public void setXRefUserLogAlarmSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
+		this.xrefUserLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+	}
+	
+	@Override
+	public int hashCode() {
+		int modifier = 31;
+		
+		return Math.abs(
+				modifier * this.logAlarmId.hashCode() +
+				modifier * this.alarmName.hashCode() +
+				modifier * this.keywordRelationship.hashCode() +
+				modifier * this.logLevel.hashCode() +
+				modifier * this.comparison.hashCode()
+		);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof LogAlarm) ? this.logAlarmId == ((LogAlarm)obj).logAlarmId : false;
 	}
 }

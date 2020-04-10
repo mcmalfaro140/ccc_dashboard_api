@@ -44,11 +44,6 @@ public class UserController {
 			}
 		};
 	}
-	
-	@GetMapping("/")
-    public String hello() {
-        return "Hello, BACKEND server for the CCC Dashboard Project";
-    }
     
     @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
     @ResponseBody
