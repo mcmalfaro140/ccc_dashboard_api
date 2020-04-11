@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import io.jsonwebtoken.Claims;
@@ -40,6 +39,27 @@ public class User implements Serializable {
 	
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
+	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefUserLogAlarm",
+		joinColumns={
+			@JoinColumn(
+				name="UserId",
+				referencedColumnName="UserId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		}
+	)
+	private List<LogAlarm> logAlarmList;
+	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
@@ -60,9 +80,6 @@ public class User implements Serializable {
 	)
 	private List<MetricAlarm> metricAlarmList;
 	
-	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
-	
 	public User() {
 	}
 	
@@ -71,15 +88,15 @@ public class User implements Serializable {
 			String password,
 			String email,
 			String dashboard,
-			List<MetricAlarm> metricAlarmList,
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+			List<LogAlarm> logAlarmList,
+			List<MetricAlarm> metricAlarmList
 	) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.dashboard = dashboard;
+		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public User(
@@ -88,16 +105,16 @@ public class User implements Serializable {
 			String password,
 			String email,
 			String dashboard,
-			List<MetricAlarm> metricAlarmList,
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+			List<LogAlarm> logAlarmList,
+			List<MetricAlarm> metricAlarmList
 	) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.dashboard = dashboard;
+		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public Long getUserId() {
@@ -136,20 +153,20 @@ public class User implements Serializable {
 		this.dashboard = dashboard;
 	}
 	
+	public List<LogAlarm> getLogAlarmList() {
+		return this.logAlarmList;
+	}
+	
+	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
+		this.logAlarmList = logAlarmList;
+	}
+	
 	public List<MetricAlarm> getMetricAlarmList() {
 		return this.metricAlarmList;
 	}
 	
 	public void setMetricAlarmList(List<MetricAlarm> metricAlarmList) {
 		this.metricAlarmList = metricAlarmList;
-	}
-	
-	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
-		return this.xrefUserLogAlarmSNSTopicList;
-	}
-	
-	public void setXRefUserLogAlarmSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
 	}
 	
 	public Claims toClaims() {
@@ -172,15 +189,14 @@ public class User implements Serializable {
 	}
 	
 	@Override
-	public int hashCode() {
-		int modifier = 31;
-		
+	public int hashCode() {		
 		return Math.abs(
-				modifier * this.userId.hashCode() +
-				modifier * this.username.hashCode() +
-				modifier * this.password.hashCode() +
-				modifier * this.email.hashCode() +
-				modifier * this.dashboard.hashCode()
+				31 * 
+				(this.userId.hashCode() +
+				this.username.hashCode() +
+				this.password.hashCode() +
+				this.email.hashCode() +
+				this.dashboard.hashCode())
 		);
 	}
 	

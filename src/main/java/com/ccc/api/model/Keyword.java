@@ -2,6 +2,7 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,12 +48,17 @@ public class Keyword implements Serializable {
 		return this.keywordId;
 	}
 	
-	public String getWord() {
-		return this.word;
+	public Optional<String> getWord() {
+		return Optional.ofNullable(this.word);
 	}
 	
-	public void setWord(String word) {
-		this.word = word;
+	public void setWord(Optional<String> word) {
+		if (word.isPresent()) {
+			this.word = word.get();
+		}
+		else {
+			this.word = null;
+		}
 	}
 	
 	public List<LogAlarm> getLogAlarmList() {
@@ -65,12 +71,8 @@ public class Keyword implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		int modifier = 31;
 		
-		return Math.abs(
-				modifier * this.keywordId.hashCode() +
-				modifier * this.word.hashCode()
-		);
+		return Math.abs(31 * (this.keywordId.hashCode() + this.word.hashCode()));
 	}
 	
 	@Override

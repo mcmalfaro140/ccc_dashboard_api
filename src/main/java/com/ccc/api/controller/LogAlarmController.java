@@ -24,18 +24,18 @@ import com.ccc.api.http.CreateLogAlarmRequest;
 import com.ccc.api.http.GetLogAlarmResponse;
 import com.ccc.api.http.LogAlarmIdRequest;
 import com.ccc.api.http.LogAlarmSubscriptionRequest;
+import com.ccc.api.model.Assigner;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
 import com.ccc.api.model.SNSTopic;
 import com.ccc.api.model.User;
-import com.ccc.api.model.XRefUserLogAlarmSNSTopic;
+import com.ccc.api.model.XRefLogAlarmSNSTopic;
 import com.ccc.api.repository.KeywordRepository;
 import com.ccc.api.repository.LogAlarmRepository;
 import com.ccc.api.repository.LogGroupRepository;
 import com.ccc.api.repository.SNSTopicRepository;
 import com.ccc.api.repository.UserRepository;
-import com.ccc.api.repository.XRefUserLogAlarmSNSTopicRepository;
 import com.ccc.api.util.GlobalVariables;
 import com.ccc.api.util.JwtUtils;
 
@@ -58,9 +58,6 @@ public class LogAlarmController {
 	private SNSTopicRepository snsTopicRepo;
 	
 	@Autowired
-	private XRefUserLogAlarmSNSTopicRepository xrefUserLogAlarmSNSTopicRepo;
-	
-	@Autowired
 	private JwtUtils jwtUtils;
 	
 	@GetMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8")
@@ -73,27 +70,15 @@ public class LogAlarmController {
 			response.put("Result", "ERROR: User Not Found");
 		}
 		else {
+			user = this.userRepo.findById(user.getUserId()).get();
+			
 			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
+			List<LogAlarm> userLogAlarms = user.getLogAlarmList();
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
 		
 		return response;
-	}
-	
-	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
-		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
-		
-		for (LogAlarm alarm : allLogAlarms) {
-			for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : alarm.getXRefUserLogAlarmSNSTopicList()) {
-				if (xrefUserLogAlarmSNSTopic.getUser().equals(user)) {
-					userLogAlarms.add(alarm);
-				}
-			}
-		}
-		
-		return userLogAlarms;
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
@@ -119,20 +104,28 @@ public class LogAlarmController {
 					
 			String snsTopicName = body.getSNSTopicName();
 			
+			List<User> userList = this.getUserList(obtainedUser);
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
 			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicName);
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = this.getXRefUserLogAlarmSNSTopicList(obtainedUser, snsTopicList);
+			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList = this.getXRefLogAlarmSNSTopicList(obtainedUser, snsTopicList.get(0));
 			
-			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, logGroupList, keywordList, xrefUserLogAlarmSNSTopicList);
+			LogAlarm logAlarm = new LogAlarm(
+					alarmName,
+					keywordRelationship,
+					logLevel, comparison,
+					logGroupList,
+					keywordList,
+					userList,
+					snsTopicList,
+					xrefLogAlarmSNSTopicList
+			);
 			
 			logGroupList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
 			keywordList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
-			xrefUserLogAlarmSNSTopicList.forEach(value -> { value.setLogAlarm(logAlarm); });
-			xrefUserLogAlarmSNSTopicList.forEach(value -> { value.setUser(obtainedUser); });
-			snsTopicList.forEach(value -> { value.getXRefUserLogAlarmSNSTopicList().addAll(xrefUserLogAlarmSNSTopicList); });
-			obtainedUser.getXRefUserLogAlarmSNSTopicList().addAll(xrefUserLogAlarmSNSTopicList);
-			logAlarm.getXRefUserLogAlarmSNSTopicList().addAll(xrefUserLogAlarmSNSTopicList);
+			xrefLogAlarmSNSTopicList.forEach(value -> { value.setLogAlarm(logAlarm); });
+			xrefLogAlarmSNSTopicList.get(0).getAssigner().setUser(obtainedUser);
+			logAlarm.getXRefLogAlarmSNSTopicList().addAll(xrefLogAlarmSNSTopicList);
 			
 			this.logAlarmRepo.save(logAlarm);
 			
@@ -140,6 +133,13 @@ public class LogAlarmController {
 		}
 		
 		return response;
+	}
+	
+	private List<User> getUserList(User user) {
+		ArrayList<User> userList = new ArrayList<User>(1);
+		userList.add(user);
+		
+		return userList;
 	}
 	
 	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
@@ -208,7 +208,7 @@ public class LogAlarmController {
 		else {
 			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
 			CreateTopicResult result = snsClient.createTopic(request);
-			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<XRefUserLogAlarmSNSTopic>());
+			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<LogAlarm>());
 			
 			this.snsTopicRepo.save(newTopic);
 			snsTopicList.add(newTopic);
@@ -217,21 +217,18 @@ public class LogAlarmController {
 		return snsTopicList;
 	}
 	
-	private List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList(User user, List<SNSTopic> snsTopicList) {
-		List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = new ArrayList<XRefUserLogAlarmSNSTopic>(snsTopicList.size());
+	private List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList(User user, SNSTopic snsTopic) {		
+		XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic();
+		xrefLogAlarmSNSTopic.setSNSTopic(snsTopic);
+		xrefLogAlarmSNSTopic.setAssigner(new Assigner(user, xrefLogAlarmSNSTopic));
 		
-		for (SNSTopic snsTopic : snsTopicList) {
-			XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic = new XRefUserLogAlarmSNSTopic();
-			xrefUserLogAlarmSNSTopic.setUser(user);
-			xrefUserLogAlarmSNSTopic.setSNSTopic(snsTopic);
-			
-			xrefUserLogAlarmSNSTopicList.add(xrefUserLogAlarmSNSTopic);
-		}
+		ArrayList<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList = new ArrayList<XRefLogAlarmSNSTopic>(1);
+		xrefLogAlarmSNSTopicList.add(xrefLogAlarmSNSTopic);
 		
-		return xrefUserLogAlarmSNSTopicList;
+		return xrefLogAlarmSNSTopicList;
 	}
 	
-	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")
+	/*@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> subscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmSubscriptionRequest body) {
 		Map<String, String> response = new HashMap<String, String>();
@@ -330,5 +327,5 @@ public class LogAlarmController {
 		}
 		
 		return response;
-	}
+	}*/
 }

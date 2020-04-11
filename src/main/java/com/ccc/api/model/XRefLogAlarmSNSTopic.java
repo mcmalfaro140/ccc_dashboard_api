@@ -11,17 +11,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-@Entity(name="XRefUserLogAlarmSNSTopic")
-@Table(name="XRefUserLogAlarmSNSTopic")
-public class XRefUserLogAlarmSNSTopic implements Serializable {
-	private static final long serialVersionUID = 6688047311719451698L;
+@Entity(name="XRefLogAlarmSNSTopic")
+@Table(name="XRefLogAlarmSNSTopic")
+public class XRefLogAlarmSNSTopic implements Serializable {
+	private static final long serialVersionUID = 4385868977900164012L;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="UserLogAlarmSNSTopicId")
-	private Long userLogAlarmSNSTopicId;
+	@Column(name="LogAlarmSNSTopicId")
+	private Long logAlarmSNSTopicId;
 	
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name="LogAlarmId")
@@ -31,28 +32,27 @@ public class XRefUserLogAlarmSNSTopic implements Serializable {
 	@JoinColumn(name="SNSTopicId")
 	private SNSTopic snsTopic;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="UserId")
-	private User user;
+	@OneToOne(mappedBy="xrefLogAlarmSNSTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private Assigner assigner;
 	
-	public XRefUserLogAlarmSNSTopic() {
+	public XRefLogAlarmSNSTopic() {
 	}
 	
-	public XRefUserLogAlarmSNSTopic(LogAlarm logAlarm, SNSTopic snsTopic, User user) {
+	public XRefLogAlarmSNSTopic(LogAlarm logAlarm, SNSTopic snsTopic, Assigner assigner) {
 		this.logAlarm = logAlarm;
 		this.snsTopic = snsTopic;
-		this.user = user;
+		this.assigner = assigner;
 	}
 	
-	public XRefUserLogAlarmSNSTopic(Long userLogAlarmSNSTopicId, LogAlarm logAlarm, SNSTopic snsTopic, User user) {
-		this.userLogAlarmSNSTopicId = userLogAlarmSNSTopicId;
+	public XRefLogAlarmSNSTopic(Long logAlarmSNSTopicId, LogAlarm logAlarm, SNSTopic snsTopic, Assigner assigner) {
+		this.logAlarmSNSTopicId = logAlarmSNSTopicId;
 		this.logAlarm = logAlarm;
 		this.snsTopic = snsTopic;
-		this.user = user;
+		this.assigner = assigner;
 	}
 	
-	public Long getUserLogAlarmSNSTopicId() {
-		return this.userLogAlarmSNSTopicId;
+	public Long getLogAlarmSNSTopicId() {
+		return this.logAlarmSNSTopicId;
 	}
 	
 	public LogAlarm getLogAlarm() {
@@ -71,21 +71,21 @@ public class XRefUserLogAlarmSNSTopic implements Serializable {
 		this.snsTopic = snsTopic;
 	}
 	
-	public User getUser() {
-		return this.user;
+	public Assigner getAssigner() {
+		return this.assigner;
 	}
 	
-	public void setUser(User user) {
-		this.user = user;
+	public void setAssigner(Assigner assigner) {
+		this.assigner = assigner;
 	}
 	
 	@Override
 	public int hashCode() {
-		return 31 * this.userLogAlarmSNSTopicId.hashCode();
+		return 31 * this.logAlarmSNSTopicId.hashCode();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof XRefUserLogAlarmSNSTopic) ? this.userLogAlarmSNSTopicId == ((XRefUserLogAlarmSNSTopic)obj).userLogAlarmSNSTopicId : false;
+		return (obj instanceof XRefLogAlarmSNSTopic) ? this.logAlarmSNSTopicId == ((XRefLogAlarmSNSTopic)obj).logAlarmSNSTopicId : false;
 	}
 }

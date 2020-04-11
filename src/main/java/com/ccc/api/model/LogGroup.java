@@ -64,12 +64,11 @@ public class LogGroup implements Serializable {
 	}
 	
 	@Override
-	public int hashCode() {
-		int modifier = 31;
-		
+	public int hashCode() {		
 		return Math.abs(
-				modifier * this.logGroupId.hashCode() +
-				modifier * this.name.hashCode()
+				31 *
+				(this.logGroupId.hashCode() +
+				this.name.hashCode())
 		);
 	}
 	

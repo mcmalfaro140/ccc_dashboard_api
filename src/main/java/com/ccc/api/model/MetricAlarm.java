@@ -1,11 +1,16 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity(name="MetricAlarms")
@@ -21,17 +26,22 @@ public class MetricAlarm implements Serializable {
 	@Column(name="AlarmArn")
 	private String metricAlarmArn;
 	
+	@ManyToMany(mappedBy="metricAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<User> userList;
+	
 	
 	public MetricAlarm() {
 	}
 	
-	public MetricAlarm(String alarmArn) {
+	public MetricAlarm(String alarmArn, List<User> userList) {
 		this.metricAlarmArn = alarmArn;
+		this.userList = userList;
 	}
 	
-	public MetricAlarm(Long metricAlarmId, String alarmArn) {
+	public MetricAlarm(Long metricAlarmId, String alarmArn, List<User> userList) {
 		this.metricAlarmId = metricAlarmId;
 		this.metricAlarmArn = alarmArn;
+		this.userList = userList;
 	}
 	
 	public Long getMetricAlarmId() {
@@ -46,14 +56,17 @@ public class MetricAlarm implements Serializable {
 		this.metricAlarmArn = alarmArn;
 	}
 	
+	public List<User> getUserList() {
+		return this.userList;
+	}
+	
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
+	}
+	
 	@Override
-	public int hashCode() {
-		int modifier = 31;
-		
-		return Math.abs(
-				modifier * this.metricAlarmId.hashCode() +
-				modifier * this.metricAlarmArn.hashCode()
-		);
+	public int hashCode() {		
+		return Math.abs(31 * (this.metricAlarmId.hashCode() + this.metricAlarmArn.hashCode()));
 	}
 
 	@Override

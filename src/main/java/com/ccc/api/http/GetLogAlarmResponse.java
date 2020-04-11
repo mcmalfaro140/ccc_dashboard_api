@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ccc.api.model.Assigner;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
-import com.ccc.api.model.XRefUserLogAlarmSNSTopic;
+import com.ccc.api.model.SNSTopic;
+import com.ccc.api.model.User;
+import com.ccc.api.model.XRefLogAlarmSNSTopic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,27 +35,24 @@ public class GetLogAlarmResponse {
 	
 	private void add(List<Map<String, Object>> logAlarmsMapList, List<LogAlarm> logAlarmList) {				
 		for (LogAlarm alarm : logAlarmList) {			
-			List<String> logGroupNames = this.getLogGroupNames(alarm.getLogGroupList());
-			List<String> keywordNames = this.getKeywords(alarm.getKeywordList());
-			
 			Map<String, Object> entry = new HashMap<String, Object>();
 			entry.put("LogAlarmId", alarm.getLogAlarmId());
 			entry.put("AlarmName", alarm.getAlarmName());
 			entry.put("LogLevel", alarm.getLogLevel());
 			entry.put("KeywordRelationship", alarm.getKeywordRelationship());
 			entry.put("Comparison", alarm.getComparison());
+			
+			List<String> logGroupNames = this.getLogGroupNames(alarm.getLogGroupList());
+			List<String> keywordNames = this.getKeywords(alarm.getKeywordList());
+			List<String> usernames = this.getUsernames(alarm.getUserList());
+			List<String> snsTopicNames = this.getSNSTopicNames(alarm.getSNSTopicList());
+			List<Data> assigners = this.getAssigners(alarm.getXRefLogAlarmSNSTopicList());
+			
 			entry.put("LogGroups", logGroupNames);
 			entry.put("Keywords", keywordNames);
-			
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = this.getXRefUserLogAlarmSNSTopic(alarm, alarm.getXRefUserLogAlarmSNSTopicList());
-			List<String> userList = this.getUserList(xrefUserLogAlarmSNSTopicList);
-			List<String> snsTopicList = this.getSNSTopicList(xrefUserLogAlarmSNSTopicList);
-			List<Data> xrefUserSNSTopicList = this.getXRefUserSNSTopicList(xrefUserLogAlarmSNSTopicList);
-			
-			entry.put("Users", userList);
-			entry.put("SNSTopics", snsTopicList);
-			entry.put("XRefUserSNSTopic", xrefUserSNSTopicList);
-			
+			entry.put("Users", usernames);
+			entry.put("SNSTopicNames", snsTopicNames);
+			entry.put("XRefUserSNSTopic", assigners);
 			
 			logAlarmsMapList.add(entry);
 		}
@@ -71,53 +71,45 @@ public class GetLogAlarmResponse {
 	private List<String> getKeywords(List<Keyword> keywordList) {
 		List<String> keywordNameList = new ArrayList<String>(keywordList.size());
 		
-		for (Keyword keyword : keywordList) {
-			keywordNameList.add(keyword.getWord());
+		if (keywordList.size() > 1 || (keywordList.size() == 1 && keywordList.get(0).getWord().isPresent())) {
+			for (Keyword keyword : keywordList) {
+				keywordNameList.add(keyword.getWord().get());
+			}
 		}
 		
 		return keywordNameList;
 	}
 	
-	private List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopic(LogAlarm alarm, List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
-		List<XRefUserLogAlarmSNSTopic> result = new ArrayList<XRefUserLogAlarmSNSTopic>(xrefUserLogAlarmSNSTopicList.size());
+	private List<String> getUsernames(List<User> userList) {
+		ArrayList<String> usernames = new ArrayList<String>(userList.size());
 		
-		for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic :  xrefUserLogAlarmSNSTopicList) {
-			if (xrefUserLogAlarmSNSTopic.getLogAlarm().equals(alarm)) {
-				result.add(xrefUserLogAlarmSNSTopic);
-			}
+		for (User user : userList) {
+			usernames.add(user.getUsername());
 		}
 		
-		return result;
+		return usernames;
 	}
 	
-	private List<String> getUserList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
-		List<String> userList = new ArrayList<String>(xrefUserLogAlarmSNSTopicList.size());
+	private List<String> getSNSTopicNames(List<SNSTopic> snsTopicList) {
+		ArrayList<String> snsTopicNames = new ArrayList<String>(snsTopicList.size());
 		
-		for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : xrefUserLogAlarmSNSTopicList) {
-			userList.add(xrefUserLogAlarmSNSTopic.getUser().getUsername());
+		for (SNSTopic snsTopic : snsTopicList) {
+			snsTopicNames.add(snsTopic.getTopicName());
 		}
 		
-		return userList;
+		return snsTopicNames;
 	}
 	
-	private List<String> getSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
-		List<String> snsTopicList = new ArrayList<String>(xrefUserLogAlarmSNSTopicList.size());
+	private List<Data> getAssigners(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
+		ArrayList<Data> xrefUserSNSTopic = new ArrayList<Data>(xrefLogAlarmSNSTopicList.size());
 		
-		for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : xrefUserLogAlarmSNSTopicList) {
-			snsTopicList.add(xrefUserLogAlarmSNSTopic.getSNSTopic().getTopicName());
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicList) {
+			Assigner assigner = xrefLogAlarmSNSTopic.getAssigner();
+			
+			xrefUserSNSTopic.add(new Data(assigner.getUser().getUsername(), xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
 		}
 		
-		return snsTopicList;
-	}
-	
-	private List<Data> getXRefUserSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
-		List<Data> xrefUserSNSTopicList = new ArrayList<Data>(xrefUserLogAlarmSNSTopicList.size());
-		
-		for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : xrefUserLogAlarmSNSTopicList) {
-			xrefUserSNSTopicList.add(new Data(xrefUserLogAlarmSNSTopic.getUser().getUsername(), xrefUserLogAlarmSNSTopic.getSNSTopic().getTopicName()));
-		}
-		
-		return xrefUserSNSTopicList;
+		return xrefUserSNSTopic;
 	}
 	
 	public static class Data {
