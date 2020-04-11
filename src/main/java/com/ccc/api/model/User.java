@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import io.jsonwebtoken.Claims;
@@ -80,6 +81,9 @@ public class User implements Serializable {
 	)
 	private List<MetricAlarm> metricAlarmList;
 	
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
+	
 	public User() {
 	}
 	
@@ -89,7 +93,8 @@ public class User implements Serializable {
 			String email,
 			String dashboard,
 			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList
+			List<MetricAlarm> metricAlarmList,
+			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
 	) {
 		this.username = username;
 		this.password = password;
@@ -97,6 +102,7 @@ public class User implements Serializable {
 		this.dashboard = dashboard;
 		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
+		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
 	public User(
@@ -106,7 +112,8 @@ public class User implements Serializable {
 			String email,
 			String dashboard,
 			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList
+			List<MetricAlarm> metricAlarmList,
+			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
 	) {
 		this.userId = userId;
 		this.username = username;
@@ -115,6 +122,7 @@ public class User implements Serializable {
 		this.dashboard = dashboard;
 		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
+		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
 	public Long getUserId() {
@@ -167,6 +175,14 @@ public class User implements Serializable {
 	
 	public void setMetricAlarmList(List<MetricAlarm> metricAlarmList) {
 		this.metricAlarmList = metricAlarmList;
+	}
+	
+	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
+		return this.xrefLogAlarmSNSTopicList;
+	}
+	
+	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
+		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
 	public Claims toClaims() {

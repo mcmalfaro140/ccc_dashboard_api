@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import com.ccc.api.model.Assigner;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
@@ -104,9 +104,14 @@ public class GetLogAlarmResponse {
 		ArrayList<Data> xrefUserSNSTopic = new ArrayList<Data>(xrefLogAlarmSNSTopicList.size());
 		
 		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicList) {
-			Assigner assigner = xrefLogAlarmSNSTopic.getAssigner();
+			Optional<User> user = xrefLogAlarmSNSTopic.getUser();
 			
-			xrefUserSNSTopic.add(new Data(assigner.getUser().getUsername(), xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
+			if (user.isPresent()) {
+				xrefUserSNSTopic.add(new Data(user.get().getUsername(), xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
+			}
+			else {
+				xrefUserSNSTopic.add(new Data("User no longer in database", xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
+			}
 		}
 		
 		return xrefUserSNSTopic;

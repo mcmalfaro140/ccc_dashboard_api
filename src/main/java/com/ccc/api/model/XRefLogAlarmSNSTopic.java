@@ -1,6 +1,7 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,9 +14,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity(name="XRefLogAlarmSNSTopic")
-@Table(name="XRefLogAlarmSNSTopic")
+@Table(
+	name="XRefLogAlarmSNSTopic",
+	uniqueConstraints={
+		@UniqueConstraint(columnNames={ "LogAlarmId", "SNSTopicId" }) 
+	}
+)
 public class XRefLogAlarmSNSTopic implements Serializable {
 	private static final long serialVersionUID = 4385868977900164012L;
 	
@@ -32,23 +39,36 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 	@JoinColumn(name="SNSTopicId")
 	private SNSTopic snsTopic;
 	
-	@OneToOne(mappedBy="xrefLogAlarmSNSTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private Assigner assigner;
+	@OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name="UserId")
+	private User user;
 	
 	public XRefLogAlarmSNSTopic() {
 	}
 	
-	public XRefLogAlarmSNSTopic(LogAlarm logAlarm, SNSTopic snsTopic, Assigner assigner) {
+	public XRefLogAlarmSNSTopic(LogAlarm logAlarm, SNSTopic snsTopic, Optional<User> user) {
 		this.logAlarm = logAlarm;
 		this.snsTopic = snsTopic;
-		this.assigner = assigner;
+		
+		if (user.isPresent()) {
+			this.user = user.get();
+		}
+		else {
+			this.user = null;
+		}
 	}
 	
-	public XRefLogAlarmSNSTopic(Long logAlarmSNSTopicId, LogAlarm logAlarm, SNSTopic snsTopic, Assigner assigner) {
+	public XRefLogAlarmSNSTopic(Long logAlarmSNSTopicId, LogAlarm logAlarm, SNSTopic snsTopic, Optional<User> user) {
 		this.logAlarmSNSTopicId = logAlarmSNSTopicId;
 		this.logAlarm = logAlarm;
 		this.snsTopic = snsTopic;
-		this.assigner = assigner;
+		
+		if (user.isPresent()) {
+			this.user = user.get();
+		}
+		else {
+			this.user = null;
+		}
 	}
 	
 	public Long getLogAlarmSNSTopicId() {
@@ -71,12 +91,17 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 		this.snsTopic = snsTopic;
 	}
 	
-	public Assigner getAssigner() {
-		return this.assigner;
+	public Optional<User> getUser() {
+		return Optional.ofNullable(this.user);
 	}
 	
-	public void setAssigner(Assigner assigner) {
-		this.assigner = assigner;
+	public void setUser(Optional<User> user) {
+		if (user.isPresent()) {
+			this.user = user.get();
+		}
+		else {
+			this.user = null;
+		}
 	}
 	
 	@Override

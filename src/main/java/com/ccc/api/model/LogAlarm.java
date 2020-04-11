@@ -110,7 +110,7 @@ public class LogAlarm implements Serializable {
 	
 	public LogAlarm(
 			String alarmName,
-			String keywordRelationship,
+			Optional<String> keywordRelationship,
 			String logLevel,
 			String comparison,
 			List<LogGroup> logGroupList,
@@ -120,7 +120,6 @@ public class LogAlarm implements Serializable {
 			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
 	) {
 		this.alarmName = alarmName;
-		this.keywordRelationship = keywordRelationship;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
 		this.logGroupList = logGroupList;
@@ -128,6 +127,13 @@ public class LogAlarm implements Serializable {
 		this.userList = userList;
 		this.snsTopicList = snsTopicList;
 		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		
+		if (keywordRelationship.isPresent()) {
+			this.keywordRelationship = keywordRelationship.get();
+		}
+		else {
+			this.keywordRelationship = null;
+		}
 	}
 	
 	public LogAlarm(

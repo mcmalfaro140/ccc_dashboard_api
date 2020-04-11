@@ -38,10 +38,16 @@ public class Keyword implements Serializable {
 		this.logAlarmList = logAlarmList;
 	}
 	
-	public Keyword(Long keywordId, String word, List<LogAlarm> logAlarmList) {
+	public Keyword(Long keywordId, Optional<String> word, List<LogAlarm> logAlarmList) {
 		this.keywordId = keywordId;
-		this.word = word;
 		this.logAlarmList = logAlarmList;
+		
+		if (word.isPresent()) {
+			this.word = word.get();
+		}
+		else {
+			this.word = null;
+		}
 	}
 	
 	public Long getKeywordId() {

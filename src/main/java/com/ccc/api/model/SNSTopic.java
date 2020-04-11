@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity(name="SNSTopics")
@@ -32,29 +33,36 @@ public class SNSTopic implements Serializable {
 	@ManyToMany(mappedBy="snsTopicList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
+	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
+	
 	public SNSTopic() {
 	}
 	
 	public SNSTopic(
 			String topicName,
 			String topicArn,
-			List<LogAlarm> logAlarmList
+			List<LogAlarm> logAlarmList,
+			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
 	) {
 		this.topicName = topicName;
 		this.topicArn = topicArn;
 		this.logAlarmList = logAlarmList;
+		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
 	public SNSTopic(
 			Long snsTopicId,
 			String topicName,
 			String topicArn,
-			List<LogAlarm> logAlarmList
+			List<LogAlarm> logAlarmList,
+			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
 	) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
 		this.logAlarmList = logAlarmList;
+		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
 	public Long getSNSTopicId() {
@@ -83,6 +91,14 @@ public class SNSTopic implements Serializable {
 	
 	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
 		this.logAlarmList = logAlarmList;
+	}
+	
+	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
+		return this.xrefLogAlarmSNSTopicList;
+	}
+	
+	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
+		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
 	@Override
