@@ -112,7 +112,7 @@ public class LogAlarm implements Serializable {
 	)
 	private List<SNSTopic> snsTopicList;
 	
-	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public LogAlarm() {

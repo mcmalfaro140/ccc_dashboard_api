@@ -89,7 +89,7 @@ public class User implements Serializable {
 	private List<MetricAlarm> metricAlarmList;
 	
 	@NotNull
-	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public User() {
