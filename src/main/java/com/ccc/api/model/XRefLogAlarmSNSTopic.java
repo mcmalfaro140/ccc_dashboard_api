@@ -1,6 +1,7 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
@@ -75,6 +76,10 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 		return this.logAlarmSNSTopicId;
 	}
 	
+	public void setLogAlarmSNSTopicId(Long logAlarmSNSTopicId) {
+		this.logAlarmSNSTopicId = logAlarmSNSTopicId;
+	}
+	
 	public LogAlarm getLogAlarm() {
 		return this.logAlarm;
 	}
@@ -106,11 +111,19 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		return 31 * this.logAlarmSNSTopicId.hashCode();
+		return 31 * Objects.hashCode(this.logAlarmSNSTopicId);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof XRefLogAlarmSNSTopic) ? this.logAlarmSNSTopicId == ((XRefLogAlarmSNSTopic)obj).logAlarmSNSTopicId : false;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format(
+			"XRefLogAlarmSNSTopic{LogAlarmSNSTopicId=%d, LogAlarm=%s, SNSTopic=%s, User=%s}",
+			this.logAlarmSNSTopicId, this.logAlarm.getAlarmName(), this.snsTopic.getTopicName(), this.user.getUsername()
+		);
 	}
 }

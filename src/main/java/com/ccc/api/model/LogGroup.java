@@ -2,6 +2,7 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,6 +48,10 @@ public class LogGroup implements Serializable {
 		return this.logGroupId;
 	}
 	
+	public void setLogGroupId(Long logGroupId) {
+		this.logGroupId = logGroupId;
+	}
+	
 	public String getName() {
 		return this.name;
 	}
@@ -65,15 +70,31 @@ public class LogGroup implements Serializable {
 	
 	@Override
 	public int hashCode() {		
-		return Math.abs(
-				31 *
-				(this.logGroupId.hashCode() +
-				this.name.hashCode())
-		);
+		return Math.abs(31 * (Objects.hashCode(this.logGroupId) + Objects.hashCode(this.name)));
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof LogGroup) ? this.logGroupId == ((LogGroup)obj).logGroupId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String logAlarmNames = this.getLogAlarmNames();
+		
+		return String.format(
+			"LogGroup{LogGroupId=%d, Name=%s, LogAlarm=%s}",
+			this.logGroupId, this.name, logAlarmNames
+		);
+	}
+	
+	private String getLogAlarmNames() {
+		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		
+		for (int index = 0; index < logAlarmNames.length; ++index) {
+			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		}
+		
+		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 }

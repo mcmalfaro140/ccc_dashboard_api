@@ -130,9 +130,13 @@ public class LogAlarmController {
 			
 			xrefLogAlarmSNSTopicList.get(0).setLogAlarm(logAlarm);
 			
-			this.xrefLogAlarmSNSTopicRepo.save(xrefLogAlarmSNSTopicList.get(0));
+			this.logger.error("Test22");
+			this.logger.error(logAlarm.toString());
+			this.logAlarmRepo.save(logAlarm);
+			this.logger.error("Test22");
+			this.logger.error(logAlarm.toString());
 			
-			response.put("Result", "Alarm successfully created");
+			response.put("Result", "Success");
 		}
 		
 		return response;

@@ -5,7 +5,6 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -20,22 +19,32 @@ public class JwtUtils {
 	
 	public JwtUtils(@Value("${jwt.secret}") String secret) {
 		byte[] keyBytes = Decoders.BASE64URL.decode(secret);
-		secretKey = Keys.hmacShaKeyFor(keyBytes);
+		this.secretKey = Keys.hmacShaKeyFor(keyBytes);
 	}
 
 	public String toToken(User user) {
 		Calendar expiration = Calendar.getInstance();
 		expiration.add(Calendar.DATE, 7);
-		    
+		
+		Claims userClaims = Jwts.claims();
+		userClaims.put("UserId", user.getUserId());
+		userClaims.put("Username", user.getUsername());
+		userClaims.put("Email", user.getEmail());  
 		    
 		return Jwts.builder().setIssuer(issuer).setSubject(user.getUserId().toString())
-				.setExpiration(expiration.getTime()).setClaims(user.toClaims()).signWith(secretKey).compact();
+				.setExpiration(expiration.getTime()).setClaims(userClaims).signWith(this.secretKey).compact();
 	}
 
 	public User toUser(String token) {
 		try {
-			Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-			return User.fromClaims(jws.getBody());
+			Claims claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token).getBody();
+			
+			User user = new User();
+			user.setUserId(claims.get("UserId", Long.class));
+			user.setUsername(claims.get("Username", String.class));
+			user.setEmail(claims.get("Email", String.class));
+			
+			return user;
 		} catch (JwtException e) {
 		      return null;
 		}

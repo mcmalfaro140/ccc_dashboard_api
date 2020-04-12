@@ -2,6 +2,7 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
@@ -54,6 +55,10 @@ public class Keyword implements Serializable {
 		return this.keywordId;
 	}
 	
+	public void setKeywordId(Long keywordId) {
+		this.keywordId = keywordId;
+	}
+	
 	public Optional<String> getWord() {
 		return Optional.ofNullable(this.word);
 	}
@@ -78,11 +83,31 @@ public class Keyword implements Serializable {
 	@Override
 	public int hashCode() {
 		
-		return Math.abs(31 * (this.keywordId.hashCode() + this.word.hashCode()));
+		return Math.abs(31 * (Objects.hashCode(this.keywordId) + Objects.hashCode(this.word)));
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof Keyword) ? this.keywordId == ((Keyword)obj).keywordId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String logAlarmNames = this.getLogAlarmNames();
+		
+		return String.format(
+			"Keyword{KeywordId=%d, Word=%s, LogAlarms=%s}",
+			this.keywordId, this.word, logAlarmNames
+		);
+	}
+	
+	private String getLogAlarmNames() {
+		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		
+		for (int index = 0; index < logAlarmNames.length; ++index) {
+			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		}
+		
+		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 }

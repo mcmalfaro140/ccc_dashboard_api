@@ -2,6 +2,7 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,9 +16,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 @Entity(name="Users")
 @Table(name="Users")
@@ -129,6 +127,10 @@ public class User implements Serializable {
 		return this.userId;
 	}
 	
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	
 	public String getUsername() {
 		return this.username;
 	}
@@ -185,39 +187,70 @@ public class User implements Serializable {
 		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
 	}
 	
-	public Claims toClaims() {
-		Claims claims = Jwts.claims();
-		
-		claims.put("UserId", this.userId);
-		claims.put("Username", this.username);
-		claims.put("Email", this.email);
-		    
-		return claims;
-	}
-
-	public static User fromClaims(Claims claims) {
-		User user = new User();
-		user.userId = claims.get("UserId", Long.class);
-		user.username = claims.get("Username", String.class);
-		user.email = claims.get("Email", String.class);
-		
-		return user;
-	}
-	
 	@Override
 	public int hashCode() {		
 		return Math.abs(
 				31 * 
-				(this.userId.hashCode() +
-				this.username.hashCode() +
-				this.password.hashCode() +
-				this.email.hashCode() +
-				this.dashboard.hashCode())
+				(Objects.hashCode(this.userId) +
+				Objects.hashCode(this.username) +
+				Objects.hashCode(this.password) +
+				Objects.hashCode(this.email) +
+				Objects.hashCode(this.dashboard))
 		);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof User) ? this.userId == ((User)obj).userId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String logAlarmNames = this.getLogAlarmNames();
+		String metricAlarmNames = this.getMetricAlarmNames();
+		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
+		
+		return String.format(
+			"User{UserId=%d, Username=%s, Password=%d, Email=%s, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
+			this.userId, this.username, this.password, this.email, this.dashboard, logAlarmNames, metricAlarmNames, xrefLogAlarmSNSTopicNames
+		);
+	}
+	
+	private String getLogAlarmNames() {
+		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		
+		for (int index = 0; index < logAlarmNames.length; ++index) {
+			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		}
+		
+		return '[' + String.join(",", logAlarmNames) + ']';
+	}
+	
+	private String getMetricAlarmNames() {
+		String[] metricAlarmNames = new String[this.metricAlarmList.size()];
+		
+		for (int index = 0; index < metricAlarmNames.length; ++index) {
+			metricAlarmNames[index] = this.metricAlarmList.get(index).getAlarmArn();
+		}
+		
+		return '[' + String.join(",", metricAlarmNames) + ']';
+	}
+	
+	private String getXRefLogAlarmSNSTopicNames() {
+		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicList.size()];
+		
+		for (int index = 0; index < xrefLogAlarmSNSTopicNames.length; ++index) {
+			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.xrefLogAlarmSNSTopicList.get(index);
+			
+			String logAlarmName = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
+			String snsTopicName = xrefLogAlarmSNSTopic.getSNSTopic().getTopicName();
+			
+			xrefLogAlarmSNSTopicNames[index] = String.format(
+					"(LogAlarm=%s, SNSTopic=%s)",
+					logAlarmName, snsTopicName
+			);
+		}
+		
+		return '[' + String.join(",", xrefLogAlarmSNSTopicNames) + ']';
 	}
 }

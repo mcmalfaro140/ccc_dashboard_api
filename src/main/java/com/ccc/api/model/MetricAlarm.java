@@ -2,6 +2,7 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -48,6 +49,10 @@ public class MetricAlarm implements Serializable {
 		return this.metricAlarmId;
 	}
 	
+	public void setMetricAlarmId(Long metricAlarmId) {
+		this.metricAlarmId = metricAlarmId;
+	}
+	
 	public String getAlarmArn() {
 		return this.metricAlarmArn;
 	}
@@ -66,11 +71,31 @@ public class MetricAlarm implements Serializable {
 	
 	@Override
 	public int hashCode() {		
-		return Math.abs(31 * (this.metricAlarmId.hashCode() + this.metricAlarmArn.hashCode()));
+		return Math.abs(31 * (Objects.hashCode(this.metricAlarmId) + Objects.hashCode(this.metricAlarmArn)));
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof MetricAlarm) ? this.metricAlarmId == ((MetricAlarm)obj).metricAlarmId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String usernames = this.getUsernames();
+		
+		return String.format(
+			"MetricAlarm{MetricAlarmId=%d, AlarmArn=%s, Users=%s}",
+			this.metricAlarmId, this.metricAlarmArn, usernames
+		);
+	}
+	
+	private String getUsernames() {
+		String[] usernames = new String[this.userList.size()];
+		
+		for (int index = 0; index < usernames.length; ++index) {
+			usernames[index] = this.userList.get(index).getUsername();
+		}
+		
+		return '[' + String.join(",", usernames) + ']';
 	}
 }

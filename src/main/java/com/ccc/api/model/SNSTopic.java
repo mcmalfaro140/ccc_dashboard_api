@@ -2,6 +2,8 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -69,6 +71,10 @@ public class SNSTopic implements Serializable {
 		return this.snsTopicId;
 	}
 	
+	public void setSNSTopicId(Long snsTopicId) {
+		this.snsTopicId = snsTopicId;
+	}
+	
 	public String getTopicName() {
 		return this.topicName;
 	}
@@ -105,14 +111,54 @@ public class SNSTopic implements Serializable {
 	public int hashCode() {		
 		return Math.abs(
 				31 * 
-				(this.snsTopicId.hashCode() +
-				this.topicName.hashCode() +
-				this.topicArn.hashCode())
+				(Objects.hashCode(this.snsTopicId) +
+				Objects.hashCode(this.topicName) +
+				Objects.hashCode(this.topicArn))
 		);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof SNSTopic) ? this.snsTopicId == ((SNSTopic)obj).snsTopicId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String logAlarmNames = this.getLogAlarmNames();
+		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
+		
+		return String.format(
+			"SNSTopic{SNSTopicId=%d, TopicName=%s, TopicArn=%s, LogAlarms=%s, XRefLogAlarmSNSTopics=%s}",
+			this.snsTopicId, this.topicName, this.topicArn, logAlarmNames, xrefLogAlarmSNSTopicNames
+		);
+	}
+	
+	private String getLogAlarmNames() {
+		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		
+		for (int index = 0; index < logAlarmNames.length; ++index) {
+			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		}
+		
+		return '[' + String.join(",", logAlarmNames) + ']';
+	}
+	
+	private String getXRefLogAlarmSNSTopicNames() {
+		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicList.size()];
+		
+		for (int index = 0; index < xrefLogAlarmSNSTopicNames.length; ++index) {
+			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.xrefLogAlarmSNSTopicList.get(index);
+			Optional<User> user = xrefLogAlarmSNSTopic.getUser();
+			
+			String username = (user.isPresent()) ? user.get().getUsername() : "null";
+			String logAlarmName = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
+			
+			xrefLogAlarmSNSTopicNames[index] = String.format(
+					"(User=%s, LogAlarm=%s)",
+					username, logAlarmName
+			);
+		}
+		
+		return '[' + String.join(",", xrefLogAlarmSNSTopicNames) + ']';
 	}
 }
