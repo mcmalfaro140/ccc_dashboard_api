@@ -18,7 +18,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -39,7 +38,6 @@ public class LogAlarm implements Serializable {
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
 	
-	@Pattern(regexp="^[ANY|ALL]$")
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
