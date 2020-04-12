@@ -29,7 +29,6 @@ public class JwtUtils {
 		Claims userClaims = Jwts.claims();
 		userClaims.put("UserId", user.getUserId());
 		userClaims.put("Username", user.getUsername());
-		userClaims.put("Email", user.getEmail());  
 		    
 		return Jwts.builder().setIssuer(issuer).setSubject(user.getUserId().toString())
 				.setExpiration(expiration.getTime()).setClaims(userClaims).signWith(this.secretKey).compact();
@@ -42,7 +41,6 @@ public class JwtUtils {
 			User user = new User();
 			user.setUserId(claims.get("UserId", Long.class));
 			user.setUsername(claims.get("Username", String.class));
-			user.setEmail(claims.get("Email", String.class));
 			
 			return user;
 		} catch (JwtException e) {

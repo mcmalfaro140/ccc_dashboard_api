@@ -16,29 +16,37 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name="Users")
 @Table(name="Users")
+@DynamicUpdate
 public class User implements Serializable {
 	private static final long serialVersionUID = 4066752461555608563L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="UserId")
+	@Column(name="UserId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long userId;
 	
+	@NotNull
+	@Size(max=50)
 	@Column(name="Username", nullable=false, unique=true)
 	private String username;
 	
+	@NotNull
+	@Size(max=65535)
 	@Column(name="Password", nullable=false)
 	private String password;
 	
-	@Column(name="Email", nullable=false, unique=true)
-	private String email;
-	
+	@NotNull
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
 	
+	@NotNull
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserLogAlarm",
@@ -59,6 +67,7 @@ public class User implements Serializable {
 	)
 	private List<LogAlarm> logAlarmList;
 	
+	@NotNull
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
@@ -79,7 +88,8 @@ public class User implements Serializable {
 	)
 	private List<MetricAlarm> metricAlarmList;
 	
-	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@NotNull
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public User() {
@@ -88,7 +98,6 @@ public class User implements Serializable {
 	public User(
 			String username,
 			String password,
-			String email,
 			String dashboard,
 			List<LogAlarm> logAlarmList,
 			List<MetricAlarm> metricAlarmList,
@@ -96,7 +105,6 @@ public class User implements Serializable {
 	) {
 		this.username = username;
 		this.password = password;
-		this.email = email;
 		this.dashboard = dashboard;
 		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
@@ -107,7 +115,6 @@ public class User implements Serializable {
 			Long userId,
 			String username,
 			String password,
-			String email,
 			String dashboard,
 			List<LogAlarm> logAlarmList,
 			List<MetricAlarm> metricAlarmList,
@@ -116,7 +123,6 @@ public class User implements Serializable {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
-		this.email = email;
 		this.dashboard = dashboard;
 		this.logAlarmList = logAlarmList;
 		this.metricAlarmList = metricAlarmList;
@@ -145,14 +151,6 @@ public class User implements Serializable {
 	
 	public void setPassword(String password) {
 		this.password = password;
-	}
-	
-	public String getEmail() {
-		return this.email;
-	}
-	
-	public void setEmail(String email) {
-		this.email = email;
 	}
 	
 	public String getDashboard() {
@@ -194,7 +192,6 @@ public class User implements Serializable {
 				(Objects.hashCode(this.userId) +
 				Objects.hashCode(this.username) +
 				Objects.hashCode(this.password) +
-				Objects.hashCode(this.email) +
 				Objects.hashCode(this.dashboard))
 		);
 	}
@@ -211,8 +208,8 @@ public class User implements Serializable {
 		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
 		
 		return String.format(
-			"User{UserId=%d, Username=%s, Password=%d, Email=%s, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
-			this.userId, this.username, this.password, this.email, this.dashboard, logAlarmNames, metricAlarmNames, xrefLogAlarmSNSTopicNames
+			"User{UserId=%d, Username=%s, Password=%d, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
+			this.userId, this.username, this.password, this.dashboard, logAlarmNames, metricAlarmNames, xrefLogAlarmSNSTopicNames
 		);
 	}
 	

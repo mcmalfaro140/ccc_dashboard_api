@@ -15,27 +15,38 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name="SNSTopics")
 @Table(name="SNSTopics")
+@DynamicUpdate
 public class SNSTopic implements Serializable {
 	private static final long serialVersionUID = 3077399178896844362L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="SNSTopicId")
+	@Column(name="SNSTopicId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long snsTopicId;
 	
+	@NotNull
+	@Size(max=50)
 	@Column(name="TopicName", nullable=false, unique=true)
 	private String topicName;
 	
+	@NotNull
+	@Size(max=255)
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
+	@NotNull
 	@ManyToMany(mappedBy="snsTopicList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
-	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@NotNull
+	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public SNSTopic() {

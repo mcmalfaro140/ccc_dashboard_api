@@ -6,12 +6,10 @@ USE db;
 CREATE TABLE Users (
 	UserId INT NOT NULL AUTO_INCREMENT,
 	Username VARCHAR(50) NOT NULL,
-    Password TEXT NOT NULL,
-	Email VARCHAR(255) NOT NULL,
+    Password TEXT NOT NULL
 	Dashboard LONGTEXT NOT NULL,
 	PRIMARY KEY (UserId),
-	UNIQUE (Username),
-	UNIQUE (Email)
+	UNIQUE (Username)
 );
 
 CREATE TABLE SNSTopics (
@@ -49,7 +47,7 @@ CREATE TABLE LogAlarms (
 
 CREATE TABLE MetricAlarms (
 	MetricAlarmId INT NOT NULL AUTO_INCREMENT,
-	AlarmArn VARCHAR(100) NOT NULL,
+	AlarmArn VARCHAR(255) NOT NULL,
 	PRIMARY KEY (MetricAlarmId),
 	UNIQUE (AlarmArn)
 );

@@ -13,35 +13,40 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name="XRefLogAlarmSNSTopic")
 @Table(
 	name="XRefLogAlarmSNSTopic",
 	uniqueConstraints={
-		@UniqueConstraint(columnNames={ "LogAlarmId", "SNSTopicId" }) 
+		@UniqueConstraint(columnNames={ "UserId", "LogAlarmId", "SNSTopicId" }) 
 	}
 )
+@DynamicUpdate
 public class XRefLogAlarmSNSTopic implements Serializable {
 	private static final long serialVersionUID = 4385868977900164012L;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="LogAlarmSNSTopicId")
+	@Column(name="LogAlarmSNSTopicId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long logAlarmSNSTopicId;
 	
+	@NotNull
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="LogAlarmId")
+	@JoinColumn(name="LogAlarmId", referencedColumnName="LogAlarmId", nullable=false)
 	private LogAlarm logAlarm;
 	
+	@NotNull
 	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="SNSTopicId")
+	@JoinColumn(name="SNSTopicId", referencedColumnName="SNSTopicId", nullable=false)
 	private SNSTopic snsTopic;
 	
-	@OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="UserId")
+	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name="UserId", referencedColumnName="UserId")
 	private User user;
 	
 	public XRefLogAlarmSNSTopic() {

@@ -14,20 +14,27 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name="Keywords")
 @Table(name="Keywords")
+@DynamicUpdate
 public class Keyword implements Serializable {
 	private static final long serialVersionUID = 2313514433783049935L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="KeywordId")
+	@Column(name="KeywordId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long keywordId;
 	
+	@Size(max=70)
 	@Column(name="Word", unique=true)
 	private String word;
 	
+	@NotNull
 	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	

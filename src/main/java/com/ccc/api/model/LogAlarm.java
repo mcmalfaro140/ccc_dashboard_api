@@ -17,27 +17,38 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name="LogAlarms")
 @Table(name="LogAlarms")
+@DynamicUpdate
 public class LogAlarm implements Serializable {
 	private static final long serialVersionUID = 4198681733980071621L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="LogAlarmId")
+	@Column(name="LogAlarmId", nullable=false, unique=true)
 	private Long logAlarmId;
 	
+	@NotNull
+	@Size(max=255)
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
 	
+	@Pattern(regexp="^[ANY|ALL]$")
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
-	@Column(name="LogLevel")
+	@NotNull
+	@Column(name="LogLevel", nullable=false)
 	private String logLevel;
 	
-	@Column(name="Comparison")
+	@NotNull
+	@Column(name="Comparison", nullable=false)
 	private String comparison;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -103,7 +114,7 @@ public class LogAlarm implements Serializable {
 	)
 	private List<SNSTopic> snsTopicList;
 	
-	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public LogAlarm() {
@@ -140,7 +151,7 @@ public class LogAlarm implements Serializable {
 	public LogAlarm(
 			Long logAlarmId,
 			String alarmName,
-			String keywordRelationship,
+			Optional<String> keywordRelationship,
 			String logLevel,
 			String comparison,
 			List<LogGroup> logGroupList,
@@ -151,7 +162,6 @@ public class LogAlarm implements Serializable {
 	) {
 		this.logAlarmId = logAlarmId;
 		this.alarmName = alarmName;
-		this.keywordRelationship = keywordRelationship;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
 		this.logGroupList = logGroupList;
@@ -159,6 +169,13 @@ public class LogAlarm implements Serializable {
 		this.userList = userList;
 		this.snsTopicList = snsTopicList;
 		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		
+		if (keywordRelationship.isPresent()) {
+			this.keywordRelationship = keywordRelationship.get();
+		}
+		else {
+			this.keywordRelationship = null;
+		}
 	}
 	
 	public Long getLogAlarmId() {

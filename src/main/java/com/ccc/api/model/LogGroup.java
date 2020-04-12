@@ -13,20 +13,28 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name="LogGroups")
 @Table(name="LogGroups")
+@DynamicUpdate
 public class LogGroup implements Serializable {
 	private static final long serialVersionUID = 6840950844769274284L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="LogGroupId")
+	@Column(name="LogGroupId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long logGroupId;
 	
+	@NotNull
+	@Size(max=255)
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
 	
+	@NotNull
 	@ManyToMany(mappedBy="logGroupList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	
