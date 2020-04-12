@@ -107,10 +107,10 @@ public class GetLogAlarmResponse {
 			Optional<User> user = xrefLogAlarmSNSTopic.getUser();
 			
 			if (user.isPresent()) {
-				xrefUserSNSTopic.add(new Data(user.get().getUsername(), xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
+				xrefUserSNSTopic.add(new Data(Optional.of(user.get().getUsername()), xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
 			}
 			else {
-				xrefUserSNSTopic.add(new Data("User no longer in database", xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
+				xrefUserSNSTopic.add(new Data(Optional.empty(), xrefLogAlarmSNSTopic.getSNSTopic().getTopicName()));
 			}
 		}
 		
@@ -124,13 +124,20 @@ public class GetLogAlarmResponse {
 		@JsonProperty(value="SNSTopicName")
 		private String snsTopicName;
 		
-		public Data(String username, String snsTopicName) {
-			this.username = username;
+		public Data(Optional<String> username, String snsTopicName) {
 			this.snsTopicName = snsTopicName;
+			
+			if (username.isPresent()) {
+				this.username = username.get();
+			}
+			else {
+				this.username = null;
+			}
 		}
 		
-		public String getUsername() {
-			return this.username;
+		@JsonIgnore
+		public Optional<String> getUsername() {
+			return Optional.ofNullable(this.username);
 		}
 		
 		@JsonIgnore
