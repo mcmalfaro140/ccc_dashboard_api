@@ -54,11 +54,11 @@ INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (3, 2, 
 
 --misael
 Use db;
-INSERT INTO Users (Username, Password, Email, Dashboard) VALUES ('AlexHorejsi', 'test1', 'alex9@gmail.com', '{}');
-INSERT INTO Users (Username, Password, Email, Dashboard) VALUES ('MisaelCorvera', 'test2', 'mcmal@gmail.com', '{}');
-INSERT INTO Users (Username, Password, Email, Dashboard) VALUES ('YiWang', 'test3', 'super@gmail.com', '{}');
-INSERT INTO Users (Username, Password, Email, Dashboard) VALUES ('ZacYou', 'test4', 'zac@yahoo.com', '{}');
-INSERT INTO Users (Username, Password, Email, Dashboard) VALUES ('JayDida', 'test5', 'dida@gmail.com', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('AlexHorejsi', 'test1', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('MisaelCorvera', 'test2', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('YiWang', 'test3', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('ZacYou', 'test4', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('JayDida', 'test5', '{}');
 
 INSERT INTO LogGroups (Name) VALUES ('test');
 INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('EmailTopic', 'arn:aws:sns:us-east-1:112911356528:EmailTopic');

@@ -226,7 +226,8 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public void setLogGroupList(List<LogGroup> logGroupList) {
-		this.logGroupList = logGroupList;
+		this.logGroupList.clear();
+		this.logGroupList.addAll(logGroupList);
 	}
 	
 	public List<Keyword> getKeywordList() {
@@ -234,7 +235,8 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public void setKeywordList(List<Keyword> keywordList) {
-		this.keywordList = keywordList;
+		this.keywordList.clear();
+		this.keywordList.addAll(keywordList);
 	}
 	
 	public List<User> getUserList() {
@@ -242,7 +244,8 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public void setUserList(List<User> userList) {
-		this.userList = userList;
+		this.userList.clear();
+		this.userList.addAll(userList);
 	}
 	
 	public List<SNSTopic> getSNSTopicList() {
@@ -250,7 +253,8 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public void setSNTopicList(List<SNSTopic> snsTopicList) {
-		this.snsTopicList = snsTopicList;
+		this.snsTopicList.clear();
+		this.snsTopicList.addAll(snsTopicList);
 	}
 	
 	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
@@ -258,7 +262,8 @@ public class LogAlarm implements Serializable {
 	}
 	
 	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.xrefLogAlarmSNSTopicList.clear();
+		this.xrefLogAlarmSNSTopicList.addAll(xrefLogAlarmSNSTopicList);
 	}
 	
 	@Override

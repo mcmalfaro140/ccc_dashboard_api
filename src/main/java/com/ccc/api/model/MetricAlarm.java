@@ -74,7 +74,8 @@ public class MetricAlarm implements Serializable {
 	}
 	
 	public void setUserList(List<User> userList) {
-		this.userList = userList;
+		this.userList.clear();
+		this.userList.addAll(userList);
 	}
 	
 	@Override

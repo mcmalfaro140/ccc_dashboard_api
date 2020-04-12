@@ -73,7 +73,8 @@ public class LogGroup implements Serializable {
 	}
 	
 	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
+		this.logAlarmList.clear();
+		this.logAlarmList.addAll(logAlarmList);
 	}
 	
 	@Override

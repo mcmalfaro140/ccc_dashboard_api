@@ -166,7 +166,8 @@ public class User implements Serializable {
 	}
 	
 	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
+		this.logAlarmList.clear();
+		this.logAlarmList.addAll(logAlarmList);
 	}
 	
 	public List<MetricAlarm> getMetricAlarmList() {
@@ -174,7 +175,8 @@ public class User implements Serializable {
 	}
 	
 	public void setMetricAlarmList(List<MetricAlarm> metricAlarmList) {
-		this.metricAlarmList = metricAlarmList;
+		this.metricAlarmList.clear();
+		this.metricAlarmList.addAll(metricAlarmList);
 	}
 	
 	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
@@ -182,7 +184,8 @@ public class User implements Serializable {
 	}
 	
 	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.xrefLogAlarmSNSTopicList.clear();
+		this.xrefLogAlarmSNSTopicList.addAll(xrefLogAlarmSNSTopicList);
 	}
 	
 	@Override
@@ -201,14 +204,14 @@ public class User implements Serializable {
 		return (obj instanceof User) ? this.userId == ((User)obj).userId : false;
 	}
 	
-	@Override
+	
 	public String toString() {
 		String logAlarmNames = this.getLogAlarmNames();
 		String metricAlarmNames = this.getMetricAlarmNames();
 		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
 		
 		return String.format(
-			"User{UserId=%d, Username=%s, Password=%d, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
+			"User{UserId=%d, Username=%s, Password=%s, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
 			this.userId, this.username, this.password, this.dashboard, logAlarmNames, metricAlarmNames, xrefLogAlarmSNSTopicNames
 		);
 	}

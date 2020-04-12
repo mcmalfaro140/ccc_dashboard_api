@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +42,9 @@ import com.ccc.api.util.JwtUtils;
 
 @RestController
 @Transactional
-public class LogAlarmController {	
+public class LogAlarmController {
+	private Logger logger = LoggerFactory.getLogger(LogAlarmController.class);
+	
 	@Autowired
 	private LogAlarmRepository logAlarmRepo;
 	
@@ -125,8 +129,28 @@ public class LogAlarmController {
 			);
 			
 			xrefLogAlarmSNSTopicList.get(0).setLogAlarm(logAlarm);
+			logGroupList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
+			keywordList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
+			userList.get(0).getLogAlarmList().add(logAlarm);
+			userList.get(0).setXRefLogAlarmSNSTopicList(xrefLogAlarmSNSTopicList);
+			snsTopicList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
+			snsTopicList.forEach(value -> { value.setXRefLogAlarmSNSTopicList(xrefLogAlarmSNSTopicList); });
 			
+			this.logger.error("Test22");
+			this.logger.error(logAlarm.toString());
+			this.logger.error(userList.toString());
+			this.logger.error(logGroupList.toString());
+			this.logger.error(keywordList.toString());
+			this.logger.error(snsTopicList.toString());
+			this.logger.error(xrefLogAlarmSNSTopicList.toString());
 			this.logAlarmRepo.save(logAlarm);
+			this.logger.error("Test22");
+			this.logger.error(logAlarm.toString());
+			this.logger.error(userList.toString());
+			this.logger.error(logGroupList.toString());
+			this.logger.error(keywordList.toString());
+			this.logger.error(snsTopicList.toString());
+			this.logger.error(xrefLogAlarmSNSTopicList.toString());
 			
 			response.put("Result", "Success");
 		}

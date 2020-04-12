@@ -107,7 +107,8 @@ public class SNSTopic implements Serializable {
 	}
 	
 	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
+		this.logAlarmList.clear();
+		this.logAlarmList.addAll(logAlarmList);
 	}
 	
 	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
@@ -115,7 +116,8 @@ public class SNSTopic implements Serializable {
 	}
 	
 	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.xrefLogAlarmSNSTopicList.clear();
+		this.xrefLogAlarmSNSTopicList.addAll(xrefLogAlarmSNSTopicList);
 	}
 	
 	@Override
