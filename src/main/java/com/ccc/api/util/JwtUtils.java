@@ -30,7 +30,7 @@ public class JwtUtils {
 		userClaims.put("UserId", user.getUserId());
 		userClaims.put("Username", user.getUsername());
 		    
-		return Jwts.builder().setIssuer(issuer).setSubject(user.getUserId().toString())
+		return Jwts.builder().setIssuer(this.issuer).setSubject(user.getUserId().toString())
 				.setExpiration(expiration.getTime()).setClaims(userClaims).signWith(this.secretKey).compact();
 	}
 
