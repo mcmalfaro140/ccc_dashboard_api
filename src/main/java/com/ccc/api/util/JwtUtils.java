@@ -14,7 +14,7 @@ import com.ccc.api.model.User;
 
 @Component
 public class JwtUtils {
-	private String issuer = "ccc";
+	private static final String ISSUER = "ccc";
 	private SecretKey secretKey;
 	
 	public JwtUtils(@Value("${jwt.secret}") String secret) {
@@ -30,7 +30,7 @@ public class JwtUtils {
 		userClaims.put("UserId", user.getUserId());
 		userClaims.put("Username", user.getUsername());
 		    
-		return Jwts.builder().setIssuer(this.issuer).setSubject(user.getUserId().toString())
+		return Jwts.builder().setIssuer(JwtUtils.ISSUER).setSubject(user.getUserId().toString())
 				.setExpiration(expiration.getTime()).setClaims(userClaims).signWith(this.secretKey).compact();
 	}
 
