@@ -48,8 +48,9 @@ INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (2, 2, 
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (3, 3, 3);
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (4, 2, 4);
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (4, 3, 1);
+INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (3, 2, 2);
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 2, 3);
-INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (3, 2, 3);
+INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 1, 2);
 
 
 --misael

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+
 @Entity(name="XRefLogAlarmSNSTopic")
 @Table(
 	name="XRefLogAlarmSNSTopic",
@@ -23,11 +29,15 @@ import javax.persistence.UniqueConstraint;
 		@UniqueConstraint(columnNames={ "UserId", "LogAlarmId", "SNSTopicId" }) 
 	}
 )
+@DynamicInsert
+@DynamicUpdate
 public class XRefLogAlarmSNSTopic implements Serializable {
 	private static final long serialVersionUID = 4385868977900164012L;
 	
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="LogAlarmSNSTopicId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long logAlarmSNSTopicId;
 	

@@ -95,16 +95,20 @@ public class LogAlarmController {
 		else {
 			user = this.userRepo.findById(user.getUserId()).get();
 			
+			Optional<String> keywordRelationship = Optional.ofNullable(body.getKeywordRelationship());
+			Optional<String> keywordNamesAsString = Optional.ofNullable(body.getKeywords());
+			Optional<String[]> keywordNames = (keywordNamesAsString.isPresent()) ? Optional.of(keywordNamesAsString.get().split(",")): Optional.empty();
+			
+			if (keywordNames.isPresent() != keywordRelationship.isPresent()) {
+				response.put("Result", "Cannot specify keywords without a keyword relationship and vice versa");
+				return response;
+			}
+			
 			String alarmName = body.getAlarmName();
-			String keywordRelationship = body.getKeywordRelationship();
+			String snsTopicName = body.getSNSTopicName();
 			String logLevel = body.getLogLevel();
 			String comparison = body.getComparison();
 			String[] logGroupNames = body.getLogGroups().split(",");
-			
-			String keywordNamesAsString = body.getKeywords();
-			Optional<String[]> keywordNames = (null == keywordNamesAsString) ? Optional.empty() : Optional.of(keywordNamesAsString.split(","));
-					
-			String snsTopicName = body.getSNSTopicName();
 			
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
@@ -113,7 +117,7 @@ public class LogAlarmController {
 			
 			LogAlarm logAlarm = new LogAlarm(
 					alarmName,
-					Optional.ofNullable(keywordRelationship),
+					keywordRelationship,
 					logLevel,
 					comparison,
 					new ArrayList<LogGroup>(logGroupList.size()),
@@ -148,13 +152,7 @@ public class LogAlarmController {
 		
 		for (String logGroupName : logGroupNameList) {
 			Optional<LogGroup> logGroup = this.logGroupRepo.findByName(logGroupName);
-			
-			if (logGroup.isPresent()) {
-				logGroupList.add(logGroup.get());
-			}
-			else {
-				logGroupList.add(new LogGroup(logGroupName, null));
-			}
+			logGroupList.add(logGroup.isPresent() ? logGroup.get() : new LogGroup(logGroupName, new ArrayList<LogAlarm>()));
 		}
 		
 		return logGroupList;
@@ -168,13 +166,7 @@ public class LogAlarmController {
 			
 			for (String keywordName : keywordNameList) {			
 				Optional<Keyword> keyword = this.keywordRepo.findByWord(keywordName);
-				
-				if (keyword.isPresent()) {
-					keywordList.add(keyword.get());
-				}
-				else {
-					keywordList.add(new Keyword(keywordName, new ArrayList<LogAlarm>()));
-				}
+				keywordList.add(keyword.isPresent() ? keyword.get() : new Keyword(keywordName, new ArrayList<LogAlarm>()));
 			}
 		}
 		

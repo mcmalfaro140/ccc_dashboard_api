@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,32 +17,47 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="LogAlarms")
 @Table(name="LogAlarms")
+@DynamicInsert
 @DynamicUpdate
 public class LogAlarm implements Serializable {
 	private static final long serialVersionUID = 4198681733980071621L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="LogAlarmId", nullable=false, unique=true)
 	private Long logAlarmId;
 	
 	@Size(max=255)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
 	
+	@Pattern(regexp="ANY|ALL")
+	@Basic(fetch=FetchType.LAZY)
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
+	@Pattern(regexp="TRACE|DEBUG|INFO|WARN|ERROR")
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="LogLevel", nullable=false)
 	private String logLevel;
 	
+	@Pattern(regexp="==|<|>|<=|>=")
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Comparison", nullable=false)
 	private String comparison;
 	
@@ -63,6 +79,7 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
+	@OrderBy
 	private List<LogGroup> logGroupList;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -83,9 +100,11 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
+	@OrderBy
 	private List<Keyword> keywordList;
 	
 	@ManyToMany(mappedBy="logAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
 	private List<User> userList;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -106,9 +125,11 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
+	@OrderBy
 	private List<SNSTopic> snsTopicList;
 	
-	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@OrderBy
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public LogAlarm() {

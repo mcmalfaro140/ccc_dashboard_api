@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,27 +14,36 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="Keywords")
 @Table(name="Keywords")
+@DynamicInsert
 @DynamicUpdate
 public class Keyword implements Serializable {
 	private static final long serialVersionUID = 2313514433783049935L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="KeywordId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long keywordId;
 	
 	@Size(max=70)
+	@Basic(fetch=FetchType.LAZY)
 	@Column(name="Word", unique=true)
 	private String word;
 	
 	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
 	private List<LogAlarm> logAlarmList;
 	
 	public Keyword() {

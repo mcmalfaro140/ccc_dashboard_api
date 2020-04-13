@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,30 +16,40 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="Users")
 @Table(name="Users")
+@DynamicInsert
 @DynamicUpdate
 public class User implements Serializable {
 	private static final long serialVersionUID = 4066752461555608563L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="UserId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long userId;
 	
 	@Size(max=50)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Username", nullable=false, unique=true)
 	private String username;
 	
 	@Size(max=65535)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Password", nullable=false)
 	private String password;
 	
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
 	
@@ -60,6 +71,7 @@ public class User implements Serializable {
 			)
 		}
 	)
+	@OrderBy
 	private List<LogAlarm> logAlarmList;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -80,9 +92,11 @@ public class User implements Serializable {
 			)
 		}
 	)
+	@OrderBy
 	private List<MetricAlarm> metricAlarmList;
 	
-	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@OrderBy
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public User() {

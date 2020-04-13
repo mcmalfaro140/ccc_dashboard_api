@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,27 +13,36 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="LogGroups")
 @Table(name="LogGroups")
+@DynamicInsert
 @DynamicUpdate
 public class LogGroup implements Serializable {
 	private static final long serialVersionUID = 6840950844769274284L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="LogGroupId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long logGroupId;
 	
 	@Size(max=255)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
 	
 	@ManyToMany(mappedBy="logGroupList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
 	private List<LogAlarm> logAlarmList;
 	
 	public LogGroup() {

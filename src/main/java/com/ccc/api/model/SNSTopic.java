@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,34 +15,45 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="SNSTopics")
 @Table(name="SNSTopics")
+@DynamicInsert
 @DynamicUpdate
 public class SNSTopic implements Serializable {
 	private static final long serialVersionUID = 3077399178896844362L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="SNSTopicId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long snsTopicId;
 	
 	@Size(max=50)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="TopicName", nullable=false, unique=true)
 	private String topicName;
 	
 	@Size(max=255)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
 	@ManyToMany(mappedBy="snsTopicList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
 	private List<LogAlarm> logAlarmList;
 	
-	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@OrderBy
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
 	public SNSTopic() {
