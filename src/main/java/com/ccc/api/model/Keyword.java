@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -34,7 +33,6 @@ public class Keyword implements Serializable {
 	@Column(name="Word", unique=true)
 	private String word;
 	
-	@NotNull
 	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<LogAlarm> logAlarmList;
 	

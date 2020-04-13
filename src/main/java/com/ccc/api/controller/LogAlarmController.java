@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,9 +40,7 @@ import com.ccc.api.util.JwtUtils;
 
 @RestController
 @Transactional
-public class LogAlarmController {
-	private Logger logger = LoggerFactory.getLogger(LogAlarmController.class);
-	
+public class LogAlarmController {	
 	@Autowired
 	private LogAlarmRepository logAlarmRepo;
 	
@@ -110,59 +106,41 @@ public class LogAlarmController {
 					
 			String snsTopicName = body.getSNSTopicName();
 			
-			List<User> userList = this.getUserList(user);
 			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
 			List<Keyword> keywordList = this.getKeywordList(keywordNames);
-			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicName);
-			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList = this.getXRefLogAlarmSNSTopicList(user, snsTopicList.get(0));
+			SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
+			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.getXRefLogAlarmSNSTopic(user, snsTopic);
 			
 			LogAlarm logAlarm = new LogAlarm(
 					alarmName,
 					Optional.ofNullable(keywordRelationship),
 					logLevel,
 					comparison,
-					logGroupList,
-					keywordList,
-					userList,
-					snsTopicList,
-					xrefLogAlarmSNSTopicList
+					new ArrayList<LogGroup>(logGroupList.size()),
+					new ArrayList<Keyword>(keywordList.size()),
+					new ArrayList<User>(1),
+					new ArrayList<SNSTopic>(1),
+					new ArrayList<XRefLogAlarmSNSTopic>(1)
 			);
 			
-			xrefLogAlarmSNSTopicList.get(0).setLogAlarm(logAlarm);
-			logGroupList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
-			keywordList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
-			userList.get(0).getLogAlarmList().add(logAlarm);
-			userList.get(0).setXRefLogAlarmSNSTopicList(xrefLogAlarmSNSTopicList);
-			snsTopicList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
-			snsTopicList.forEach(value -> { value.setXRefLogAlarmSNSTopicList(xrefLogAlarmSNSTopicList); });
+			xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
+			user.getLogAlarmList().add(logAlarm);
+			user.getXRefLogAlarmSNSTopicList().add(xrefLogAlarmSNSTopic);
+			snsTopic.getLogAlarmList().add(logAlarm);
+			snsTopic.getXRefLogAlarmSNSTopicList().add(xrefLogAlarmSNSTopic);
+			logAlarm.getUserList().add(user);
+			logAlarm.getLogGroupList().addAll(logGroupList);
+			logAlarm.getKeywordList().addAll(keywordList);
+			logAlarm.getSNSTopicList().add(snsTopic);
+			logAlarm.getXRefLogAlarmSNSTopicList().add(xrefLogAlarmSNSTopic);
 			
-			this.logger.error("Test22");
-			this.logger.error(logAlarm.toString());
-			this.logger.error(userList.toString());
-			this.logger.error(logGroupList.toString());
-			this.logger.error(keywordList.toString());
-			this.logger.error(snsTopicList.toString());
-			this.logger.error(xrefLogAlarmSNSTopicList.toString());
 			this.logAlarmRepo.save(logAlarm);
-			this.logger.error("Test22");
-			this.logger.error(logAlarm.toString());
-			this.logger.error(userList.toString());
-			this.logger.error(logGroupList.toString());
-			this.logger.error(keywordList.toString());
-			this.logger.error(snsTopicList.toString());
-			this.logger.error(xrefLogAlarmSNSTopicList.toString());
+			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 			
 			response.put("Result", "Success");
 		}
 		
 		return response;
-	}
-	
-	private List<User> getUserList(User user) {
-		ArrayList<User> userList = new ArrayList<User>(1);
-		userList.add(user);
-		
-		return userList;
 	}
 	
 	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
@@ -175,7 +153,7 @@ public class LogAlarmController {
 				logGroupList.add(logGroup.get());
 			}
 			else {
-				logGroupList.add(new LogGroup(logGroupName, new ArrayList<LogAlarm>()));
+				logGroupList.add(new LogGroup(logGroupName, null));
 			}
 		}
 		
@@ -203,8 +181,7 @@ public class LogAlarmController {
 		return keywordList;
 	}
 	
-	private List<SNSTopic> getSNSTopicList(String snsTopicName) {
-		ArrayList<SNSTopic> snsTopicList = new ArrayList<SNSTopic>(1);
+	private SNSTopic getSNSTopic(String snsTopicName) {
 		AmazonSNS snsClient = AmazonSNSClientBuilder
 				.standard()
 				.withCredentials(GlobalVariables.AWS_CREDENTIALS)
@@ -214,28 +191,23 @@ public class LogAlarmController {
 		Optional<SNSTopic> snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName);
 		
 		if (snsTopic.isPresent()) {
-			snsTopicList.add(snsTopic.get());
+			return snsTopic.get();
 		}
 		else {
 			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
 			CreateTopicResult result = snsClient.createTopic(request);
 			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<LogAlarm>(), new ArrayList<XRefLogAlarmSNSTopic>());
 			
-			snsTopicList.add(newTopic);
+			return newTopic;
 		}
-		
-		return snsTopicList;
 	}
 	
-	private List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList(User user, SNSTopic snsTopic) {		
+	private XRefLogAlarmSNSTopic getXRefLogAlarmSNSTopic(User user, SNSTopic snsTopic) {		
 		XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic();
 		xrefLogAlarmSNSTopic.setSNSTopic(snsTopic);
 		xrefLogAlarmSNSTopic.setUser(Optional.of(user));
 		
-		ArrayList<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList = new ArrayList<XRefLogAlarmSNSTopic>(1);
-		xrefLogAlarmSNSTopicList.add(xrefLogAlarmSNSTopic);
-		
-		return xrefLogAlarmSNSTopicList;
+		return xrefLogAlarmSNSTopic;
 	}
 	
 	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")

@@ -17,7 +17,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -33,7 +32,6 @@ public class LogAlarm implements Serializable {
 	@Column(name="LogAlarmId", nullable=false, unique=true)
 	private Long logAlarmId;
 	
-	@NotNull
 	@Size(max=255)
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
@@ -41,11 +39,9 @@ public class LogAlarm implements Serializable {
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
-	@NotNull
 	@Column(name="LogLevel", nullable=false)
 	private String logLevel;
 	
-	@NotNull
 	@Column(name="Comparison", nullable=false)
 	private String comparison;
 	

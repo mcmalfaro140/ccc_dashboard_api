@@ -13,7 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -29,12 +28,10 @@ public class MetricAlarm implements Serializable {
 	@Column(name="MetricAlarmId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long metricAlarmId;
 	
-	@NotNull
 	@Size(max=255)
 	@Column(name="AlarmArn", nullable=false, unique=true)
 	private String metricAlarmArn;
 	
-	@NotNull
 	@ManyToMany(mappedBy="metricAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<User> userList;
 	

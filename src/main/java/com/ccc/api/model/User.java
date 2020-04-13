@@ -16,7 +16,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -32,21 +31,17 @@ public class User implements Serializable {
 	@Column(name="UserId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long userId;
 	
-	@NotNull
 	@Size(max=50)
 	@Column(name="Username", nullable=false, unique=true)
 	private String username;
 	
-	@NotNull
 	@Size(max=65535)
 	@Column(name="Password", nullable=false)
 	private String password;
 	
-	@NotNull
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
 	
-	@NotNull
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserLogAlarm",
@@ -67,7 +62,6 @@ public class User implements Serializable {
 	)
 	private List<LogAlarm> logAlarmList;
 	
-	@NotNull
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
@@ -88,7 +82,6 @@ public class User implements Serializable {
 	)
 	private List<MetricAlarm> metricAlarmList;
 	
-	@NotNull
 	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
 	
@@ -204,7 +197,7 @@ public class User implements Serializable {
 		return (obj instanceof User) ? this.userId == ((User)obj).userId : false;
 	}
 	
-	
+	@Override
 	public String toString() {
 		String logAlarmNames = this.getLogAlarmNames();
 		String metricAlarmNames = this.getMetricAlarmNames();
