@@ -1,9 +1,9 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -48,13 +48,13 @@ public class SNSTopic implements Serializable {
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
-	@ManyToMany(mappedBy="snsTopicList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(mappedBy="snsTopicSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@OrderBy
-	private List<LogAlarm> logAlarmList;
+	private Set<LogAlarm> logAlarmSet;
 	
 	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
 	@OrderBy
-	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
+	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public SNSTopic() {
 	}
@@ -62,27 +62,27 @@ public class SNSTopic implements Serializable {
 	public SNSTopic(
 			String topicName,
 			String topicArn,
-			List<LogAlarm> logAlarmList,
-			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
+			Set<LogAlarm> logAlarmSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.topicName = topicName;
 		this.topicArn = topicArn;
-		this.logAlarmList = logAlarmList;
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.logAlarmSet = logAlarmSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
 	public SNSTopic(
 			Long snsTopicId,
 			String topicName,
 			String topicArn,
-			List<LogAlarm> logAlarmList,
-			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
+			Set<LogAlarm> logAlarmSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
-		this.logAlarmList = logAlarmList;
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.logAlarmSet = logAlarmSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
 	public Long getSNSTopicId() {
@@ -109,22 +109,22 @@ public class SNSTopic implements Serializable {
 		this.topicArn = topicArn;
 	}
 	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
 	}
 	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList.clear();
-		this.logAlarmList.addAll(logAlarmList);
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
 	}
 	
-	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
-		return this.xrefLogAlarmSNSTopicList;
+	public Set<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicSet() {
+		return this.xrefLogAlarmSNSTopicSet;
 	}
 	
-	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
-		this.xrefLogAlarmSNSTopicList.clear();
-		this.xrefLogAlarmSNSTopicList.addAll(xrefLogAlarmSNSTopicList);
+	public void setXRefLogAlarmSNSTopicSet(Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet) {
+		this.xrefLogAlarmSNSTopicSet.clear();
+		this.xrefLogAlarmSNSTopicSet.addAll(xrefLogAlarmSNSTopicSet);
 	}
 	
 	@Override
@@ -154,20 +154,22 @@ public class SNSTopic implements Serializable {
 	}
 	
 	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		String[] logAlarmNames = new String[this.logAlarmSet.size()];
 		
-		for (int index = 0; index < logAlarmNames.length; ++index) {
-			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		int index = 0;
+		for (LogAlarm logAlarm : this.logAlarmSet) {
+			logAlarmNames[index] = logAlarm.getAlarmName();
+			++index;
 		}
 		
 		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 	
 	private String getXRefLogAlarmSNSTopicNames() {
-		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicList.size()];
+		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
 		
-		for (int index = 0; index < xrefLogAlarmSNSTopicNames.length; ++index) {
-			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.xrefLogAlarmSNSTopicList.get(index);
+		int index = 0;
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
 			Optional<User> user = xrefLogAlarmSNSTopic.getUser();
 			
 			String username = (user.isPresent()) ? user.get().getUsername() : "null";

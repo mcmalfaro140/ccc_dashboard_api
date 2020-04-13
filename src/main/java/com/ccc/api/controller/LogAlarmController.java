@@ -1,10 +1,11 @@
 package com.ccc.api.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +76,7 @@ public class LogAlarmController {
 			user = this.userRepo.findById(user.getUserId()).get();
 			
 			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			List<LogAlarm> userLogAlarms = user.getLogAlarmList();
+			Set<LogAlarm> userLogAlarms = user.getLogAlarmSet();
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
@@ -110,8 +111,8 @@ public class LogAlarmController {
 			String comparison = body.getComparison();
 			String[] logGroupNames = body.getLogGroups().split(",");
 			
-			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
-			List<Keyword> keywordList = this.getKeywordList(keywordNames);
+			Set<LogGroup> logGroupSet = this.getLogGroupSet(logGroupNames);
+			Set<Keyword> keywordSet = this.getKeywordSet(keywordNames);
 			SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
 			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.getXRefLogAlarmSNSTopic(user, snsTopic);
 			
@@ -120,26 +121,26 @@ public class LogAlarmController {
 					keywordRelationship,
 					logLevel,
 					comparison,
-					new ArrayList<LogGroup>(logGroupList.size()),
-					new ArrayList<Keyword>(keywordList.size()),
-					new ArrayList<User>(1),
-					new ArrayList<SNSTopic>(1),
-					new ArrayList<XRefLogAlarmSNSTopic>(1)
+					new HashSet<LogGroup>(logGroupSet.size()),
+					new HashSet<Keyword>(keywordSet.size()),
+					new HashSet<User>(1),
+					new HashSet<SNSTopic>(1),
+					new HashSet<XRefLogAlarmSNSTopic>(1)
 			);
 			
 			xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
-			user.getLogAlarmList().add(logAlarm);
-			user.getXRefLogAlarmSNSTopicList().add(xrefLogAlarmSNSTopic);
-			snsTopic.getLogAlarmList().add(logAlarm);
-			snsTopic.getXRefLogAlarmSNSTopicList().add(xrefLogAlarmSNSTopic);
-			logAlarm.getUserList().add(user);
-			logAlarm.getLogGroupList().addAll(logGroupList);
-			logAlarm.getKeywordList().addAll(keywordList);
-			logAlarm.getSNSTopicList().add(snsTopic);
-			logAlarm.getXRefLogAlarmSNSTopicList().add(xrefLogAlarmSNSTopic);
+			user.getLogAlarmSet().add(logAlarm);
+			user.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+			snsTopic.getLogAlarmSet().add(logAlarm);
+			snsTopic.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+			logAlarm.getUserSet().add(user);
+			logAlarm.getLogGroupSet().addAll(logGroupSet);
+			logAlarm.getKeywordSet().addAll(keywordSet);
+			logAlarm.getSNSTopicSet().add(snsTopic);
+			logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
 			
 			this.logAlarmRepo.save(logAlarm);
-			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
+			//this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 			
 			response.put("Result", "Success");
 		}
@@ -147,30 +148,30 @@ public class LogAlarmController {
 		return response;
 	}
 	
-	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
-		ArrayList<LogGroup> logGroupList = new ArrayList<LogGroup>(logGroupNameList.length);
+	private Set<LogGroup> getLogGroupSet(String[] logGroupNameSet) {
+		HashSet<LogGroup> logGroupSet = new HashSet<LogGroup>(logGroupNameSet.length);
 		
-		for (String logGroupName : logGroupNameList) {
+		for (String logGroupName : logGroupNameSet) {
 			Optional<LogGroup> logGroup = this.logGroupRepo.findByName(logGroupName);
-			logGroupList.add(logGroup.isPresent() ? logGroup.get() : new LogGroup(logGroupName, new ArrayList<LogAlarm>()));
+			logGroupSet.add(logGroup.isPresent() ? logGroup.get() : new LogGroup(logGroupName, new HashSet<LogAlarm>()));
 		}
 		
-		return logGroupList;
+		return logGroupSet;
 	}
 	
-	private List<Keyword> getKeywordList(Optional<String[]> nullableKeywordNameList) {
-		ArrayList<Keyword> keywordList = new ArrayList<Keyword>();
+	private Set<Keyword> getKeywordSet(Optional<String[]> nullableKeywordNameSet) {
+		HashSet<Keyword> keywordSet = new HashSet<Keyword>();
 		
-		if (nullableKeywordNameList.isPresent()) {
-			String[] keywordNameList = nullableKeywordNameList.get();
+		if (nullableKeywordNameSet.isPresent()) {
+			String[] keywordNameSet = nullableKeywordNameSet.get();
 			
-			for (String keywordName : keywordNameList) {			
+			for (String keywordName : keywordNameSet) {			
 				Optional<Keyword> keyword = this.keywordRepo.findByWord(keywordName);
-				keywordList.add(keyword.isPresent() ? keyword.get() : new Keyword(keywordName, new ArrayList<LogAlarm>()));
+				keywordSet.add(keyword.isPresent() ? keyword.get() : new Keyword(keywordName, new HashSet<LogAlarm>()));
 			}
 		}
 		
-		return keywordList;
+		return keywordSet;
 	}
 	
 	private SNSTopic getSNSTopic(String snsTopicName) {
@@ -188,7 +189,9 @@ public class LogAlarmController {
 		else {
 			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
 			CreateTopicResult result = snsClient.createTopic(request);
-			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<LogAlarm>(), new ArrayList<XRefLogAlarmSNSTopic>());
+			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new HashSet<LogAlarm>(), new HashSet<XRefLogAlarmSNSTopic>());
+			
+			this.snsTopicRepo.save(newTopic);
 			
 			return newTopic;
 		}

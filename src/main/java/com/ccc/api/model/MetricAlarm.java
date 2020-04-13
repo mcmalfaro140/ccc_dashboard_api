@@ -1,8 +1,8 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -41,23 +41,23 @@ public class MetricAlarm implements Serializable {
 	@Column(name="AlarmArn", nullable=false, unique=true)
 	private String metricAlarmArn;
 	
-	@ManyToMany(mappedBy="metricAlarmList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(mappedBy="metricAlarmSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@OrderBy
-	private List<User> userList;
+	private Set<User> userSet;
 	
 	
 	public MetricAlarm() {
 	}
 	
-	public MetricAlarm(String alarmArn, List<User> userList) {
+	public MetricAlarm(String alarmArn, Set<User> userSet) {
 		this.metricAlarmArn = alarmArn;
-		this.userList = userList;
+		this.userSet = userSet;
 	}
 	
-	public MetricAlarm(Long metricAlarmId, String alarmArn, List<User> userList) {
+	public MetricAlarm(Long metricAlarmId, String alarmArn, Set<User> userSet) {
 		this.metricAlarmId = metricAlarmId;
 		this.metricAlarmArn = alarmArn;
-		this.userList = userList;
+		this.userSet = userSet;
 	}
 	
 	public Long getMetricAlarmId() {
@@ -76,13 +76,13 @@ public class MetricAlarm implements Serializable {
 		this.metricAlarmArn = alarmArn;
 	}
 	
-	public List<User> getUserList() {
-		return this.userList;
+	public Set<User> getUserSet() {
+		return this.userSet;
 	}
 	
-	public void setUserList(List<User> userList) {
-		this.userList.clear();
-		this.userList.addAll(userList);
+	public void setUserSet(Set<User> userSet) {
+		this.userSet.clear();
+		this.userSet.addAll(userSet);
 	}
 	
 	@Override
@@ -106,10 +106,11 @@ public class MetricAlarm implements Serializable {
 	}
 	
 	private String getUsernames() {
-		String[] usernames = new String[this.userList.size()];
+		String[] usernames = new String[this.userSet.size()];
 		
-		for (int index = 0; index < usernames.length; ++index) {
-			usernames[index] = this.userList.get(index).getUsername();
+		int index = 0;
+		for (User user : this.userSet) {
+			usernames[index] = user.getUsername();
 		}
 		
 		return '[' + String.join(",", usernames) + ']';

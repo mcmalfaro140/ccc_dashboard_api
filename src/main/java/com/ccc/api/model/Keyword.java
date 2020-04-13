@@ -1,9 +1,9 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -42,21 +42,21 @@ public class Keyword implements Serializable {
 	@Column(name="Word", unique=true)
 	private String word;
 	
-	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(mappedBy="keywordSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@OrderBy
-	private List<LogAlarm> logAlarmList;
+	private Set<LogAlarm> logAlarmSet;
 	
 	public Keyword() {
 	}
 	
-	public Keyword(String word, List<LogAlarm> logAlarmList) {
+	public Keyword(String word, Set<LogAlarm> logAlarmSet) {
 		this.word = word;
-		this.logAlarmList = logAlarmList;
+		this.logAlarmSet = logAlarmSet;
 	}
 	
-	public Keyword(Long keywordId, Optional<String> word, List<LogAlarm> logAlarmList) {
+	public Keyword(Long keywordId, Optional<String> word, Set<LogAlarm> logAlarmSet) {
 		this.keywordId = keywordId;
-		this.logAlarmList = logAlarmList;
+		this.logAlarmSet = logAlarmSet;
 		
 		if (word.isPresent()) {
 			this.word = word.get();
@@ -87,13 +87,13 @@ public class Keyword implements Serializable {
 		}
 	}
 	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
 	}
 	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList.clear();
-		this.logAlarmList.addAll(logAlarmList);
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
 	}
 	
 	@Override
@@ -118,10 +118,12 @@ public class Keyword implements Serializable {
 	}
 	
 	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		String[] logAlarmNames = new String[this.logAlarmSet.size()];
 		
-		for (int index = 0; index < logAlarmNames.length; ++index) {
-			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		int index = 0;
+		for (LogAlarm logAlarm : this.logAlarmSet) {
+			logAlarmNames[index] = logAlarm.getAlarmName();
+			++index;
 		}
 		
 		return '[' + String.join(",", logAlarmNames) + ']';

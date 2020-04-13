@@ -1,8 +1,8 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -72,7 +72,7 @@ public class User implements Serializable {
 		}
 	)
 	@OrderBy
-	private List<LogAlarm> logAlarmList;
+	private Set<LogAlarm> logAlarmSet;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
@@ -93,11 +93,11 @@ public class User implements Serializable {
 		}
 	)
 	@OrderBy
-	private List<MetricAlarm> metricAlarmList;
+	private Set<MetricAlarm> metricAlarmSet;
 	
 	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
 	@OrderBy
-	private List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList;
+	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public User() {
 	}
@@ -106,16 +106,16 @@ public class User implements Serializable {
 			String username,
 			String password,
 			String dashboard,
-			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList,
-			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
+			Set<LogAlarm> logAlarmSet,
+			Set<MetricAlarm> metricAlarmSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.username = username;
 		this.password = password;
 		this.dashboard = dashboard;
-		this.logAlarmList = logAlarmList;
-		this.metricAlarmList = metricAlarmList;
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.logAlarmSet = logAlarmSet;
+		this.metricAlarmSet = metricAlarmSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
 	public User(
@@ -123,17 +123,17 @@ public class User implements Serializable {
 			String username,
 			String password,
 			String dashboard,
-			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList,
-			List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList
+			Set<LogAlarm> logAlarmSet,
+			Set<MetricAlarm> metricAlarmSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
 		this.dashboard = dashboard;
-		this.logAlarmList = logAlarmList;
-		this.metricAlarmList = metricAlarmList;
-		this.xrefLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+		this.logAlarmSet = logAlarmSet;
+		this.metricAlarmSet = metricAlarmSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
 	public Long getUserId() {
@@ -168,31 +168,31 @@ public class User implements Serializable {
 		this.dashboard = dashboard;
 	}
 	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
 	}
 	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList.clear();
-		this.logAlarmList.addAll(logAlarmList);
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
 	}
 	
-	public List<MetricAlarm> getMetricAlarmList() {
-		return this.metricAlarmList;
+	public Set<MetricAlarm> getMetricAlarmSet() {
+		return this.metricAlarmSet;
 	}
 	
-	public void setMetricAlarmList(List<MetricAlarm> metricAlarmList) {
-		this.metricAlarmList.clear();
-		this.metricAlarmList.addAll(metricAlarmList);
+	public void setMetricAlarmSet(Set<MetricAlarm> metricAlarmSet) {
+		this.metricAlarmSet.clear();
+		this.metricAlarmSet.addAll(metricAlarmSet);
 	}
 	
-	public List<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicList() {
-		return this.xrefLogAlarmSNSTopicList;
+	public Set<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicSet() {
+		return this.xrefLogAlarmSNSTopicSet;
 	}
 	
-	public void setXRefLogAlarmSNSTopicList(List<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
-		this.xrefLogAlarmSNSTopicList.clear();
-		this.xrefLogAlarmSNSTopicList.addAll(xrefLogAlarmSNSTopicList);
+	public void setXRefLogAlarmSNSTopicSet(Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet) {
+		this.xrefLogAlarmSNSTopicSet.clear();
+		this.xrefLogAlarmSNSTopicSet.addAll(xrefLogAlarmSNSTopicSet);
 	}
 	
 	@Override
@@ -224,31 +224,33 @@ public class User implements Serializable {
 	}
 	
 	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.logAlarmList.size()];
+		String[] logAlarmNames = new String[this.logAlarmSet.size()];
 		
-		for (int index = 0; index < logAlarmNames.length; ++index) {
-			logAlarmNames[index] = this.logAlarmList.get(index).getAlarmName();
+		int index = 0;
+		for (LogAlarm logAlarm : this.logAlarmSet) {
+			logAlarmNames[index] = logAlarm.getAlarmName();
+			++index;
 		}
 		
 		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 	
 	private String getMetricAlarmNames() {
-		String[] metricAlarmNames = new String[this.metricAlarmList.size()];
+		String[] metricAlarmNames = new String[this.metricAlarmSet.size()];
 		
-		for (int index = 0; index < metricAlarmNames.length; ++index) {
-			metricAlarmNames[index] = this.metricAlarmList.get(index).getAlarmArn();
+		int index = 0;
+		for (MetricAlarm metricAlarm : this.metricAlarmSet) {
+			metricAlarmNames[index] = metricAlarm.getAlarmArn();
 		}
 		
 		return '[' + String.join(",", metricAlarmNames) + ']';
 	}
 	
 	private String getXRefLogAlarmSNSTopicNames() {
-		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicList.size()];
+		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
 		
-		for (int index = 0; index < xrefLogAlarmSNSTopicNames.length; ++index) {
-			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.xrefLogAlarmSNSTopicList.get(index);
-			
+		int index = 0;
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
 			String logAlarmName = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
 			String snsTopicName = xrefLogAlarmSNSTopic.getSNSTopic().getTopicName();
 			
