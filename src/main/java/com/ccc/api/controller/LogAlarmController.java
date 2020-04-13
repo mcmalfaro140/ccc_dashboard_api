@@ -140,7 +140,7 @@ public class LogAlarmController {
 			logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
 			
 			this.logAlarmRepo.save(logAlarm);
-			//this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
+			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 			
 			response.put("Result", "Success");
 		}
