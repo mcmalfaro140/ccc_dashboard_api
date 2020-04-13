@@ -1,16 +1,21 @@
 package com.ccc.api.util;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.ccc.api.model.User;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
-import com.ccc.api.model.User;
 
 @Component
 public class JwtUtils {
@@ -23,15 +28,21 @@ public class JwtUtils {
 	}
 
 	public String toToken(User user) {
-		Calendar expiration = Calendar.getInstance();
-		expiration.add(Calendar.DATE, 7);
+		Date expirationDate = this.computeExpirationDate();
 		
 		Claims userClaims = Jwts.claims();
 		userClaims.put("UserId", user.getUserId());
 		userClaims.put("Username", user.getUsername());
 		    
 		return Jwts.builder().setIssuer(JwtUtils.ISSUER).setSubject(user.getUserId().toString())
-				.setExpiration(expiration.getTime()).setClaims(userClaims).signWith(this.secretKey).compact();
+				.setExpiration(expirationDate).setClaims(userClaims).signWith(this.secretKey).compact();
+	}
+	
+	private Date computeExpirationDate() {
+		int maxDays = 30;
+		LocalDateTime expirationDate = LocalDateTime.now().plusDays(maxDays);
+		
+		return Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
 	}
 
 	public User toUser(String token) {
@@ -44,7 +55,7 @@ public class JwtUtils {
 			
 			return user;
 		} catch (JwtException e) {
-		      return null;
+		    return null;
 		}
 	}
 }
