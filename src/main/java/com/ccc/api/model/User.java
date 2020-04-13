@@ -1,8 +1,10 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,32 +16,64 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="Users")
 @Table(name="Users")
+@DynamicInsert
+@DynamicUpdate
 public class User implements Serializable {
 	private static final long serialVersionUID = 4066752461555608563L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="UserId")
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="UserId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long userId;
 	
+	@Size(max=50)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Username", nullable=false, unique=true)
 	private String username;
 	
+	@Size(max=65535)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Password", nullable=false)
 	private String password;
 	
-	@Column(name="Email", nullable=false, unique=true)
-	private String email;
-	
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
+	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefUserLogAlarm",
+		joinColumns={
+			@JoinColumn(
+				name="UserId",
+				referencedColumnName="UserId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		}
+	)
+	@OrderBy
+	private Set<LogAlarm> logAlarmSet;
+	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
 		name="XRefUserMetricAlarm",
@@ -58,10 +92,12 @@ public class User implements Serializable {
 			)
 		}
 	)
-	private List<MetricAlarm> metricAlarmList;
+	@OrderBy
+	private Set<MetricAlarm> metricAlarmSet;
 	
-	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@OrderBy
+	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public User() {
 	}
@@ -69,40 +105,43 @@ public class User implements Serializable {
 	public User(
 			String username,
 			String password,
-			String email,
 			String dashboard,
-			List<MetricAlarm> metricAlarmList,
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+			Set<LogAlarm> logAlarmSet,
+			Set<MetricAlarm> metricAlarmSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.username = username;
 		this.password = password;
-		this.email = email;
 		this.dashboard = dashboard;
-		this.metricAlarmList = metricAlarmList;
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
+		this.logAlarmSet = logAlarmSet;
+		this.metricAlarmSet = metricAlarmSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
 	public User(
 			Long userId,
 			String username,
 			String password,
-			String email,
 			String dashboard,
-			List<LogAlarm> logAlarmList,
-			List<MetricAlarm> metricAlarmList,
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+			Set<LogAlarm> logAlarmSet,
+			Set<MetricAlarm> metricAlarmSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
-		this.email = email;
 		this.dashboard = dashboard;
-		this.metricAlarmList = metricAlarmList;
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
+		this.logAlarmSet = logAlarmSet;
+		this.metricAlarmSet = metricAlarmSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
 	public Long getUserId() {
 		return this.userId;
+	}
+	
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 	
 	public String getUsername() {
@@ -121,14 +160,6 @@ public class User implements Serializable {
 		this.password = password;
 	}
 	
-	public String getEmail() {
-		return this.email;
-	}
-	
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
 	public String getDashboard() {
 		return this.dashboard;
 	}
@@ -137,56 +168,98 @@ public class User implements Serializable {
 		this.dashboard = dashboard;
 	}
 	
-	public List<MetricAlarm> getMetricAlarmList() {
-		return this.metricAlarmList;
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
 	}
 	
-	public void setMetricAlarmList(List<MetricAlarm> metricAlarmList) {
-		this.metricAlarmList = metricAlarmList;
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
 	}
 	
-	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
-		return this.xrefUserLogAlarmSNSTopicList;
+	public Set<MetricAlarm> getMetricAlarmSet() {
+		return this.metricAlarmSet;
 	}
 	
-	public void setXRefUserLogAlarmSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList) {
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
+	public void setMetricAlarmSet(Set<MetricAlarm> metricAlarmSet) {
+		this.metricAlarmSet.clear();
+		this.metricAlarmSet.addAll(metricAlarmSet);
 	}
 	
-	public Claims toClaims() {
-		Claims claims = Jwts.claims();
-		
-		claims.put("UserId", this.userId);
-		claims.put("Username", this.username);
-		claims.put("Email", this.email);
-		    
-		return claims;
+	public Set<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicSet() {
+		return this.xrefLogAlarmSNSTopicSet;
 	}
-
-	public static User fromClaims(Claims claims) {
-		User user = new User();
-		user.userId = claims.get("UserId", Long.class);
-		user.username = claims.get("Username", String.class);
-		user.email = claims.get("Email", String.class);
-		
-		return user;
+	
+	public void setXRefLogAlarmSNSTopicSet(Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet) {
+		this.xrefLogAlarmSNSTopicSet.clear();
+		this.xrefLogAlarmSNSTopicSet.addAll(xrefLogAlarmSNSTopicSet);
 	}
 	
 	@Override
-	public int hashCode() {
-		int modifier = 31;
-		
+	public int hashCode() {		
 		return Math.abs(
-				modifier * this.userId.hashCode() +
-				modifier * this.username.hashCode() +
-				modifier * this.password.hashCode() +
-				modifier * this.email.hashCode() +
-				modifier * this.dashboard.hashCode()
+				31 * 
+				(Objects.hashCode(this.userId) +
+				Objects.hashCode(this.username) +
+				Objects.hashCode(this.password) +
+				Objects.hashCode(this.dashboard))
 		);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof User) ? this.userId == ((User)obj).userId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String logAlarmNames = this.getLogAlarmNames();
+		String metricAlarmNames = this.getMetricAlarmNames();
+		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
+		
+		return String.format(
+			"User{UserId=%d, Username=%s, Password=%s, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
+			this.userId, this.username, this.password, this.dashboard, logAlarmNames, metricAlarmNames, xrefLogAlarmSNSTopicNames
+		);
+	}
+	
+	private String getLogAlarmNames() {
+		String[] logAlarmNames = new String[this.logAlarmSet.size()];
+		
+		int index = 0;
+		for (LogAlarm logAlarm : this.logAlarmSet) {
+			logAlarmNames[index] = logAlarm.getAlarmName();
+			++index;
+		}
+		
+		return '[' + String.join(",", logAlarmNames) + ']';
+	}
+	
+	private String getMetricAlarmNames() {
+		String[] metricAlarmNames = new String[this.metricAlarmSet.size()];
+		
+		int index = 0;
+		for (MetricAlarm metricAlarm : this.metricAlarmSet) {
+			metricAlarmNames[index] = metricAlarm.getAlarmArn();
+		}
+		
+		return '[' + String.join(",", metricAlarmNames) + ']';
+	}
+	
+	private String getXRefLogAlarmSNSTopicNames() {
+		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
+		
+		int index = 0;
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
+			String logAlarmName = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
+			String snsTopicName = xrefLogAlarmSNSTopic.getSNSTopic().getTopicName();
+			
+			xrefLogAlarmSNSTopicNames[index] = String.format(
+					"(LogAlarm=%s, SNSTopic=%s)",
+					logAlarmName, snsTopicName
+			);
+		}
+		
+		return '[' + String.join(",", xrefLogAlarmSNSTopicNames) + ']';
 	}
 }

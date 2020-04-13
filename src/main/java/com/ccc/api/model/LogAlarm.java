@@ -1,8 +1,11 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
+import java.util.Objects;
+import java.util.Optional;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,28 +17,48 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="LogAlarms")
 @Table(name="LogAlarms")
+@DynamicInsert
+@DynamicUpdate
 public class LogAlarm implements Serializable {
 	private static final long serialVersionUID = 4198681733980071621L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="LogAlarmId")
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="LogAlarmId", nullable=false, unique=true)
 	private Long logAlarmId;
 	
+	@Size(max=255)
+	@Basic(optional=false, fetch=FetchType.LAZY)
 	@Column(name="AlarmName", nullable=false, unique=true)
 	private String alarmName;
 	
+	@Pattern(regexp="ANY|ALL")
+	@Basic(fetch=FetchType.LAZY)
 	@Column(name="KeywordRelationship")
 	private String keywordRelationship;
 	
-	@Column(name="LogLevel")
+	@Pattern(regexp="TRACE|DEBUG|INFO|WARN|ERROR")
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="LogLevel", nullable=false)
 	private String logLevel;
 	
-	@Column(name="Comparison")
+	@Pattern(regexp="==|<|>|<=|>=")
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="Comparison", nullable=false)
 	private String comparison;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -56,7 +79,8 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
-	private List<LogGroup> logGroupList;
+	@OrderBy
+	private Set<LogGroup> logGroupSet;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
@@ -76,54 +100,106 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
-	private List<Keyword> keywordList;
+	@OrderBy
+	private Set<Keyword> keywordSet;
 	
-	@OneToMany(mappedBy="logAlarm", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList;
+	@ManyToMany(mappedBy="logAlarmSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
+	private Set<User> userSet;
+	
+	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinTable(
+		name="XRefLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="SNSTopicId",
+				referencedColumnName="SNSTopicId",
+				nullable=false
+			)
+		}
+	)
+	@OrderBy
+	private Set<SNSTopic> snsTopicSet;
+	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@JoinColumn(name="LogAlarmId", referencedColumnName="LogAlarmId")
+	@OrderBy
+	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public LogAlarm() {
 	}
 	
 	public LogAlarm(
 			String alarmName,
-			String keywordRelationship,
+			Optional<String> keywordRelationship,
 			String logLevel,
 			String comparison,
-			List<LogGroup> logGroupList,
-			List<Keyword> keywordList,
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+			Set<LogGroup> logGroupSet,
+			Set<Keyword> keywordSet,
+			Set<User> userSet,
+			Set<SNSTopic> snsTopicSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.alarmName = alarmName;
-		this.keywordRelationship = keywordRelationship;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
-		this.logGroupList = logGroupList;
-		this.keywordList = keywordList;
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
+		this.logGroupSet = logGroupSet;
+		this.keywordSet = keywordSet;
+		this.userSet = userSet;
+		this.snsTopicSet = snsTopicSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
+		
+		if (keywordRelationship.isPresent()) {
+			this.keywordRelationship = keywordRelationship.get();
+		}
+		else {
+			this.keywordRelationship = null;
+		}
 	}
 	
 	public LogAlarm(
 			Long logAlarmId,
 			String alarmName,
-			String keywordRelationship,
+			Optional<String> keywordRelationship,
 			String logLevel,
 			String comparison,
-			List<LogGroup> logGroupList,
-			List<Keyword> keywordList,
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList
+			Set<LogGroup> logGroupSet,
+			Set<Keyword> keywordSet,
+			Set<User> userSet,
+			Set<SNSTopic> snsTopicSet,
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.logAlarmId = logAlarmId;
 		this.alarmName = alarmName;
-		this.keywordRelationship = keywordRelationship;
 		this.logLevel = logLevel;
 		this.comparison = comparison;
-		this.logGroupList = logGroupList;
-		this.keywordList = keywordList;
-		this.xrefUserLogAlarmSNSTopicList = xrefUserLogAlarmSNSTopicList;
+		this.logGroupSet = logGroupSet;
+		this.keywordSet = keywordSet;
+		this.userSet = userSet;
+		this.snsTopicSet = snsTopicSet;
+		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
+		
+		if (keywordRelationship.isPresent()) {
+			this.keywordRelationship = keywordRelationship.get();
+		}
+		else {
+			this.keywordRelationship = null;
+		}
 	}
 	
 	public Long getLogAlarmId() {
 		return this.logAlarmId;
+	}
+	
+	public void setLogAlarmId(Long logAlarmId) {
+		this.logAlarmId = logAlarmId;
 	}
 	
 	public String getAlarmName() {
@@ -134,12 +210,17 @@ public class LogAlarm implements Serializable {
 		this.alarmName = alarmName;
 	}
 	
-	public String getKeywordRelationship() {
-		return this.keywordRelationship;
+	public Optional<String> getKeywordRelationship() {
+		return Optional.ofNullable(this.keywordRelationship);
 	}
 	
-	public void setKeywordRelationship(String keywordRelationship) {
-		this.keywordRelationship = keywordRelationship;
+	public void setKeywordRelationship(Optional<String> keywordRelationship) {
+		if (keywordRelationship.isPresent()) {
+			this.keywordRelationship = keywordRelationship.get();
+		}
+		else {
+			this.keywordRelationship = null;
+		}
 	}
 	
 	public String getLogLevel() {
@@ -158,45 +239,147 @@ public class LogAlarm implements Serializable {
 		this.comparison = comparison;
 	}
 	
-	public List<LogGroup> getLogGroupList() {
-		return this.logGroupList;
+	public Set<LogGroup> getLogGroupSet() {
+		return this.logGroupSet;
 	}
 	
-	public void setLogGroupList(List<LogGroup> logGroupList) {
-		this.logGroupList = logGroupList;
+	public void setLogGroupSet(Set<LogGroup> logGroupSet) {
+		this.logGroupSet.clear();
+		this.logGroupSet.addAll(logGroupSet);
 	}
 	
-	public List<Keyword> getKeywordList() {
-		return this.keywordList;
+	public Set<Keyword> getKeywordSet() {
+		return this.keywordSet;
 	}
 	
-	public void setKeywordList(List<Keyword> keywordList) {
-		this.keywordList = keywordList;
+	public void setKeywordSet(Set<Keyword> keywordSet) {
+		this.keywordSet.clear();
+		this.keywordSet.addAll(keywordSet);
 	}
 	
-	public List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList() {
-		return this.xrefUserLogAlarmSNSTopicList;
+	public Set<User> getUserSet() {
+		return this.userSet;
 	}
 	
-	public void setXRefUserLogAlarmSNSTopicList(List<XRefUserLogAlarmSNSTopic> xrefLogAlarmSNSTopicList) {
-		this.xrefUserLogAlarmSNSTopicList = xrefLogAlarmSNSTopicList;
+	public void setUserSet(Set<User> userSet) {
+		this.userSet.clear();
+		this.userSet.addAll(userSet);
+	}
+	
+	public Set<SNSTopic> getSNSTopicSet() {
+		return this.snsTopicSet;
+	}
+	
+	public void setSNTopicSet(Set<SNSTopic> snsTopicSet) {
+		this.snsTopicSet.clear();
+		this.snsTopicSet.addAll(snsTopicSet);
+	}
+	
+	public Set<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicSet() {
+		return this.xrefLogAlarmSNSTopicSet;
+	}
+	
+	public void setXRefLogAlarmSNSTopicSet(Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet) {
+		this.xrefLogAlarmSNSTopicSet.clear();
+		this.xrefLogAlarmSNSTopicSet.addAll(xrefLogAlarmSNSTopicSet);
 	}
 	
 	@Override
-	public int hashCode() {
-		int modifier = 31;
-		
+	public int hashCode() {		
 		return Math.abs(
-				modifier * this.logAlarmId.hashCode() +
-				modifier * this.alarmName.hashCode() +
-				modifier * this.keywordRelationship.hashCode() +
-				modifier * this.logLevel.hashCode() +
-				modifier * this.comparison.hashCode()
+				31 * 
+				(Objects.hashCode(this.logAlarmId) +
+				Objects.hashCode(this.alarmName) +
+				Objects.hashCode(this.keywordRelationship) +
+				Objects.hashCode(this.logLevel) +
+				Objects.hashCode(this.comparison))
 		);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof LogAlarm) ? this.logAlarmId == ((LogAlarm)obj).logAlarmId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String usernames = this.getUsernames();
+		String logGroupNames = this.getLogGroupNames();
+		String keywordNames = this.getKeywordNames();
+		String snsTopicNames = this.getSNSTopicNames();
+		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
+		
+		return String.format(
+			"LogAlarm{LogAlarmId=%d, AlarmName=%s, KeywordRelationship=%s, LogLevel=%s, Comparison=%s," +
+			"Users=%s, LogGroups=%s, Keywords=%s, SNSTopics=%s, XRefLogAlarmSNSTopics=%s}",
+			this.logAlarmId, this.alarmName, this.keywordRelationship, this.logLevel, this.comparison,
+			usernames, logGroupNames, keywordNames, snsTopicNames, xrefLogAlarmSNSTopicNames
+		);
+	}
+	
+	private String getUsernames() {
+		String[] usernames = new String[this.userSet.size()];
+		
+		int index = 0;
+		for (User user : this.userSet) {
+			usernames[index] = user.getUsername();
+		}
+		
+		return '[' + String.join(",", usernames) + ']';
+	}
+	
+	private String getLogGroupNames() {
+		String[] logGroupNames = new String[this.logGroupSet.size()];
+		
+		int index = 0;
+		for (LogGroup logGroup : this.logGroupSet) {
+			logGroupNames[index] = logGroup.getName();
+			++index;
+		}
+		
+		return '[' + String.join(",", logGroupNames) + ']';
+	}
+	
+	private String getKeywordNames() {
+		String[] keywordNames = new String[this.keywordSet.size()];
+		
+		int index = 0;
+		for (Keyword keyword : this.keywordSet) {
+			keywordNames[index] = keyword.getWord().toString();
+			++index;
+		}
+		
+		return '[' + String.join(",", keywordNames) + ']';
+	}
+	
+	private String getSNSTopicNames() {
+		String[] snsTopicNames = new String[this.snsTopicSet.size()];
+		
+		int index = 0;
+		for (SNSTopic snsTopic : this.snsTopicSet) {
+			snsTopicNames[index] = snsTopic.getTopicName();
+			++index;
+		}
+		
+		return '[' + String.join(",", snsTopicNames) + ']';
+	}
+	
+	private String getXRefLogAlarmSNSTopicNames() {
+		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
+		
+		int index = 0;
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
+			Optional<User> user = xrefLogAlarmSNSTopic.getUser();
+			
+			String username = (user.isPresent()) ? user.get().getUsername() : "null";
+			String snsTopicName = xrefLogAlarmSNSTopic.getSNSTopic().getTopicName();
+			
+			xrefLogAlarmSNSTopicNames[index] = String.format(
+					"(User=%s, SNSTopic=%s)",
+					username, snsTopicName
+			);
+		}
+		
+		return '[' + String.join(",", xrefLogAlarmSNSTopicNames) + ']';
 	}
 }

@@ -1,43 +1,61 @@
 package com.ccc.api.util;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.ccc.api.model.User;
+
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
-import com.ccc.api.model.User;
-
 @Component
 public class JwtUtils {
-	private String issuer = "ccc";
+	private static final String ISSUER = "ccc";
 	private SecretKey secretKey;
 	
 	public JwtUtils(@Value("${jwt.secret}") String secret) {
 		byte[] keyBytes = Decoders.BASE64URL.decode(secret);
-		secretKey = Keys.hmacShaKeyFor(keyBytes);
+		this.secretKey = Keys.hmacShaKeyFor(keyBytes);
 	}
 
 	public String toToken(User user) {
-		Calendar expiration = Calendar.getInstance();
-		expiration.add(Calendar.DATE, 7);
+		Date expirationDate = this.computeExpirationDate();
+		
+		Claims userClaims = Jwts.claims();
+		userClaims.put("UserId", user.getUserId());
+		userClaims.put("Username", user.getUsername());
 		    
-		    
-		return Jwts.builder().setIssuer(issuer).setSubject(user.getUserId().toString())
-				.setExpiration(expiration.getTime()).setClaims(user.toClaims()).signWith(secretKey).compact();
+		return Jwts.builder().setIssuer(JwtUtils.ISSUER).setSubject(user.getUserId().toString())
+				.setExpiration(expirationDate).setClaims(userClaims).signWith(this.secretKey).compact();
+	}
+	
+	private Date computeExpirationDate() {
+		long maxDays = 30;
+		LocalDateTime expirationDate = LocalDateTime.now().plusDays(maxDays);
+		
+		return Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
 	}
 
 	public User toUser(String token) {
 		try {
-			Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-			return User.fromClaims(jws.getBody());
+			Claims claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token).getBody();
+			
+			User user = new User();
+			user.setUserId(claims.get("UserId", Long.class));
+			user.setUsername(claims.get("Username", String.class));
+			
+			return user;
 		} catch (JwtException e) {
-		      return null;
+		    return null;
 		}
 	}
 }

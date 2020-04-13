@@ -1,41 +1,71 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="MetricAlarms")
 @Table(name="MetricAlarms")
+@DynamicInsert
+@DynamicUpdate
 public class MetricAlarm implements Serializable {
 	private static final long serialVersionUID = 4198681733980071621L;
 	
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="MetricAlarmId")
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="MetricAlarmId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long metricAlarmId;
 	
-	@Column(name="AlarmArn")
+	@Size(max=255)
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="AlarmArn", nullable=false, unique=true)
 	private String metricAlarmArn;
+	
+	@ManyToMany(mappedBy="metricAlarmSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
+	private Set<User> userSet;
 	
 	
 	public MetricAlarm() {
 	}
 	
-	public MetricAlarm(String alarmArn) {
+	public MetricAlarm(String alarmArn, Set<User> userSet) {
 		this.metricAlarmArn = alarmArn;
+		this.userSet = userSet;
 	}
 	
-	public MetricAlarm(Long metricAlarmId, String alarmArn) {
+	public MetricAlarm(Long metricAlarmId, String alarmArn, Set<User> userSet) {
 		this.metricAlarmId = metricAlarmId;
 		this.metricAlarmArn = alarmArn;
+		this.userSet = userSet;
 	}
 	
 	public Long getMetricAlarmId() {
 		return this.metricAlarmId;
+	}
+	
+	public void setMetricAlarmId(Long metricAlarmId) {
+		this.metricAlarmId = metricAlarmId;
 	}
 	
 	public String getAlarmArn() {
@@ -46,18 +76,43 @@ public class MetricAlarm implements Serializable {
 		this.metricAlarmArn = alarmArn;
 	}
 	
+	public Set<User> getUserSet() {
+		return this.userSet;
+	}
+	
+	public void setUserSet(Set<User> userSet) {
+		this.userSet.clear();
+		this.userSet.addAll(userSet);
+	}
+	
 	@Override
-	public int hashCode() {
-		int modifier = 31;
-		
-		return Math.abs(
-				modifier * this.metricAlarmId.hashCode() +
-				modifier * this.metricAlarmArn.hashCode()
-		);
+	public int hashCode() {		
+		return Math.abs(31 * (Objects.hashCode(this.metricAlarmId) + Objects.hashCode(this.metricAlarmArn)));
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof MetricAlarm) ? this.metricAlarmId == ((MetricAlarm)obj).metricAlarmId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String usernames = this.getUsernames();
+		
+		return String.format(
+			"MetricAlarm{MetricAlarmId=%d, AlarmArn=%s, Users=%s}",
+			this.metricAlarmId, this.metricAlarmArn, usernames
+		);
+	}
+	
+	private String getUsernames() {
+		String[] usernames = new String[this.userSet.size()];
+		
+		int index = 0;
+		for (User user : this.userSet) {
+			usernames[index] = user.getUsername();
+		}
+		
+		return '[' + String.join(",", usernames) + ']';
 	}
 }

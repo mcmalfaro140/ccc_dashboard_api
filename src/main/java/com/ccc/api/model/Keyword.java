@@ -1,8 +1,11 @@
 package com.ccc.api.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,70 +14,118 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity(name="Keywords")
 @Table(name="Keywords")
+@DynamicInsert
+@DynamicUpdate
 public class Keyword implements Serializable {
 	private static final long serialVersionUID = 2313514433783049935L;
 
 	@Id
+	@Generated(value=GenerationTime.INSERT)
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="KeywordId")
+	@Basic(optional=false, fetch=FetchType.LAZY)
+	@Column(name="KeywordId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long keywordId;
 	
+	@Size(max=70)
+	@Basic(fetch=FetchType.LAZY)
 	@Column(name="Word", unique=true)
 	private String word;
 	
-	@ManyToMany(mappedBy="keywordList", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<LogAlarm> logAlarmList;
+	@ManyToMany(mappedBy="keywordSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OrderBy
+	private Set<LogAlarm> logAlarmSet;
 	
 	public Keyword() {
 	}
 	
-	public Keyword(String word, List<LogAlarm> logAlarmList) {
+	public Keyword(String word, Set<LogAlarm> logAlarmSet) {
 		this.word = word;
-		this.logAlarmList = logAlarmList;
+		this.logAlarmSet = logAlarmSet;
 	}
 	
-	public Keyword(Long keywordId, String word, List<LogAlarm> logAlarmList) {
+	public Keyword(Long keywordId, Optional<String> word, Set<LogAlarm> logAlarmSet) {
 		this.keywordId = keywordId;
-		this.word = word;
-		this.logAlarmList = logAlarmList;
+		this.logAlarmSet = logAlarmSet;
+		
+		if (word.isPresent()) {
+			this.word = word.get();
+		}
+		else {
+			this.word = null;
+		}
 	}
 	
 	public Long getKeywordId() {
 		return this.keywordId;
 	}
 	
-	public String getWord() {
-		return this.word;
+	public void setKeywordId(Long keywordId) {
+		this.keywordId = keywordId;
 	}
 	
-	public void setWord(String word) {
-		this.word = word;
+	public Optional<String> getWord() {
+		return Optional.ofNullable(this.word);
 	}
 	
-	public List<LogAlarm> getLogAlarmList() {
-		return this.logAlarmList;
+	public void setWord(Optional<String> word) {
+		if (word.isPresent()) {
+			this.word = word.get();
+		}
+		else {
+			this.word = null;
+		}
 	}
 	
-	public void setLogAlarmList(List<LogAlarm> logAlarmList) {
-		this.logAlarmList = logAlarmList;
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
+	}
+	
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
 	}
 	
 	@Override
 	public int hashCode() {
-		int modifier = 31;
 		
-		return Math.abs(
-				modifier * this.keywordId.hashCode() +
-				modifier * this.word.hashCode()
-		);
+		return Math.abs(31 * (Objects.hashCode(this.keywordId) + Objects.hashCode(this.word)));
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof Keyword) ? this.keywordId == ((Keyword)obj).keywordId : false;
+	}
+	
+	@Override
+	public String toString() {
+		String logAlarmNames = this.getLogAlarmNames();
+		
+		return String.format(
+			"Keyword{KeywordId=%d, Word=%s, LogAlarms=%s}",
+			this.keywordId, this.word, logAlarmNames
+		);
+	}
+	
+	private String getLogAlarmNames() {
+		String[] logAlarmNames = new String[this.logAlarmSet.size()];
+		
+		int index = 0;
+		for (LogAlarm logAlarm : this.logAlarmSet) {
+			logAlarmNames[index] = logAlarm.getAlarmName();
+			++index;
+		}
+		
+		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 }

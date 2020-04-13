@@ -1,11 +1,11 @@
-  
 package com.ccc.api.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +20,6 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
-import com.ccc.api.http.AssignTopicToLogAlarmRequest;
 import com.ccc.api.http.CreateLogAlarmRequest;
 import com.ccc.api.http.GetLogAlarmResponse;
 import com.ccc.api.http.LogAlarmIdRequest;
@@ -31,13 +29,13 @@ import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
 import com.ccc.api.model.SNSTopic;
 import com.ccc.api.model.User;
-import com.ccc.api.model.XRefUserLogAlarmSNSTopic;
+import com.ccc.api.model.XRefLogAlarmSNSTopic;
 import com.ccc.api.repository.KeywordRepository;
 import com.ccc.api.repository.LogAlarmRepository;
 import com.ccc.api.repository.LogGroupRepository;
 import com.ccc.api.repository.SNSTopicRepository;
 import com.ccc.api.repository.UserRepository;
-import com.ccc.api.repository.XRefUserLogAlarmSNSTopicRepository;
+import com.ccc.api.repository.XRefLogAlarmSNSTopicRepository;
 import com.ccc.api.util.GlobalVariables;
 import com.ccc.api.util.JwtUtils;
 
@@ -60,7 +58,7 @@ public class LogAlarmController {
 	private SNSTopicRepository snsTopicRepo;
 	
 	@Autowired
-	private XRefUserLogAlarmSNSTopicRepository xrefUserLogAlarmSNSTopicRepo;
+	private XRefLogAlarmSNSTopicRepository xrefLogAlarmSNSTopicRepo;
 	
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -75,27 +73,15 @@ public class LogAlarmController {
 			response.put("Result", "ERROR: User Not Found");
 		}
 		else {
+			user = this.userRepo.findById(user.getUserId()).get();
+			
 			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			List<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
+			Set<LogAlarm> userLogAlarms = user.getLogAlarmSet();
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
 		
 		return response;
-	}
-	
-	private List<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
-		List<LogAlarm> userLogAlarms = new ArrayList<LogAlarm>(allLogAlarms.size());
-		
-		for (LogAlarm alarm : allLogAlarms) {
-			for (XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic : alarm.getXRefUserLogAlarmSNSTopicList()) {
-				if (xrefUserLogAlarmSNSTopic.getUser().equals(user)) {
-					userLogAlarms.add(alarm);
-				}
-			}
-		}
-		
-		return userLogAlarms;
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
@@ -108,134 +94,115 @@ public class LogAlarmController {
 			response.put("Result", "User not found");
 		}
 		else {
-			User obtainedUser = this.userRepo.findById(user.getUserId()).get();
+			user = this.userRepo.findById(user.getUserId()).get();
+			
+			Optional<String> keywordRelationship = Optional.ofNullable(body.getKeywordRelationship());
+			Optional<String> keywordNamesAsString = Optional.ofNullable(body.getKeywords());
+			Optional<String[]> keywordNames = (keywordNamesAsString.isPresent()) ? Optional.of(keywordNamesAsString.get().split(",")): Optional.empty();
+			
+			if (keywordNames.isPresent() != keywordRelationship.isPresent()) {
+				response.put("Result", "Cannot specify keywords without a keyword relationship and vice versa");
+				return response;
+			}
 			
 			String alarmName = body.getAlarmName();
-			String keywordRelationship = body.getKeywordRelationship();
+			String snsTopicName = body.getSNSTopicName();
 			String logLevel = body.getLogLevel();
 			String comparison = body.getComparison();
 			String[] logGroupNames = body.getLogGroups().split(",");
 			
-			String keywordNamesAsString = body.getKeywords();
-			Optional<String[]> keywordNames = (null == keywordNamesAsString) ? Optional.empty() : Optional.of(keywordNamesAsString.split(","));
-					
-			String[] snsTopicNames = body.getSNSTopicNames().split(",");
+			Set<LogGroup> logGroupSet = this.getLogGroupSet(logGroupNames);
+			Set<Keyword> keywordSet = this.getKeywordSet(keywordNames);
+			SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
+			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.getXRefLogAlarmSNSTopic(user, snsTopic);
 			
-			List<LogGroup> logGroupList = this.getLogGroupList(logGroupNames);
-			List<Keyword> keywordList = this.getKeywordList(keywordNames);
-			List<SNSTopic> snsTopicList = this.getSNSTopicList(snsTopicNames);
-			List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = this.getXRefUserLogAlarmSNSTopicList(obtainedUser, snsTopicList);
+			LogAlarm logAlarm = new LogAlarm(
+					alarmName,
+					keywordRelationship,
+					logLevel,
+					comparison,
+					new HashSet<LogGroup>(logGroupSet.size()),
+					new HashSet<Keyword>(keywordSet.size()),
+					new HashSet<User>(1),
+					new HashSet<SNSTopic>(1),
+					new HashSet<XRefLogAlarmSNSTopic>(1)
+			);
 			
-			LogAlarm logAlarm = new LogAlarm(alarmName, keywordRelationship, logLevel, comparison, logGroupList, keywordList, xrefUserLogAlarmSNSTopicList);
-			
-			logGroupList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
-			keywordList.forEach(value -> { value.getLogAlarmList().add(logAlarm); });
-			xrefUserLogAlarmSNSTopicList.forEach(value -> { value.setLogAlarm(logAlarm); });
-			xrefUserLogAlarmSNSTopicList.forEach(value -> { value.setUser(obtainedUser); });
-			snsTopicList.forEach(value -> { value.getXRefUserLogAlarmSNSTopicList().addAll(xrefUserLogAlarmSNSTopicList); });
-			obtainedUser.getXRefUserLogAlarmSNSTopicList().addAll(xrefUserLogAlarmSNSTopicList);
-			logAlarm.getXRefUserLogAlarmSNSTopicList().addAll(xrefUserLogAlarmSNSTopicList);
+			xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
+			user.getLogAlarmSet().add(logAlarm);
+			user.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+			snsTopic.getLogAlarmSet().add(logAlarm);
+			snsTopic.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+			logAlarm.getUserSet().add(user);
+			logAlarm.getLogGroupSet().addAll(logGroupSet);
+			logAlarm.getKeywordSet().addAll(keywordSet);
+			logAlarm.getSNSTopicSet().add(snsTopic);
+			logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
 			
 			this.logAlarmRepo.save(logAlarm);
+			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 			
-			response.put("Result", "Alarm successfully created");
+			response.put("Result", "Success");
 		}
 		
 		return response;
 	}
 	
-	private List<LogGroup> getLogGroupList(String[] logGroupNameList) {
-		ArrayList<LogGroup> logGroupList = new ArrayList<LogGroup>(logGroupNameList.length);
-		ArrayList<LogGroup> newLogGroupsToSave = new ArrayList<LogGroup>(logGroupNameList.length);
+	private Set<LogGroup> getLogGroupSet(String[] logGroupNameSet) {
+		HashSet<LogGroup> logGroupSet = new HashSet<LogGroup>(logGroupNameSet.length);
 		
-		for (String logGroupName : logGroupNameList) {
+		for (String logGroupName : logGroupNameSet) {
 			Optional<LogGroup> logGroup = this.logGroupRepo.findByName(logGroupName);
-			
-			if (logGroup.isPresent()) {
-				logGroupList.add(logGroup.get());
-			}
-			else {
-				LogGroup newLogGroup = new LogGroup(logGroupName, new ArrayList<LogAlarm>());
-				
-				newLogGroupsToSave.add(newLogGroup);
-				logGroupList.add(newLogGroup);
-			}
+			logGroupSet.add(logGroup.isPresent() ? logGroup.get() : new LogGroup(logGroupName, new HashSet<LogAlarm>()));
 		}
 		
-		this.logGroupRepo.saveAll(newLogGroupsToSave);
-		
-		return logGroupList;
+		return logGroupSet;
 	}
 	
-	private List<Keyword> getKeywordList(Optional<String[]> keywordNameList) {
-		ArrayList<Keyword> keywordList = new ArrayList<Keyword>();
+	private Set<Keyword> getKeywordSet(Optional<String[]> nullableKeywordNameSet) {
+		HashSet<Keyword> keywordSet = new HashSet<Keyword>();
 		
-		if (keywordNameList.isPresent()) {
-			String[] nonullKeywordNameList = keywordNameList.get();
-			List<Keyword> newKeywordsToSave = new ArrayList<Keyword>(nonullKeywordNameList.length);
+		if (nullableKeywordNameSet.isPresent()) {
+			String[] keywordNameSet = nullableKeywordNameSet.get();
 			
-			for (String keywordName : nonullKeywordNameList) {			
+			for (String keywordName : keywordNameSet) {			
 				Optional<Keyword> keyword = this.keywordRepo.findByWord(keywordName);
-				
-				if (keyword.isPresent()) {
-					keywordList.add(keyword.get());
-				}
-				else {
-					Keyword newKeyword = new Keyword(keywordName, new ArrayList<LogAlarm>());
-					
-					newKeywordsToSave.add(newKeyword);
-					keywordList.add(newKeyword);
-				}
+				keywordSet.add(keyword.isPresent() ? keyword.get() : new Keyword(keywordName, new HashSet<LogAlarm>()));
 			}
-			
-			this.keywordRepo.saveAll(newKeywordsToSave);
 		}
 		
-		return keywordList;
+		return keywordSet;
 	}
 	
-	private List<SNSTopic> getSNSTopicList(String[] snsTopicNameList) {
-		ArrayList<SNSTopic> snsTopicList = new ArrayList<SNSTopic>(snsTopicNameList.length);
-		ArrayList<SNSTopic> newSNSTopicsToSave = new ArrayList<SNSTopic>(snsTopicNameList.length);
+	private SNSTopic getSNSTopic(String snsTopicName) {
 		AmazonSNS snsClient = AmazonSNSClientBuilder
 				.standard()
 				.withCredentials(GlobalVariables.AWS_CREDENTIALS)
 				.withRegion(GlobalVariables.AWS_REGION)
 				.build();
 		
-		for (String snsTopicName : snsTopicNameList) {
-			Optional<SNSTopic> snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName);
-			
-			if (snsTopic.isPresent()) {
-				snsTopicList.add(snsTopic.get());
-			}
-			else {
-				CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
-				CreateTopicResult result = snsClient.createTopic(request);
-				SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new ArrayList<XRefUserLogAlarmSNSTopic>());
-				
-				newSNSTopicsToSave.add(newTopic);
-				snsTopicList.add(newTopic);
-			}
+		Optional<SNSTopic> snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName);
+		
+		if (snsTopic.isPresent()) {
+			return snsTopic.get();
 		}
-		
-		this.snsTopicRepo.saveAll(newSNSTopicsToSave);
-		
-		return snsTopicList;
+		else {
+			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
+			CreateTopicResult result = snsClient.createTopic(request);
+			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new HashSet<LogAlarm>(), new HashSet<XRefLogAlarmSNSTopic>());
+			
+			this.snsTopicRepo.save(newTopic);
+			
+			return newTopic;
+		}
 	}
 	
-	private List<XRefUserLogAlarmSNSTopic> getXRefUserLogAlarmSNSTopicList(User user, List<SNSTopic> snsTopicList) {
-		List<XRefUserLogAlarmSNSTopic> xrefUserLogAlarmSNSTopicList = new ArrayList<XRefUserLogAlarmSNSTopic>(snsTopicList.size());
+	private XRefLogAlarmSNSTopic getXRefLogAlarmSNSTopic(User user, SNSTopic snsTopic) {		
+		XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic();
+		xrefLogAlarmSNSTopic.setSNSTopic(snsTopic);
+		xrefLogAlarmSNSTopic.setUser(Optional.of(user));
 		
-		for (SNSTopic snsTopic : snsTopicList) {
-			XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic = new XRefUserLogAlarmSNSTopic();
-			xrefUserLogAlarmSNSTopic.setUser(user);
-			xrefUserLogAlarmSNSTopic.setSNSTopic(snsTopic);
-			
-			xrefUserLogAlarmSNSTopicList.add(xrefUserLogAlarmSNSTopic);
-		}
-		
-		return xrefUserLogAlarmSNSTopicList;
+		return xrefLogAlarmSNSTopic;
 	}
 	
 	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")
@@ -255,9 +222,9 @@ public class LogAlarmController {
 			
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
 			SNSTopic snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName).get();
-			XRefUserLogAlarmSNSTopic xrefUserLogAlarmSNSTopic = new XRefUserLogAlarmSNSTopic(logAlarm, snsTopic, user);
+			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic(logAlarm, snsTopic, Optional.of(user));
 			
-			this.xrefUserLogAlarmSNSTopicRepo.save(xrefUserLogAlarmSNSTopic);
+			this.xrefLogAlarmSNSTopicRepo.save(xrefLogAlarmSNSTopic);
 			
 			response.put("Result", "Success");
 		}
@@ -282,7 +249,7 @@ public class LogAlarmController {
 			
 			SNSTopic snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName).get();
 			
-			this.xrefUserLogAlarmSNSTopicRepo.deleteByForeignKeys(user.getUserId(), logAlarmId, snsTopic.getSNSTopicId());
+			this.xrefLogAlarmSNSTopicRepo.deleteByFields(user.getUserId(), logAlarmId, snsTopic.getSNSTopicId());
 			
 			response.put("Result", "Success");
 		}
@@ -307,33 +274,6 @@ public class LogAlarmController {
 				this.logAlarmRepo.deleteByLogAlarmId(body.getLogAlarmId());
 				response.put("Result", "Success");
 			}
-		}
-		
-		return response;
-	}
-	
-	@PostMapping(path="/assignTopicToLogAlarm", produces="application/json; charset=UTF-8")
-	@ResponseBody
-	public Map<String, String> assignTopicToAlarm(@RequestHeader(name="Authorization") String token, @RequestBody AssignTopicToLogAlarmRequest body) {
-		Map<String, String> response = new HashMap<String, String>();
-		User user = this.jwtUtils.toUser(token);
-		
-		if (null == user) {
-			response.put("Result", "ERROR: Invalid JWT token");
-		}
-		else {
-			user = this.userRepo.findById(user.getUserId()).get();
-			
-			Long logAlarmId = body.getLogAlarmId();
-			String snsTopicName = body.getSNSTopicName();
-			
-			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
-			SNSTopic snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName).get();
-			
-			logAlarm.getXRefUserLogAlarmSNSTopicList().add(new XRefUserLogAlarmSNSTopic(logAlarm, snsTopic, user));
-			this.logAlarmRepo.save(logAlarm);
-			
-			response.put("Result", "Success");
 		}
 		
 		return response;
