@@ -52,3 +52,21 @@ INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (3, 2, 
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 2, 3);
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 1, 2);
 
+
+--misael
+Use db;
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('AlexHorejsi', 'test1', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('MisaelCorvera', 'test2', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('YiWang', 'test3', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('ZacYou', 'test4', '{}');
+INSERT INTO Users (Username, Password, Dashboard) VALUES ('JayDida', 'test5', '{}');
+
+INSERT INTO LogGroups (Name) VALUES ('test');
+INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('EmailTopic', 'arn:aws:sns:us-east-1:112911356528:EmailTopic');
+INSERT INTO Keywords (Word) VALUES (NULL);
+INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('ERROR', '==', 'alarm4', NULL);
+
+INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (1, 1);
+INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId) VALUES (1, 1);
+INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (1, 1);
+INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (1, 1);
