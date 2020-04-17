@@ -52,7 +52,7 @@ public class UserController {
 		};
 	}
     
-    @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
+    @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public HashMap<String , Object> getUsersBySimplePath(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
@@ -77,7 +77,7 @@ public class UserController {
     	return response;
     }
     
-    @PostMapping(path = "/update", produces = "application/json; charset=UTF-8", consumes = "application/json; charset=UTF-8")
+    @PostMapping(path = "/update", produces = "application/json; charset=UTF-8")
     @ResponseBody
     public Object updateDahboard(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
