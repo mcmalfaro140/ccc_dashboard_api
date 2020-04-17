@@ -15,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -49,11 +48,9 @@ public class SNSTopic implements Serializable {
 	private String topicArn;
 	
 	@ManyToMany(mappedBy="snsTopicSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@OrderBy
 	private Set<LogAlarm> logAlarmSet;
 	
 	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
-	@OrderBy
 	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public SNSTopic() {

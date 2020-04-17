@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -42,7 +41,6 @@ public class LogGroup implements Serializable {
 	private String name;
 	
 	@ManyToMany(mappedBy="logGroupSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@OrderBy
 	private Set<LogAlarm> logAlarmSet;
 	
 	public LogGroup() {

@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -79,7 +78,6 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
-	@OrderBy
 	private Set<LogGroup> logGroupSet;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -100,11 +98,9 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
-	@OrderBy
 	private Set<Keyword> keywordSet;
 	
 	@ManyToMany(mappedBy="logAlarmSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@OrderBy
 	private Set<User> userSet;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -125,12 +121,10 @@ public class LogAlarm implements Serializable {
 			)
 		}
 	)
-	@OrderBy
 	private Set<SNSTopic> snsTopicSet;
 	
 	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
 	@JoinColumn(name="LogAlarmId", referencedColumnName="LogAlarmId")
-	@OrderBy
 	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public LogAlarm() {
