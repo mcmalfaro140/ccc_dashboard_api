@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -71,7 +70,6 @@ public class User implements Serializable {
 			)
 		}
 	)
-	@OrderBy
 	private Set<LogAlarm> logAlarmSet;
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
@@ -92,11 +90,9 @@ public class User implements Serializable {
 			)
 		}
 	)
-	@OrderBy
 	private Set<MetricAlarm> metricAlarmSet;
 	
 	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
-	@OrderBy
 	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public User() {

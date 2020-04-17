@@ -101,48 +101,48 @@ public class LogAlarmController {
 			Optional<String[]> keywordNames = (keywordNamesAsString.isPresent()) ? Optional.of(keywordNamesAsString.get().split(",")): Optional.empty();
 			
 			if (keywordNames.isPresent() != keywordRelationship.isPresent()) {
-				response.put("Result", "Cannot specify keywords without a keyword relationship and vice versa");
-				return response;
+				response.put("Result", "ERROR: Cannot specify keywords without a keyword relationship and vice versa");
 			}
-			
-			String alarmName = body.getAlarmName();
-			String snsTopicName = body.getSNSTopicName();
-			String logLevel = body.getLogLevel();
-			String comparison = body.getComparison();
-			String[] logGroupNames = body.getLogGroups().split(",");
-			
-			Set<LogGroup> logGroupSet = this.getLogGroupSet(logGroupNames);
-			Set<Keyword> keywordSet = this.getKeywordSet(keywordNames);
-			SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
-			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.getXRefLogAlarmSNSTopic(user, snsTopic);
-			
-			LogAlarm logAlarm = new LogAlarm(
-					alarmName,
-					keywordRelationship,
-					logLevel,
-					comparison,
-					new HashSet<LogGroup>(logGroupSet.size()),
-					new HashSet<Keyword>(keywordSet.size()),
-					new HashSet<User>(1),
-					new HashSet<SNSTopic>(1),
-					new HashSet<XRefLogAlarmSNSTopic>(1)
-			);
-			
-			xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
-			user.getLogAlarmSet().add(logAlarm);
-			user.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-			snsTopic.getLogAlarmSet().add(logAlarm);
-			snsTopic.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-			logAlarm.getUserSet().add(user);
-			logAlarm.getLogGroupSet().addAll(logGroupSet);
-			logAlarm.getKeywordSet().addAll(keywordSet);
-			logAlarm.getSNSTopicSet().add(snsTopic);
-			logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-			
-			this.logAlarmRepo.save(logAlarm);
-			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
-			
-			response.put("Result", "Success");
+			else {
+				String alarmName = body.getAlarmName();
+				String snsTopicName = body.getSNSTopicName();
+				String logLevel = body.getLogLevel();
+				String comparison = body.getComparison();
+				String[] logGroupNames = body.getLogGroups().split(",");
+				
+				Set<LogGroup> logGroupSet = this.getLogGroupSet(logGroupNames);
+				Set<Keyword> keywordSet = this.getKeywordSet(keywordNames);
+				SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
+				XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.getXRefLogAlarmSNSTopic(user, snsTopic);
+				
+				LogAlarm logAlarm = new LogAlarm(
+						alarmName,
+						keywordRelationship,
+						logLevel,
+						comparison,
+						new HashSet<LogGroup>(logGroupSet.size()),
+						new HashSet<Keyword>(keywordSet.size()),
+						new HashSet<User>(1),
+						new HashSet<SNSTopic>(1),
+						new HashSet<XRefLogAlarmSNSTopic>(1)
+				);
+				
+				xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
+				user.getLogAlarmSet().add(logAlarm);
+				user.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+				snsTopic.getLogAlarmSet().add(logAlarm);
+				snsTopic.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+				logAlarm.getUserSet().add(user);
+				logAlarm.getLogGroupSet().addAll(logGroupSet);
+				logAlarm.getKeywordSet().addAll(keywordSet);
+				logAlarm.getSNSTopicSet().add(snsTopic);
+				logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+				
+				this.logAlarmRepo.save(logAlarm);
+				this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
+				
+				response.put("Result", "Success");
+			}
 		}
 		
 		return response;
@@ -191,8 +191,6 @@ public class LogAlarmController {
 			CreateTopicResult result = snsClient.createTopic(request);
 			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new HashSet<LogAlarm>(), new HashSet<XRefLogAlarmSNSTopic>());
 			
-			this.snsTopicRepo.save(newTopic);
-			
 			return newTopic;
 		}
 	}
@@ -224,7 +222,13 @@ public class LogAlarmController {
 			SNSTopic snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName).get();
 			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic(logAlarm, snsTopic, Optional.of(user));
 			
-			this.xrefLogAlarmSNSTopicRepo.save(xrefLogAlarmSNSTopic);
+			logAlarm.getUserSet().add(user);
+			logAlarm.getSNSTopicSet().add(snsTopic);
+			logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
+			user.getLogAlarmSet().add(logAlarm);
+			
+			this.logAlarmRepo.save(logAlarm);
+			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 			
 			response.put("Result", "Success");
 		}
