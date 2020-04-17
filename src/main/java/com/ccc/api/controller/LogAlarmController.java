@@ -219,7 +219,7 @@ public class LogAlarmController {
 			String snsTopicName = body.getSNSTopicName();
 			
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
-			SNSTopic snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName).get();
+			SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
 			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic(logAlarm, snsTopic, Optional.of(user));
 			
 			logAlarm.getUserSet().add(user);
