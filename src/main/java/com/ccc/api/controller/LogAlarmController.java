@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -263,12 +264,14 @@ public class LogAlarmController {
 			response.put("Result", "ERROR: Invalid JWT token");
 		}
 		else {
-			if (!this.userRepo.existsById(user.getUserId())) {
-				response.put("Result", "ERROR: User does not exist");
-			}
-			else {
+			Example<User> probe = Example.of(user);
+			
+			if (this.userRepo.exists(probe)) {
 				this.logAlarmRepo.deleteByLogAlarmId(body.getLogAlarmId());
 				response.put("Result", "Success");
+			}
+			else {
+				response.put("Result", "ERROR: User does not exist");
 			}
 		}
 		
