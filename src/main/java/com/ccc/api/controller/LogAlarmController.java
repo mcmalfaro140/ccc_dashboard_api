@@ -67,7 +67,7 @@ public class LogAlarmController {
 	@GetMapping(path="/getLogAlarms", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> getLogAlarms(@RequestHeader(name="Authorization") String token) {
-		Map<String, Object> response = new HashMap<String, Object>();
+		HashMap<String, Object> response = new HashMap<String, Object>();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
@@ -98,7 +98,7 @@ public class LogAlarmController {
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> createLogAlarm(@RequestHeader("Authorization") String token, @RequestBody CreateLogAlarmRequest body) {
-		Map<String, String> response = new HashMap<String, String>();
+		HashMap<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
@@ -130,8 +130,8 @@ public class LogAlarmController {
 						keywordRelationship,
 						logLevel,
 						comparison,
-						new HashSet<LogGroup>(logGroupSet.size()),
-						new HashSet<Keyword>(keywordSet.size()),
+						logGroupSet,
+						keywordSet,
 						new HashSet<XRefLogAlarmSNSTopic>(1)
 				);
 				
@@ -140,8 +140,6 @@ public class LogAlarmController {
 				xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
 				user.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
 				snsTopic.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-				logAlarm.getLogGroupSet().addAll(logGroupSet);
-				logAlarm.getKeywordSet().addAll(keywordSet);
 				logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
 				
 				this.logAlarmRepo.save(logAlarm);
@@ -203,7 +201,7 @@ public class LogAlarmController {
 	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> subscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmSubscriptionRequest body) {
-		Map<String, String> response = new HashMap<String, String>();
+		HashMap<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
@@ -232,7 +230,7 @@ public class LogAlarmController {
 	@PostMapping(path="/unsubscribeToLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> unsubscribeToLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmSubscriptionRequest body) {
-		Map<String, String> response = new HashMap<String, String>();
+		HashMap<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
@@ -257,16 +255,16 @@ public class LogAlarmController {
 	@PostMapping(path="/deleteLogAlarm", produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, String> deleteLogAlarm(@RequestHeader(name="Authorization") String token, @RequestBody LogAlarmIdRequest body) {
-		Map<String, String> response = new HashMap<String, String>();
+		HashMap<String, String> response = new HashMap<String, String>();
 		User user = this.jwtUtils.toUser(token);
 		
 		if (null == user) {
 			response.put("Result", "ERROR: Invalid JWT token");
 		}
 		else {
-			Example<User> probe = Example.of(user);
+			Example<User> example = Example.of(user);
 			
-			if (this.userRepo.exists(probe)) {
+			if (this.userRepo.exists(example)) {
 				this.logAlarmRepo.deleteByLogAlarmId(body.getLogAlarmId());
 				response.put("Result", "Success");
 			}
