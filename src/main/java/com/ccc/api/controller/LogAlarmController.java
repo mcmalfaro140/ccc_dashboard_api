@@ -76,7 +76,7 @@ public class LogAlarmController {
 			user = this.userRepo.findById(user.getUserId()).get();
 			
 			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			Set<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
+			Set<LogAlarm> userLogAlarms = this.getUserLogAlarms(user.getXRefLogAlarmSNSTopicSet(), user);
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
@@ -84,17 +84,11 @@ public class LogAlarmController {
 		return response;
 	}
 	
-	private Set<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
-		HashSet<LogAlarm> userLogAlarms = new HashSet<LogAlarm>(allLogAlarms.size());
+	private Set<LogAlarm> getUserLogAlarms(Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet, User user) {
+		HashSet<LogAlarm> userLogAlarms = new HashSet<LogAlarm>(xrefLogAlarmSNSTopicSet.size());
 		
-		for (LogAlarm alarm : allLogAlarms) {
-			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet = alarm.getXRefLogAlarmSNSTopicSet();
-			
-			for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicSet) {
-				if (xrefLogAlarmSNSTopic.getUser().equals(user)) {
-					userLogAlarms.add(alarm);
-				}
-			}
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicSet) {
+			userLogAlarms.add(xrefLogAlarmSNSTopic.getLogAlarm());
 		}
 		
 		return userLogAlarms;
