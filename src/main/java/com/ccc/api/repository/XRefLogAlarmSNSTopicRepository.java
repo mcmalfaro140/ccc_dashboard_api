@@ -16,11 +16,4 @@ public interface XRefLogAlarmSNSTopicRepository extends JpaRepository<XRefLogAla
 		nativeQuery=true
 	)
 	public void deleteByFields(@Param(value="userId") Long userId, @Param(value="logAlarmId") Long logAlarmId, @Param(value="snsTopicId") Long snsTopicId);
-	
-	@Modifying
-	@Query(
-		value="DELETE FROM XRefLogAlarmSNSTopic ORDER BY LogAlarmSNSTopicId DESC LIMIT 1",
-		nativeQuery=true
-	)
-	public void deleteByMaxId();
 }

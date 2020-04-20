@@ -2,7 +2,6 @@ package com.ccc.api.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -56,29 +55,17 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 	public XRefLogAlarmSNSTopic() {
 	}
 	
-	public XRefLogAlarmSNSTopic(LogAlarm logAlarm, SNSTopic snsTopic, Optional<User> user) {
+	public XRefLogAlarmSNSTopic(LogAlarm logAlarm, SNSTopic snsTopic, User user) {
 		this.logAlarm = logAlarm;
 		this.snsTopic = snsTopic;
-		
-		if (user.isPresent()) {
-			this.user = user.get();
-		}
-		else {
-			this.user = null;
-		}
+		this.user = user;
 	}
 	
-	public XRefLogAlarmSNSTopic(Long logAlarmSNSTopicId, LogAlarm logAlarm, SNSTopic snsTopic, Optional<User> user) {
+	public XRefLogAlarmSNSTopic(Long logAlarmSNSTopicId, LogAlarm logAlarm, SNSTopic snsTopic, User user) {
 		this.logAlarmSNSTopicId = logAlarmSNSTopicId;
 		this.logAlarm = logAlarm;
 		this.snsTopic = snsTopic;
-		
-		if (user.isPresent()) {
-			this.user = user.get();
-		}
-		else {
-			this.user = null;
-		}
+		this.user = user;
 	}
 	
 	public Long getLogAlarmSNSTopicId() {
@@ -105,17 +92,12 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 		this.snsTopic = snsTopic;
 	}
 	
-	public Optional<User> getUser() {
-		return Optional.ofNullable(this.user);
+	public User getUser() {
+		return this.user;
 	}
 	
-	public void setUser(Optional<User> user) {
-		if (user.isPresent()) {
-			this.user = user.get();
-		}
-		else {
-			this.user = null;
-		}
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	@Override

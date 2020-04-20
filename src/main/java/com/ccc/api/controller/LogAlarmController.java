@@ -76,12 +76,28 @@ public class LogAlarmController {
 			user = this.userRepo.findById(user.getUserId()).get();
 			
 			List<LogAlarm> allLogAlarms = this.logAlarmRepo.findAll();
-			Set<LogAlarm> userLogAlarms = user.getLogAlarmSet();
+			Set<LogAlarm> userLogAlarms = this.getUserLogAlarms(allLogAlarms, user);
 			
 			response.put("Result", new GetLogAlarmResponse(allLogAlarms, userLogAlarms));
 		}
 		
 		return response;
+	}
+	
+	private Set<LogAlarm> getUserLogAlarms(List<LogAlarm> allLogAlarms, User user) {
+		HashSet<LogAlarm> userLogAlarms = new HashSet<LogAlarm>(allLogAlarms.size());
+		
+		for (LogAlarm alarm : allLogAlarms) {
+			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet = alarm.getXRefLogAlarmSNSTopicSet();
+			
+			for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicSet) {
+				if (xrefLogAlarmSNSTopic.getUser().equals(user)) {
+					userLogAlarms.add(alarm);
+				}
+			}
+		}
+		
+		return userLogAlarms;
 	}
 	
 	@PostMapping(path="/createLogAlarm", produces="application/json; charset=UTF-8")
@@ -113,7 +129,6 @@ public class LogAlarmController {
 				Set<LogGroup> logGroupSet = this.getLogGroupSet(logGroupNames);
 				Set<Keyword> keywordSet = this.getKeywordSet(keywordNames);
 				SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
-				XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = this.getXRefLogAlarmSNSTopic(user, snsTopic);
 				
 				LogAlarm logAlarm = new LogAlarm(
 						alarmName,
@@ -122,24 +137,19 @@ public class LogAlarmController {
 						comparison,
 						new HashSet<LogGroup>(logGroupSet.size()),
 						new HashSet<Keyword>(keywordSet.size()),
-						new HashSet<User>(1),
-						new HashSet<SNSTopic>(1),
 						new HashSet<XRefLogAlarmSNSTopic>(1)
 				);
 				
+				XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic(logAlarm, snsTopic, user);
+				
 				xrefLogAlarmSNSTopic.setLogAlarm(logAlarm);
-				user.getLogAlarmSet().add(logAlarm);
 				user.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-				snsTopic.getLogAlarmSet().add(logAlarm);
 				snsTopic.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-				logAlarm.getUserSet().add(user);
 				logAlarm.getLogGroupSet().addAll(logGroupSet);
 				logAlarm.getKeywordSet().addAll(keywordSet);
-				logAlarm.getSNSTopicSet().add(snsTopic);
 				logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
 				
 				this.logAlarmRepo.save(logAlarm);
-				this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 				
 				response.put("Result", "Success");
 			}
@@ -189,18 +199,10 @@ public class LogAlarmController {
 		else {
 			CreateTopicRequest request = new CreateTopicRequest(snsTopicName);
 			CreateTopicResult result = snsClient.createTopic(request);
-			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new HashSet<LogAlarm>(), new HashSet<XRefLogAlarmSNSTopic>());
+			SNSTopic newTopic = new SNSTopic(snsTopicName, result.getTopicArn(), new HashSet<XRefLogAlarmSNSTopic>());
 			
 			return newTopic;
 		}
-	}
-	
-	private XRefLogAlarmSNSTopic getXRefLogAlarmSNSTopic(User user, SNSTopic snsTopic) {		
-		XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic();
-		xrefLogAlarmSNSTopic.setSNSTopic(snsTopic);
-		xrefLogAlarmSNSTopic.setUser(Optional.of(user));
-		
-		return xrefLogAlarmSNSTopic;
 	}
 	
 	@PostMapping(path="/subscribeToLogAlarm", produces="application/json; charset=UTF-8")
@@ -220,15 +222,11 @@ public class LogAlarmController {
 			
 			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
 			SNSTopic snsTopic = this.getSNSTopic(snsTopicName);
-			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic(logAlarm, snsTopic, Optional.of(user));
+			XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic = new XRefLogAlarmSNSTopic(logAlarm, snsTopic, user);
 			
-			logAlarm.getUserSet().add(user);
-			logAlarm.getSNSTopicSet().add(snsTopic);
 			logAlarm.getXRefLogAlarmSNSTopicSet().add(xrefLogAlarmSNSTopic);
-			user.getLogAlarmSet().add(logAlarm);
 			
 			this.logAlarmRepo.save(logAlarm);
-			this.xrefLogAlarmSNSTopicRepo.deleteByMaxId();
 			
 			response.put("Result", "Success");
 		}
@@ -254,11 +252,6 @@ public class LogAlarmController {
 			SNSTopic snsTopic = this.snsTopicRepo.findByTopicName(snsTopicName).get();
 			
 			this.xrefLogAlarmSNSTopicRepo.deleteByFields(user.getUserId(), logAlarmId, snsTopic.getSNSTopicId());
-			
-			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
-			logAlarm.getUserSet().remove(user);
-			
-			this.logAlarmRepo.save(logAlarm);
 			
 			response.put("Result", "Success");
 		}

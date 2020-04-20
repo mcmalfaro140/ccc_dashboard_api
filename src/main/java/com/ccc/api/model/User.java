@@ -54,26 +54,6 @@ public class User implements Serializable {
 	
 	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinTable(
-		name="XRefUserLogAlarm",
-		joinColumns={
-			@JoinColumn(
-				name="UserId",
-				referencedColumnName="UserId",
-				nullable=false
-			)
-		},
-		inverseJoinColumns={
-			@JoinColumn(
-				name="LogAlarmId",
-				referencedColumnName="LogAlarmId",
-				nullable=false
-			)
-		}
-	)
-	private Set<LogAlarm> logAlarmSet;
-	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinTable(
 		name="XRefUserMetricAlarm",
 		joinColumns={
 			@JoinColumn(
@@ -102,14 +82,12 @@ public class User implements Serializable {
 			String username,
 			String password,
 			String dashboard,
-			Set<LogAlarm> logAlarmSet,
 			Set<MetricAlarm> metricAlarmSet,
 			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.username = username;
 		this.password = password;
 		this.dashboard = dashboard;
-		this.logAlarmSet = logAlarmSet;
 		this.metricAlarmSet = metricAlarmSet;
 		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
@@ -119,7 +97,6 @@ public class User implements Serializable {
 			String username,
 			String password,
 			String dashboard,
-			Set<LogAlarm> logAlarmSet,
 			Set<MetricAlarm> metricAlarmSet,
 			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
@@ -127,7 +104,6 @@ public class User implements Serializable {
 		this.username = username;
 		this.password = password;
 		this.dashboard = dashboard;
-		this.logAlarmSet = logAlarmSet;
 		this.metricAlarmSet = metricAlarmSet;
 		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
@@ -162,15 +138,6 @@ public class User implements Serializable {
 	
 	public void setDashboard(String dashboard) {
 		this.dashboard = dashboard;
-	}
-	
-	public Set<LogAlarm> getLogAlarmSet() {
-		return this.logAlarmSet;
-	}
-	
-	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
-		this.logAlarmSet.clear();
-		this.logAlarmSet.addAll(logAlarmSet);
 	}
 	
 	public Set<MetricAlarm> getMetricAlarmSet() {
@@ -220,11 +187,11 @@ public class User implements Serializable {
 	}
 	
 	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.logAlarmSet.size()];
+		String[] logAlarmNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
 		
 		int index = 0;
-		for (LogAlarm logAlarm : this.logAlarmSet) {
-			logAlarmNames[index] = logAlarm.getAlarmName();
+		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
+			logAlarmNames[index] = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
 			++index;
 		}
 		

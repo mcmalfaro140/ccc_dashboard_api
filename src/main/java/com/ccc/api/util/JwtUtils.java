@@ -39,7 +39,7 @@ public class JwtUtils {
 	}
 	
 	private Date computeExpirationDate() {
-		long maxDays = 30;
+		final long maxDays = 30;
 		LocalDateTime expirationDate = LocalDateTime.now().plusDays(maxDays);
 		
 		return Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
