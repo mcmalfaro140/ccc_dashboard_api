@@ -255,6 +255,11 @@ public class LogAlarmController {
 			
 			this.xrefLogAlarmSNSTopicRepo.deleteByFields(user.getUserId(), logAlarmId, snsTopic.getSNSTopicId());
 			
+			LogAlarm logAlarm = this.logAlarmRepo.findById(logAlarmId).get();
+			logAlarm.getUserSet().remove(user);
+			
+			this.logAlarmRepo.save(logAlarm);
+			
 			response.put("Result", "Success");
 		}
 		
