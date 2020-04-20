@@ -13,7 +13,6 @@ INSERT INTO LogGroups (Name) VALUES ('test2');
 INSERT INTO LogGroups (Name) VALUES ('test3');
 INSERT INTO LogGroups (Name) VALUES ('test4');
 
-INSERT INTO Keywords (Word) VALUES (NULL);
 INSERT INTO Keywords (Word) VALUES ('message1');
 INSERT INTO Keywords (Word) VALUES ('message2');
 INSERT INTO Keywords (Word) VALUES ('message3');
@@ -28,12 +27,11 @@ INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (2, 2);
 INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (3, 3);
 INSERT INTO XRefLogAlarmLogGroup (LogAlarmId, LogGroupId) VALUES (4, 1);
 
-INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (1, 2);
-INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (2, 3);
-INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (3, 4);
-INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (1, 4);
-INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (4, 1);
+INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (1, 1);
+INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (2, 2);
 INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (3, 3);
+INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (1, 3);
+INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (3, 2);
 
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 1, 1);
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (2, 2, 2);

@@ -29,7 +29,7 @@ CREATE TABLE LogGroups (
 
 CREATE TABLE Keywords (
 	KeywordId INT NOT NULL AUTO_INCREMENT,
-	Word VARCHAR(70),
+	Word VARCHAR(70) NOT NULL,
 	PRIMARY KEY (KeywordId),
 	UNIQUE (Word)
 );
