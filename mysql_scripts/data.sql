@@ -4,9 +4,9 @@ INSERT INTO Users (Username, Password, Dashboard) VALUES ('YiWang', 'test3', '{}
 INSERT INTO Users (Username, Password, Dashboard) VALUES ('ZacYou', 'test4', '{}');
 INSERT INTO Users (Username, Password, Dashboard) VALUES ('JayDida', 'test5', '{}');
 
-INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('EmailTopic', 'arn:aws:sns:us-east-1:112911356528:EmailTopic');
-INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('PhoneTopic', 'arn:aws:sns:us-east-1:112911356528:PhoneTopic');
-INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('DualTopic', 'arn:aws:sns:us-east-1:112911356528:DualTopic');
+INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('Alex_SNS', 'arn:aws:sns:us-west-1:155103565385:Alex_SNS');
+INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('Misael_SNS', 'arn:aws:sns:us-west-1:155103565385:Misael_SNS');
+INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('Zac_SNS', 'arn:aws:sns:us-west-1:155103565385:Zac_SNS');
 
 INSERT INTO LogGroups (Name) VALUES ('test');
 INSERT INTO LogGroups (Name) VALUES ('test2');
@@ -34,14 +34,6 @@ INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (3, 4);
 INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (1, 4);
 INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (4, 1);
 INSERT INTO XRefLogAlarmKeyword (LogAlarmId, KeywordId) VALUES (3, 3);
-
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (1, 1);
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (2, 2);
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (3, 3);
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (4, 4);
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (1, 4);
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (2, 3);
-INSERT INTO XRefUserLogAlarm (UserId, LogAlarmId) VALUES (3, 1);
 
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (1, 1, 1);
 INSERT INTO XRefLogAlarmSNSTopic (LogAlarmId, SNSTopicId, UserId) VALUES (2, 2, 2);
