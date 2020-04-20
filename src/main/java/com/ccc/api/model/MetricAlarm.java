@@ -40,22 +40,9 @@ public class MetricAlarm implements Serializable {
 	@Column(name="AlarmArn", nullable=false, unique=true)
 	private String metricAlarmArn;
 	
-	@ManyToMany(mappedBy="metricAlarmSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private Set<User> userSet;
 	
 	
 	public MetricAlarm() {
-	}
-	
-	public MetricAlarm(String alarmArn, Set<User> userSet) {
-		this.metricAlarmArn = alarmArn;
-		this.userSet = userSet;
-	}
-	
-	public MetricAlarm(Long metricAlarmId, String alarmArn, Set<User> userSet) {
-		this.metricAlarmId = metricAlarmId;
-		this.metricAlarmArn = alarmArn;
-		this.userSet = userSet;
 	}
 	
 	public Long getMetricAlarmId() {
@@ -74,15 +61,6 @@ public class MetricAlarm implements Serializable {
 		this.metricAlarmArn = alarmArn;
 	}
 	
-	public Set<User> getUserSet() {
-		return this.userSet;
-	}
-	
-	public void setUserSet(Set<User> userSet) {
-		this.userSet.clear();
-		this.userSet.addAll(userSet);
-	}
-	
 	@Override
 	public int hashCode() {		
 		return Math.abs(31 * (Objects.hashCode(this.metricAlarmId) + Objects.hashCode(this.metricAlarmArn)));
@@ -91,26 +69,5 @@ public class MetricAlarm implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof MetricAlarm) ? this.metricAlarmId == ((MetricAlarm)obj).metricAlarmId : false;
-	}
-	
-	@Override
-	public String toString() {
-		String usernames = this.getUsernames();
-		
-		return String.format(
-			"MetricAlarm{MetricAlarmId=%d, AlarmArn=%s, Users=%s}",
-			this.metricAlarmId, this.metricAlarmArn, usernames
-		);
-	}
-	
-	private String getUsernames() {
-		String[] usernames = new String[this.userSet.size()];
-		
-		int index = 0;
-		for (User user : this.userSet) {
-			usernames[index] = user.getUsername();
-		}
-		
-		return '[' + String.join(",", usernames) + ']';
 	}
 }
