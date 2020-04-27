@@ -19,7 +19,7 @@ The project requires the following enviroment variable:
 
 If you choose to hard core the values, take a look at the application.properties.sample and GlobalVariables.java in order to see a sample.
 
-Once all enviroment variable are added, you can go to the project directory on the cmd and run "mvn package". This will create a JAR file that can be deploy to a server.
+Once all enviroment variable are added, you can go to the project directory on the cmd and run "mvn package". This will create a folder in which a JAR file can be found to deploy the backend to a server.
 
 
 
