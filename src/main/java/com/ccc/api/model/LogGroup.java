@@ -40,7 +40,7 @@ public class LogGroup implements Serializable {
 	@Column(name="Name", nullable=false, unique=true)
 	private String name;
 	
-	@ManyToMany(mappedBy="logGroupSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(mappedBy="logGroupSet", fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
 	private Set<LogAlarm> logAlarmSet;
 	
 	public LogGroup() {
@@ -90,27 +90,5 @@ public class LogGroup implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof LogGroup) ? this.logGroupId == ((LogGroup)obj).logGroupId : false;
-	}
-	
-	@Override
-	public String toString() {
-		String logAlarmNames = this.getLogAlarmNames();
-		
-		return String.format(
-			"LogGroup{LogGroupId=%d, Name=%s, LogAlarm=%s}",
-			this.logGroupId, this.name, logAlarmNames
-		);
-	}
-	
-	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.logAlarmSet.size()];
-		
-		int index = 0;
-		for (LogAlarm logAlarm : this.logAlarmSet) {
-			logAlarmNames[index] = logAlarm.getAlarmName();
-			++index;
-		}
-		
-		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 }

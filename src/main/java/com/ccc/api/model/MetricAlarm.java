@@ -92,25 +92,4 @@ public class MetricAlarm implements Serializable {
 	public boolean equals(Object obj) {
 		return (obj instanceof MetricAlarm) ? this.metricAlarmId == ((MetricAlarm)obj).metricAlarmId : false;
 	}
-	
-	@Override
-	public String toString() {
-		String usernames = this.getUsernames();
-		
-		return String.format(
-			"MetricAlarm{MetricAlarmId=%d, AlarmArn=%s, Users=%s}",
-			this.metricAlarmId, this.metricAlarmArn, usernames
-		);
-	}
-	
-	private String getUsernames() {
-		String[] usernames = new String[this.userSet.size()];
-		
-		int index = 0;
-		for (User user : this.userSet) {
-			usernames[index] = user.getUsername();
-		}
-		
-		return '[' + String.join(",", usernames) + ']';
-	}
 }

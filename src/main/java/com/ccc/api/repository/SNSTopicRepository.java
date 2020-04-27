@@ -15,5 +15,5 @@ public interface SNSTopicRepository extends JpaRepository<SNSTopic, Long> {
 		value="SELECT * FROM SNSTopics WHERE TopicName = :topicName",
 		nativeQuery=true
 	)
-	public Optional<SNSTopic> findByTopicName(@Param(value="topicName") String topicName);
+	Optional<SNSTopic> findByTopicName(@Param(value="topicName") String topicName);
 }

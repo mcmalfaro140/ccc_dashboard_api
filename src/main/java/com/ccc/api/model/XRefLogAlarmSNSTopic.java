@@ -40,15 +40,15 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 	@Column(name="LogAlarmSNSTopicId", nullable=false, unique=true, insertable=false, updatable=false)
 	private Long logAlarmSNSTopicId;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="LogAlarmId", referencedColumnName="LogAlarmId")
+	@ManyToOne(fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
+	@JoinColumn(name="LogAlarmId", referencedColumnName="LogAlarmId", nullable=false)
 	private LogAlarm logAlarm;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JoinColumn(name="SNSTopicId", referencedColumnName="SNSTopicId")
+	@ManyToOne(fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
+	@JoinColumn(name="SNSTopicId", referencedColumnName="SNSTopicId", nullable=false)
 	private SNSTopic snsTopic;
 	
-	@ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToOne(fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
 	@JoinColumn(name="UserId", referencedColumnName="UserId")
 	private User user;
 	
@@ -108,13 +108,5 @@ public class XRefLogAlarmSNSTopic implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof XRefLogAlarmSNSTopic) ? this.logAlarmSNSTopicId == ((XRefLogAlarmSNSTopic)obj).logAlarmSNSTopicId : false;
-	}
-	
-	@Override
-	public String toString() {
-		return String.format(
-			"XRefLogAlarmSNSTopic{LogAlarmSNSTopicId=%d, LogAlarm=%s, SNSTopic=%s, User=%s}",
-			this.logAlarmSNSTopicId, this.logAlarm.getAlarmName(), this.snsTopic.getTopicName(), this.user.getUsername()
-		);
 	}
 }

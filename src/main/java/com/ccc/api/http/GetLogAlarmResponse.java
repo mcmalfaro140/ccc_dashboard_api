@@ -11,6 +11,7 @@ import java.util.Map;
 import com.ccc.api.model.Keyword;
 import com.ccc.api.model.LogAlarm;
 import com.ccc.api.model.LogGroup;
+import com.ccc.api.model.SNSTopic;
 import com.ccc.api.model.User;
 import com.ccc.api.model.XRefLogAlarmSNSTopic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,8 +35,8 @@ public class GetLogAlarmResponse {
 		this.add(this.user, logAlarmsForUser);
 	}
 	
-	private void add(List<Map<String, Object>> logAlarmsMapSet, Collection<LogAlarm> logAlarmSet) {				
-		for (LogAlarm alarm : logAlarmSet) {			
+	private void add(List<Map<String, Object>> logAlarmsMapSet, Collection<LogAlarm> logAlarmCollection) {				
+		for (LogAlarm alarm : logAlarmCollection) {			
 			Map<String, Object> entry = new HashMap<String, Object>();
 			entry.put("LogAlarmId", alarm.getLogAlarmId());
 			entry.put("AlarmName", alarm.getAlarmName());
@@ -45,8 +46,8 @@ public class GetLogAlarmResponse {
 			
 			Set<String> logGroupNames = this.getLogGroupNames(alarm.getLogGroupSet());
 			Set<String> keywordNames = this.getKeywords(alarm.getKeywordSet());
-			Set<String> usernames = this.getUsernames(alarm.getXRefLogAlarmSNSTopicSet());
-			Set<String> snsTopicNames = this.getSNSTopicNames(alarm.getXRefLogAlarmSNSTopicSet());
+			Set<String> usernames = this.getUsernames(alarm.getUserSet());
+			Set<String> snsTopicNames = this.getSNSTopicNames(alarm.getSNSTopicSet());
 			Set<Data> assigners = this.getAssigners(alarm.getXRefLogAlarmSNSTopicSet());
 			
 			entry.put("LogGroups", logGroupNames);
@@ -69,11 +70,11 @@ public class GetLogAlarmResponse {
 		return logGroupNameSet;
 	}
 	
-	private Set<String> getKeywords(Collection<Keyword> keywordSet) {
-		Set<String> keywordNameSet = new HashSet<String>(keywordSet.size());
+	private Set<String> getKeywords(Collection<Keyword> keywordCollection) {
+		Set<String> keywordNameSet = new HashSet<String>(keywordCollection.size());
 		
-		if (keywordSet.size() > 1 || (keywordSet.size() == 1 && keywordSet.iterator().next().getWord().isPresent())) {
-			for (Keyword keyword : keywordSet) {
+		if (keywordCollection.size() > 1 || (keywordCollection.size() == 1 && keywordCollection.iterator().next().getWord().isPresent())) {
+			for (Keyword keyword : keywordCollection) {
 				keywordNameSet.add(keyword.getWord().get());
 			}
 		}
@@ -81,21 +82,21 @@ public class GetLogAlarmResponse {
 		return keywordNameSet;
 	}
 	
-	private Set<String> getUsernames(Collection<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet) {
-		HashSet<String> usernames = new HashSet<String>(xrefLogAlarmSNSTopicSet.size());
+	private Set<String> getUsernames(Collection<User> userCollection) {
+		HashSet<String> usernames = new HashSet<String>(userCollection.size());
 		
-		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicSet) {
-			usernames.add(xrefLogAlarmSNSTopic.getUser().getUsername());
+		for (User user : userCollection) {
+			usernames.add(user.getUsername());
 		}
 		
 		return usernames;
 	}
 	
-	private Set<String> getSNSTopicNames(Collection<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet) {
-		HashSet<String> snsTopicNames = new HashSet<String>(xrefLogAlarmSNSTopicSet.size());
+	private Set<String> getSNSTopicNames(Collection<SNSTopic> snsTopicCollection) {
+		HashSet<String> snsTopicNames = new HashSet<String>(snsTopicCollection.size());
 		
-		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : xrefLogAlarmSNSTopicSet) {
-			snsTopicNames.add(xrefLogAlarmSNSTopic.getSNSTopic().getTopicName());
+		for (SNSTopic snsTopic : snsTopicCollection) {
+			snsTopicNames.add(snsTopic.getTopicName());
 		}
 		
 		return snsTopicNames;

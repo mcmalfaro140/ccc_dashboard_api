@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
@@ -45,7 +46,13 @@ public class SNSTopic implements Serializable {
 	@Column(name="TopicArn", nullable=false, unique=true)
 	private String topicArn;
 	
-	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@ManyToMany(mappedBy="snsTopicSet", fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
+	private Set<User> userSet;
+	
+	@ManyToMany(mappedBy="snsTopicSet", fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
+	private Set<LogAlarm> logAlarmSet;
+	
+	@OneToMany(mappedBy="snsTopic", fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE }, orphanRemoval=true)
 	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public SNSTopic() {
@@ -54,10 +61,14 @@ public class SNSTopic implements Serializable {
 	public SNSTopic(
 			String topicName,
 			String topicArn,
+			Set<User> userSet,
+			Set<LogAlarm> logAlarmSet,
 			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.topicName = topicName;
 		this.topicArn = topicArn;
+		this.userSet = userSet;
+		this.logAlarmSet = logAlarmSet;
 		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
@@ -65,11 +76,15 @@ public class SNSTopic implements Serializable {
 			Long snsTopicId,
 			String topicName,
 			String topicArn,
+			Set<User> userSet,
+			Set<LogAlarm> logAlarmSet,
 			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.snsTopicId = snsTopicId;
 		this.topicName = topicName;
 		this.topicArn = topicArn;
+		this.userSet = userSet;
+		this.logAlarmSet = logAlarmSet;
 		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
@@ -97,6 +112,24 @@ public class SNSTopic implements Serializable {
 		this.topicArn = topicArn;
 	}
 	
+	public Set<User> getUserSet() {
+		return this.userSet;
+	}
+	
+	public void setUserSet(Set<User> userSet) {
+		this.userSet.clear();
+		this.userSet.addAll(userSet);
+	}
+	
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
+	}
+	
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
+	}
+	
 	public Set<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicSet() {
 		return this.xrefLogAlarmSNSTopicSet;
 	}
@@ -119,47 +152,5 @@ public class SNSTopic implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof SNSTopic) ? this.snsTopicId == ((SNSTopic)obj).snsTopicId : false;
-	}
-	
-	@Override
-	public String toString() {
-		String logAlarmNames = this.getLogAlarmNames();
-		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
-		
-		return String.format(
-			"SNSTopic{SNSTopicId=%d, TopicName=%s, TopicArn=%s, LogAlarms=%s, XRefLogAlarmSNSTopics=%s}",
-			this.snsTopicId, this.topicName, this.topicArn, logAlarmNames, xrefLogAlarmSNSTopicNames
-		);
-	}
-	
-	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
-		
-		int index = 0;
-		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
-			logAlarmNames[index] = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
-			++index;
-		}
-		
-		return '[' + String.join(",", logAlarmNames) + ']';
-	}
-	
-	private String getXRefLogAlarmSNSTopicNames() {
-		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
-		
-		int index = 0;
-		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
-			User user = xrefLogAlarmSNSTopic.getUser();
-			
-			String username = user.getUsername();
-			String logAlarmName = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
-			
-			xrefLogAlarmSNSTopicNames[index] = String.format(
-					"(User=%s, LogAlarm=%s)",
-					username, logAlarmName
-			);
-		}
-		
-		return '[' + String.join(",", xrefLogAlarmSNSTopicNames) + ']';
 	}
 }

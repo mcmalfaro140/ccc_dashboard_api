@@ -8,7 +8,7 @@ INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('Alex_SNS', 'arn:aws:sns:us-
 INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('Misael_SNS', 'arn:aws:sns:us-west-1:155103565385:Misael_SNS');
 INSERT INTO SNSTopics (TopicName, TopicArn) VALUES ('Zac_SNS', 'arn:aws:sns:us-west-1:155103565385:Zac_SNS');
 
-INSERT INTO LogGroups (Name) VALUES ('test');
+INSERT INTO LogGroups (Name) VALUES ('test1');
 INSERT INTO LogGroups (Name) VALUES ('test2');
 INSERT INTO LogGroups (Name) VALUES ('test3');
 INSERT INTO LogGroups (Name) VALUES ('test4');
@@ -17,7 +17,7 @@ INSERT INTO Keywords (Word) VALUES ('message1');
 INSERT INTO Keywords (Word) VALUES ('message2');
 INSERT INTO Keywords (Word) VALUES ('message3');
 
-INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('WARN', '==', 'alarm', 'ANY');
+INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('WARN', '==', 'alarm1', 'ANY');
 INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('WARN', '>=', 'alarm2', 'ANY');
 INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('INFO', '>=', 'alarm3', 'ALL');
 INSERT INTO LogAlarms (LogLevel, Comparison, AlarmName, KeywordRelationship) VALUES ('ERROR', '==', 'alarm4', NULL);

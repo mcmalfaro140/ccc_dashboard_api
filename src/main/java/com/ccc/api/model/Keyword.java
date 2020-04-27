@@ -38,11 +38,10 @@ public class Keyword implements Serializable {
 	
 	@Size(max=70)
 	@Basic(fetch=FetchType.LAZY)
-	@Column(name="Word", unique=true)
+	@Column(name="Word", unique=true, nullable=false)
 	private String word;
 	
-	@ManyToMany(mappedBy="keywordSet", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-
+	@ManyToMany(mappedBy="keywordSet", fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
 	private Set<LogAlarm> logAlarmSet;
 	
 	public Keyword() {
@@ -104,27 +103,5 @@ public class Keyword implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof Keyword) ? this.keywordId == ((Keyword)obj).keywordId : false;
-	}
-	
-	@Override
-	public String toString() {
-		String logAlarmNames = this.getLogAlarmNames();
-		
-		return String.format(
-			"Keyword{KeywordId=%d, Word=%s, LogAlarms=%s}",
-			this.keywordId, this.word, logAlarmNames
-		);
-	}
-	
-	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.logAlarmSet.size()];
-		
-		int index = 0;
-		for (LogAlarm logAlarm : this.logAlarmSet) {
-			logAlarmNames[index] = logAlarm.getAlarmName();
-			++index;
-		}
-		
-		return '[' + String.join(",", logAlarmNames) + ']';
 	}
 }

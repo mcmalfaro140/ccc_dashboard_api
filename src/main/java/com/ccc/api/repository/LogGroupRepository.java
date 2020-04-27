@@ -15,5 +15,5 @@ public interface LogGroupRepository extends JpaRepository<LogGroup, Long> {
 		value="SELECT * FROM LogGroups WHERE Name = :name",
 		nativeQuery=true
 	)
-	public Optional<LogGroup> findByName(@Param(value="name") String name);
+	Optional<LogGroup> findByName(@Param(value="name") String name);
 }

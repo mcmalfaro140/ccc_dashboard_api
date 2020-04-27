@@ -14,4 +14,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 		nativeQuery=true
 	)
 	User findByUsername(@Param(value="username") String username);
+	
+	@Query(
+		value="SELECT CASE WHEN COUNT(U) != 0 THEN true ELSE false END FROM Users U WHERE U.userId = :userId AND U.username = :username"
+	)
+	boolean existsByIdAndUsername(@Param(value="userId") Long userId, @Param(value="username") String username);
 }

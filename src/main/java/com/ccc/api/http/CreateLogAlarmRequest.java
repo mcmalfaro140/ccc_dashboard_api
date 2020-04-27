@@ -1,5 +1,7 @@
 package com.ccc.api.http;
 
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CreateLogAlarmRequest {
@@ -49,8 +51,8 @@ public class CreateLogAlarmRequest {
 		return this.alarmName;
 	}
 	
-	public String getKeywordRelationship() {
-		return this.keywordRelationship;
+	public Optional<String> getKeywordRelationship() {
+		return Optional.ofNullable(this.keywordRelationship);
 	}
 	
 	public String getLogLevel() {
@@ -65,8 +67,8 @@ public class CreateLogAlarmRequest {
 		return this.logGroups;
 	}
 	
-	public String getKeywords() {
-		return this.keywords;
+	public Optional<String> getKeywords() {
+		return Optional.ofNullable(this.keywords);
 	}
 	
 	public String getSNSTopicName() {

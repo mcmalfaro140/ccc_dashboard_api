@@ -52,7 +52,7 @@ public class User implements Serializable {
 	@Column(name="Dashboard", nullable=false)
 	private String dashboard;
 	
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
 	@JoinTable(
 		name="XRefUserMetricAlarm",
 		joinColumns={
@@ -72,7 +72,47 @@ public class User implements Serializable {
 	)
 	private Set<MetricAlarm> metricAlarmSet;
 	
-	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade=CascadeType.ALL, orphanRemoval=true)
+	@ManyToMany(fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
+	@JoinTable(
+		name="XRefLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="UserId",
+				referencedColumnName="UserId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="LogAlarmId",
+				referencedColumnName="LogAlarmId",
+				nullable=false
+			)
+		}
+	)
+	private Set<LogAlarm> logAlarmSet;
+	
+	@ManyToMany(fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
+	@JoinTable(
+		name="XRefLogAlarmSNSTopic",
+		joinColumns={
+			@JoinColumn(
+				name="UserId",
+				referencedColumnName="UserId",
+				nullable=false
+			)
+		},
+		inverseJoinColumns={
+			@JoinColumn(
+				name="SNSTopicId",
+				referencedColumnName="SNSTopicId",
+				nullable=false
+			)
+		}
+	)
+	private Set<SNSTopic> snsTopicSet;
+	
+	@OneToMany(mappedBy="user", fetch=FetchType.LAZY, cascade={ CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE }, orphanRemoval=true)
 	private Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet;
 	
 	public User() {
@@ -83,12 +123,16 @@ public class User implements Serializable {
 			String password,
 			String dashboard,
 			Set<MetricAlarm> metricAlarmSet,
+			Set<LogAlarm> logAlarmSet,
+			Set<SNSTopic> snsTopicSet,
 			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.username = username;
 		this.password = password;
 		this.dashboard = dashboard;
 		this.metricAlarmSet = metricAlarmSet;
+		this.logAlarmSet = logAlarmSet;
+		this.snsTopicSet = snsTopicSet;
 		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
@@ -98,6 +142,8 @@ public class User implements Serializable {
 			String password,
 			String dashboard,
 			Set<MetricAlarm> metricAlarmSet,
+			Set<LogAlarm> logAlarmSet,
+			Set<SNSTopic> snsTopicSet,
 			Set<XRefLogAlarmSNSTopic> xrefLogAlarmSNSTopicSet
 	) {
 		this.userId = userId;
@@ -105,6 +151,8 @@ public class User implements Serializable {
 		this.password = password;
 		this.dashboard = dashboard;
 		this.metricAlarmSet = metricAlarmSet;
+		this.logAlarmSet = logAlarmSet;
+		this.snsTopicSet = snsTopicSet;
 		this.xrefLogAlarmSNSTopicSet = xrefLogAlarmSNSTopicSet;
 	}
 	
@@ -149,6 +197,24 @@ public class User implements Serializable {
 		this.metricAlarmSet.addAll(metricAlarmSet);
 	}
 	
+	public Set<LogAlarm> getLogAlarmSet() {
+		return this.logAlarmSet;
+	}
+	
+	public void setLogAlarmSet(Set<LogAlarm> logAlarmSet) {
+		this.logAlarmSet.clear();
+		this.logAlarmSet.addAll(logAlarmSet);
+	}
+	
+	public Set<SNSTopic> getSNSTopicSet() {
+		return this.snsTopicSet;
+	}
+	
+	public void setSNSTopicSet(Set<SNSTopic> snsTopicSet) {
+		this.snsTopicSet.clear();
+		this.snsTopicSet.addAll(snsTopicSet);
+	}
+	
 	public Set<XRefLogAlarmSNSTopic> getXRefLogAlarmSNSTopicSet() {
 		return this.xrefLogAlarmSNSTopicSet;
 	}
@@ -172,57 +238,5 @@ public class User implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof User) ? this.userId == ((User)obj).userId : false;
-	}
-	
-	@Override
-	public String toString() {
-		String logAlarmNames = this.getLogAlarmNames();
-		String metricAlarmNames = this.getMetricAlarmNames();
-		String xrefLogAlarmSNSTopicNames = this.getXRefLogAlarmSNSTopicNames();
-		
-		return String.format(
-			"User{UserId=%d, Username=%s, Password=%s, Dashboard=%s, LogAlarms=%s, MetricAlarms=%s, XRefLogAlarmSNSTopics=%s}",
-			this.userId, this.username, this.password, this.dashboard, logAlarmNames, metricAlarmNames, xrefLogAlarmSNSTopicNames
-		);
-	}
-	
-	private String getLogAlarmNames() {
-		String[] logAlarmNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
-		
-		int index = 0;
-		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
-			logAlarmNames[index] = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
-			++index;
-		}
-		
-		return '[' + String.join(",", logAlarmNames) + ']';
-	}
-	
-	private String getMetricAlarmNames() {
-		String[] metricAlarmNames = new String[this.metricAlarmSet.size()];
-		
-		int index = 0;
-		for (MetricAlarm metricAlarm : this.metricAlarmSet) {
-			metricAlarmNames[index] = metricAlarm.getAlarmArn();
-		}
-		
-		return '[' + String.join(",", metricAlarmNames) + ']';
-	}
-	
-	private String getXRefLogAlarmSNSTopicNames() {
-		String[] xrefLogAlarmSNSTopicNames = new String[this.xrefLogAlarmSNSTopicSet.size()];
-		
-		int index = 0;
-		for (XRefLogAlarmSNSTopic xrefLogAlarmSNSTopic : this.xrefLogAlarmSNSTopicSet) {
-			String logAlarmName = xrefLogAlarmSNSTopic.getLogAlarm().getAlarmName();
-			String snsTopicName = xrefLogAlarmSNSTopic.getSNSTopic().getTopicName();
-			
-			xrefLogAlarmSNSTopicNames[index] = String.format(
-					"(LogAlarm=%s, SNSTopic=%s)",
-					logAlarmName, snsTopicName
-			);
-		}
-		
-		return '[' + String.join(",", xrefLogAlarmSNSTopicNames) + ']';
 	}
 }

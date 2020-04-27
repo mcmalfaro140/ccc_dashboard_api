@@ -15,5 +15,5 @@ public interface LogAlarmRepository extends JpaRepository<LogAlarm, Long> {
 		value="DELETE FROM LogAlarms WHERE LogAlarmId = :logAlarmId",
 		nativeQuery=true
 	)
-	public void deleteByLogAlarmId(@Param(value="logAlarmId") Long logAlarmId);
+	void deleteByLogAlarmId(@Param(value="logAlarmId") Long logAlarmId);
 }

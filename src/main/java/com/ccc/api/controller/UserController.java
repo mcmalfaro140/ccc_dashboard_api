@@ -54,7 +54,7 @@ public class UserController {
     
     @PostMapping(path = "/authenticate", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public HashMap<String , Object> getUsersBySimplePath(@RequestBody Map<String, String> payload) {
+    public HashMap<String , Object> authenticate(@RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
     	String inUser = payload.get("username");
     	String inPass = payload.get("password");
@@ -79,7 +79,7 @@ public class UserController {
     
     @PostMapping(path = "/update", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public Object updateDahboard(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> payload) {
+    public Object update(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> payload) {
     	HashMap<String, Object> response = new HashMap<>();
     	String dashBoard = payload.get("dashboard");
 
@@ -107,7 +107,7 @@ public class UserController {
     
     @GetMapping(path = "/getDashboard" , produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public Object getdashboard(@RequestHeader("Authorization") String token) {
+    public Object getDashboard(@RequestHeader("Authorization") String token) {
     	HashMap<String, Object> response = new HashMap<>();
     	User toUsers = jwtutils.toUser(token);
     	

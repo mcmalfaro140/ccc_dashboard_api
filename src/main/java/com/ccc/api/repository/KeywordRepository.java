@@ -15,5 +15,5 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 		value="SELECT * FROM Keywords WHERE Word = :word",
 		nativeQuery=true
 	)
-	public Optional<Keyword> findByWord(@Param(value="word") String word);
+	Optional<Keyword> findByWord(@Param(value="word") String word);
 }
