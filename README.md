@@ -12,7 +12,7 @@ The project requires the following enviroment variable:
 1. DATABASE_URL
 2. DATABASE_USERNAME
 3. DATABASE_PASSWORD
-4. JTW_SECRET
+4. JWT_SECRET
 5. AWS_ACCESS_KEY_ID (You can use the same key as the frontend)
 6. AWS_SECRET_ACCESS_KEY 
 7. AWS_REGION
